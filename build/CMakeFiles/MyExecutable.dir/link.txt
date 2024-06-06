@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG -O3 -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math  -flto CMakeFiles/MyExecutable.dir/source/main.cpp.o -o ../bin/Release/MyExecutable  -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -ldl -lm ../bin/libmylib.a 
