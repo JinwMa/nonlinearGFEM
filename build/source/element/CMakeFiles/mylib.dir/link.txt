@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../bin/libmylib.a CMakeFiles/mylib.dir/Linear_Hex8.cpp.o
+/usr/bin/ranlib ../../../bin/libmylib.a
