@@ -7,3 +7,4 @@
       2.4 执行 source ~/.bashrc
       2.5 执行 echo $MKLROOT, 查询是否正确安装MKL库
 3. 修改CMakeLists.txt
+4. git push origin HEAD username: Ma_2032 password: majinwei091212
