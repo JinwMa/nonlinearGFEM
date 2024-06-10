@@ -2,6 +2,7 @@
       只需要移植文件即可 
       当前Eigen已经记录到git中,可以直接clone,后面需要修改CMakeLists.txt中的路径
 2. 安装MKL库
+      2.0 特别注意，安装mkl库需要有图形界面，最好在code终端中试安装
       2.1 sh 执行安装
       2.2 按照操作执行
       2.3 在~/.bashrc 中增加 source /path/to/intel/oneapi/setvars.sh
