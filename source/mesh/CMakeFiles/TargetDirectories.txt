@@ -1,0 +1,3 @@
+/home/ma/work/M3D-C/source/mesh/CMakeFiles/mesh.dir
+/home/ma/work/M3D-C/source/mesh/CMakeFiles/edit_cache.dir
+/home/ma/work/M3D-C/source/mesh/CMakeFiles/rebuild_cache.dir

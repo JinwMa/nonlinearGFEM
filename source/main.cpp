@@ -6,13 +6,15 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "/home/ma/work/M3D-C/source/element/Linear_Hex8.cpp"
+#include "mesh.h"
 
 int main() {
   std::cout.precision(20);
-  test();
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
+
+  Mesh mesh1;
+  mesh1.test();
 
   std::ifstream infile(filename);
   if (!infile) {
