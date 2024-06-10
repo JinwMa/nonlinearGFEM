@@ -1,6 +1,8 @@
-#ifndef MESH1_H
-#define MESH1_H
-class Mesh
+#ifndef INPUT1_H
+#define INPUT1_H
+
+
+class Input
 {
     public:
     void test();

@@ -1,5 +1,3 @@
-
-#include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <Eigen/PardisoSupport>
 #include <ctime>
@@ -7,8 +5,12 @@
 #include <iostream>
 #include <string>
 #include "mesh.h"
-
+#include "input.h"
 int main() {
+
+  // Input input1;
+  // input1.test();
+
   std::cout.precision(20);
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
@@ -31,6 +33,8 @@ int main() {
   // 读取文件中的每一行
   int row, col;
   double value;
+
+  std::clock_t c_start_readstart = std::clock();
   while (infile >> row >> col >> value) {
     tripletList.push_back(Eigen::Triplet<double>(row, col, value));
   }
@@ -50,13 +54,14 @@ int main() {
     infile2 >> b(i);
 
   std::clock_t c_start = std::clock();
-  Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper> solver;
+  std::cout << "time of read input" << 1000.0 * (c_start - c_start_readstart) / CLOCKS_PER_SEC  << std::endl;
+  // Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper> solver;
 
   // Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver;
 
   // Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
 
-  // Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
+  Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
 
   solver.compute(mat);
   if (solver.info() != Eigen::Success) {
