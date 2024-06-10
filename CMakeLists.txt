@@ -20,7 +20,7 @@ target_link_libraries(M3D PRIVATE InputLib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
 
 # 设置Eigen路径
-set(EIGEN3_INCLUDE_DIR "/home/ma/work/code/eigen-3.4.0")
+set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")
 include_directories(${EIGEN3_INCLUDE_DIR})
 # 设置MKL路径
 if(NOT DEFINED MKLROOT)
