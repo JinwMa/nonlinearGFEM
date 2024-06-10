@@ -66,10 +66,7 @@ endif()
 # 链接element静态库到可执行文件
 target_link_libraries(MyExecutable mylib)
 
-
 # 指定可执行文件的输出目录(可选)
 set_target_properties(MyExecutable PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE}"
 )
-
-
