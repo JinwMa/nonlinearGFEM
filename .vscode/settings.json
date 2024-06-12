@@ -84,6 +84,19 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "pardisosupport": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "*.tcc": "cpp",
+        "codecvt": "cpp",
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "memory_resource": "cpp",
+        "regex": "cpp",
+        "string_view": "cpp",
+        "hash_map": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "shared_mutex": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp"
     }
 }

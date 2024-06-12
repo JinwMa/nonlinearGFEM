@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # 添加mesh子目录,如果还有别的子目录,则继续添加即可,目前先做到手动添加 #默认当前目录为CMakeLists.txt所在目录
 add_subdirectory(source/input)
 add_subdirectory(source/mesh)
+add_subdirectory(source/post)
 # 指定可执行文件的名称和源文件
 add_executable(M3D source/main.cpp)
 
@@ -18,6 +19,9 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
 
 target_link_libraries(M3D PRIVATE InputLib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
+
+target_link_libraries(M3D PRIVATE PostLib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
 
 # 设置Eigen路径
 set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")

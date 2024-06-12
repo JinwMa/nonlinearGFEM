@@ -1,5 +1,5 @@
-#ifndef INPUT1_H
-#define INPUT1_H
+#ifndef POST1_H
+#define POST1_H
 
 #include <iostream>
 #include <fstream>
@@ -9,12 +9,12 @@
 #include <vector>
 #include <unordered_set>
 using namespace std;
-class Input
+class Posts
 {
     public:
     map<string, vector<string> > db;
     std::unordered_set<std::string> keys;
-    Input(const string filename)
+    Posts(const string filename)
     {
         read_input_file(filename);
     }
@@ -22,4 +22,4 @@ class Input
     void read_input_file(const string filename);
 };
 
-#endif // INPUT1_H
+#endif // POST1_H
