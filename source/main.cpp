@@ -6,18 +6,21 @@
 #include <string>
 #include "mesh.h"
 #include "input.h"
+#include "dof_map.h"
 int main(int argc, char *argv[])
 {
   std::cout.precision(20);
   Input input(argv[1]); // 读入和解析input文件
   Mesh mesh(input.db["mesh_file_name"][0]); // 读入网格文件
+  Dof_Map dof_map(mesh.node_ids, mesh.actual_node_count);
 
 
 
 
 
 
-  exit(0);
+
+  // exit(0);
   std::cout.precision(20);
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
@@ -55,10 +58,10 @@ int main(int argc, char *argv[])
 
   std::clock_t c_start = std::clock();
   std::cout << "time of read input" << 1000.0 * (c_start - c_start_readstart) / CLOCKS_PER_SEC << std::endl;
-  // Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper> solver;
+  Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper> solver;
   // Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver;
   // Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
-  Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
+  // Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
   solver.compute(mat);
   if (solver.info() != Eigen::Success)
   {
