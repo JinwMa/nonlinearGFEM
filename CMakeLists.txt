@@ -68,6 +68,10 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /DEBUG /Od")
 endif()
 
+if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+    target_compile_options(M3D PRIVATE -g -fsanitize=address -fno-omit-frame-pointer)
+    target_link_options(M3D PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+endif()
 # 指定可执行文件的输出目录(可选)
 set_target_properties(M3D PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin"

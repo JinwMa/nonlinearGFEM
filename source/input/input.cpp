@@ -10,6 +10,7 @@ void Input::read_input_file(const string filename)
     if (!inputFile)
     {
         std::cerr << "无法打开文件:" << filename << std::endl;
+        exit(0);
     }
     std::string line;
     while (std::getline(inputFile, line))

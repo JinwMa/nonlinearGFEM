@@ -8,18 +8,17 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include "mesh.h"
 using namespace std;
-class Posts
+class Post
 {
     public:
-    map<string, vector<string> > db;
-    std::unordered_set<std::string> keys;
-    Posts(const string filename)
+    Post(const std::string &filename): outputFilename(filename)
     {
-        read_input_file(filename);
     }
+    void onlymesh(Mesh & mesh);
     private:
-    void read_input_file(const string filename);
+    string outputFilename;
 };
 
 #endif // POST1_H

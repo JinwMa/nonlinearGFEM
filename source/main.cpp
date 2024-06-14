@@ -7,6 +7,7 @@
 #include "mesh.h"
 #include "input.h"
 #include "dof_map.h"
+#include "post.h"
 int main(int argc, char *argv[])
 {
   std::cout.precision(20);
@@ -14,10 +15,8 @@ int main(int argc, char *argv[])
   Mesh mesh(input.db["mesh_file_name"][0]); // 读入网格文件
   Dof_Map dof_map(mesh.node_ids, mesh.actual_node_count);
 
-
-
-
-
+  Post post("aaa");
+  post.onlymesh(mesh);
 
 
   // exit(0);
