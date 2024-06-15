@@ -11,6 +11,12 @@ add_subdirectory(source/input)
 add_subdirectory(source/mesh)
 add_subdirectory(source/post)
 add_subdirectory(source/object)
+add_subdirectory(source/solver)
+add_subdirectory(source/element)
+add_subdirectory(source/load)
+add_subdirectory(source/constraint)
+
+
 # 指定可执行文件的名称和源文件
 add_executable(M3D source/main.cpp)
 
@@ -26,6 +32,18 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
 
 target_link_libraries(M3D PRIVATE ObjectLib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/object)
+
+target_link_libraries(M3D PRIVATE SolverLib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
+
+target_link_libraries(M3D PRIVATE ElementLib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
+
+target_link_libraries(M3D PRIVATE LoadLib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
+
+target_link_libraries(M3D PRIVATE ConstraintLib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
 
 # 设置Eigen路径
 set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")

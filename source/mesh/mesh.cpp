@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <sstream>
 #include <algorithm>
+#include <cassert>
+#include <stdexcept>
 void Mesh::readmeshfile()
 {    
     std::streampos pos;
@@ -60,9 +62,11 @@ void Mesh::readmeshfile()
                     mesh_element[element_id - 1].push_back(node_id);
                 }
                 if (!mesh_element[element_id - 1].empty())
-                {
+                {                    
                     ++actual_element_count;
+                    element_ids[actual_element_count - 1] = element_id;
                     if (element_id > max_elementid) max_elementid = element_id;
+
                 }
             }
         }
@@ -108,4 +112,10 @@ void Mesh::readmeshfile()
         }
     }
     inputFile.close();
+}
+
+void Mesh::checkmesh()
+{
+    if (!actual_element_count == max_elementid || !actual_node_count == max_nodeid)
+    throw std::runtime_error("单元中节点编号或单元编号出问题");
 }

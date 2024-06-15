@@ -18,8 +18,11 @@ int main(int argc, char *argv[])
   Post post("aaa");
   post.onlymesh(mesh);
 
+  for (int i = 0; i < mesh.actual_element_count; i++)
+  std::cout << mesh.element_ids[i] << std::endl;
 
-  // exit(0);
+
+  exit(0);
   std::cout.precision(20);
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
@@ -44,6 +47,8 @@ int main(int argc, char *argv[])
     tripletList.push_back(Eigen::Triplet<double>(row, col, value));
   }
   mat.setFromTriplets(tripletList.begin(), tripletList.end());
+
+  std::cout<< mat.coeffRef(0,0) << std::endl;
   Eigen::VectorXd b(tff);
   std::string filename2 = "/home/ma/work/M3D-C/file/b.dat";
   std::ifstream infile2(filename2);
