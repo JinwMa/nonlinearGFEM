@@ -8,6 +8,7 @@
 #include "input.h"
 #include "dof_map.h"
 #include "post.h"
+#include <omp.h>
 int main(int argc, char *argv[])
 {
   std::cout.precision(20);
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
   std::cout << mesh.element_ids[i] << std::endl;
 
 
-  exit(0);
+  // exit(0);
   std::cout.precision(20);
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
   Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper> solver;
   // Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver;
   // Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
+  // Eigen::BiCGSTAB<Eigen::SparseMatrix<double>> solver;
   // Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
   solver.compute(mat);
   if (solver.info() != Eigen::Success)
@@ -73,7 +75,14 @@ int main(int argc, char *argv[])
     std::cerr << "分解失败" << std::endl;
     return -1;
   }
-  Eigen::VectorXd x = solver.solve(b);
+  omp_set_num_threads(4);
+Eigen::VectorXd x;
+#pragma omp parallel
+  {
+#pragma omp single
+    x = solver.solve(b);
+  }
+  // Eigen::VectorXd x = solver.solve(b);
   if (solver.info() != Eigen::Success)
   {
     // 求解失败

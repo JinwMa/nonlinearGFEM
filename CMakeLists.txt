@@ -65,6 +65,9 @@ add_definitions(-DEIGEN_USE_MKL_ALL)
 # 链接静态库到可执行文件
 # target_link_libraries(MyExecutable ${MKL_INTEL_LP64} ${MKL_SEQUENTIAL} ${MKL_CORE} ${IOMP5})
 
+find_package(OpenMP REQUIRED)
+target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
+
 # 设置构建类型
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
