@@ -18,7 +18,7 @@ add_subdirectory(source/constraint)
 
 
 # 指定可执行文件的名称和源文件
-add_executable(M3D source/main.cpp)
+add_executable(M3D source/main.cpp source/solve.cpp)
 
 # 链接子目录下的动态库
 target_link_libraries(M3D PRIVATE MeshLib)

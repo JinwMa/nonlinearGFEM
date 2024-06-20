@@ -10,63 +10,25 @@
 #include "post.h"
 #include <omp.h>
 #include <chrono>
+
+void solve();
 int main(int argc, char *argv[])
 {
-//    omp_set_num_threads(4);
-
-//     const int size = 500000000;
-//     std::vector<int> a(size, 1);
-//     std::vector<int> bb(size, 2);
-//     std::vector<int> c(size, 0);
-
-//     // 记录非并行for循环的开始时间
-//     auto start = std::chrono::high_resolution_clock::now();
-
-//     // 非并行for循环
-//     for (int i = 0; i < size; ++i) {
-//         c[i] = a[i] + bb[i];
-//     }
-
-//     // 记录非并行for循环的结束时间
-//     auto end = std::chrono::high_resolution_clock::now();
-//     std::chrono::duration<double, std::milli> non_parallel_time = end - start;
-
-//     // 打印非并行for循环的时间
-//     std::cout << "Non-parallel for loop time: " << non_parallel_time.count() << " ms" << std::endl;
-
-//     // 清空c向量
-//     std::fill(c.begin(), c.end(), 0);
-
-//     // 记录并行for循环的开始时间
-//     start = std::chrono::high_resolution_clock::now();
-
-//     // 并行化for循环
-//     #pragma omp parallel for
-//     for (int i = 0; i < size; ++i) {
-//         c[i] = a[i] + bb[i];
-//     }
-
-//     // 记录并行for循环的结束时间
-//     end = std::chrono::high_resolution_clock::now();
-//     std::chrono::duration<double, std::milli> parallel_time = end - start;
-
-//     // 打印并行for循环的时间
-//     std::cout << "Parallel for loop time: " << parallel_time.count() << " ms" << std::endl;
-
-//  exit(0);
   std::cout.precision(20);
   Input input(argv[1]); // 读入和解析input文件
   Mesh mesh(input.db["mesh_file_name"][0]); // 读入网格文件
   Dof_Map dof_map(mesh.node_ids, mesh.actual_node_count);
 
   Post post("aaa");
-  post.onlymesh(mesh);
+  post.onlymesh(mesh);  //传入网格,输出网格
 
   // for (int i = 0; i < mesh.actual_element_count; i++)
   // std::cout << mesh.element_ids[i] << std::endl;
 
+  solve();
 
-  // exit(0);
+
+  exit(0);
   std::cout.precision(20);
   int tff;
   std::string filename = "/home/ma/work/M3D-C/file/a.dat";
@@ -135,3 +97,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+
