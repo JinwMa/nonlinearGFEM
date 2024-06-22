@@ -11,7 +11,7 @@
 #include <omp.h>
 #include <chrono>
 
-void solve();
+void solve(Input & input, Mesh & mesh);
 int main(int argc, char *argv[])
 {
   std::cout.precision(20);
@@ -21,11 +21,13 @@ int main(int argc, char *argv[])
 
   Post post("aaa");
   post.onlymesh(mesh);  //传入网格,输出网格
+  // auto post2 = new Post("bbb");
+  // post2->onlymesh(mesh);
 
   // for (int i = 0; i < mesh.actual_element_count; i++)
   // std::cout << mesh.element_ids[i] << std::endl;
 
-  solve();
+  solve(input, mesh);
 
 
   exit(0);

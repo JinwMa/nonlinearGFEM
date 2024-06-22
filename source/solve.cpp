@@ -1,7 +1,14 @@
 #include "mesh.h"
 #include <string>
 #include <iostream>
-void solve()
+#include "mesh.h"
+#include "input.h"
+#include "LinearHex8.h"
+void solve(Input & input, Mesh & mesh)
 {
-    std::cout << "pass here" << std::endl;
+    for (auto key : input.keys)
+    std::cout << key << std::endl;
+    auto element = new LinearHex8;
+    element->ComputeStiffness(10);
+
 }
