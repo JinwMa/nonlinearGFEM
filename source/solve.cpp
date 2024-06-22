@@ -9,6 +9,6 @@ void solve(Input & input, Mesh & mesh)
     for (auto key : input.keys)
     std::cout << key << std::endl;
     auto element = new LinearHex8;
-    element->ComputeStiffness(10);
+    // element->ComputeStiffness();
 
 }
