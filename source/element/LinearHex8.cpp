@@ -100,6 +100,7 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
         std::cout << "数组长度不匹配" << std::endl;
         exit(0);
     }
+    std::cout<< "pass 0" << std::endl;
     // 计算形函数
     for (int i = 0; i < num_GP; i++)
     {
@@ -112,6 +113,7 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
         ShapeFunction[i][6] = ((1.0 + GaussPoints[i][0]) * (1.0 + GaussPoints[i][1]) * (1.0 + GaussPoints[i][2])) / 8.0;
         ShapeFunction[i][7] = ((1.0 - GaussPoints[i][0]) * (1.0 + GaussPoints[i][1]) * (1.0 + GaussPoints[i][2])) / 8.0;
     }
+    std::cout << "pass 1" << std::endl;
     // 计算形函数导数和雅可比行列式值
     for (int i = 0; i < num_GP; i++)
     {
@@ -169,7 +171,7 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
     }
 }
 
-void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<std::vector<double>> GaussPoints)
+void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<std::vector<double>>& GaussPoints)
 {
     if (intergrationorder < 1)
     {

@@ -8,10 +8,10 @@ class BaseElement
     public:
     int integration_order = 2;
     virtual ~BaseElement() = 0; //定义纯虚析构函数
-    virtual void ComputeStiffness();
-    virtual void ComputeInternalForce();
-    virtual void SetGaussIntegration() ;
-    virtual void getShapeFunction() ;
+    // virtual void ComputeStiffness() {};
+    // virtual void ComputeInternalForce(){};
+    // virtual void SetGaussIntegration(){};
+    // virtual void getShapeFunction(){};
     
 };
 

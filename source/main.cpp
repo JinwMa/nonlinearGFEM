@@ -1,5 +1,6 @@
 #include <Eigen/Sparse>
 #include <Eigen/PardisoSupport>
+#include <Eigen/Dense>
 #include <ctime>
 #include <fstream>
 #include <iostream>

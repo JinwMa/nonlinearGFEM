@@ -4,6 +4,31 @@ project(M3D)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# 指定可执行文件的名称和源文件
+add_executable(M3D source/main.cpp source/solve.cpp)
+
+# 设置Eigen路径
+set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")
+include_directories(${EIGEN3_INCLUDE_DIR})
+# 设置MKL路径
+if(NOT DEFINED MKLROOT)
+    set(MKLROOT /home/ma/intel/oneapi/mkl/latest)
+endif()
+# 添加包含目录
+include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
+# 设置MKL库目录
+link_directories(${MKLROOT}/lib/intel64)
+# 链接MKL库
+target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core pthread dl m)
+
+#添加MKL相关定义 加速计算
+add_definitions(-DEIGEN_USE_MKL_ALL)
+
+# 链接静态库到可执行文件
+# target_link_libraries(MyExecutable ${MKL_INTEL_LP64} ${MKL_SEQUENTIAL} ${MKL_CORE} ${IOMP5})
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
 
 
 # 添加mesh子目录,如果还有别的子目录,则继续添加即可,目前先做到手动添加 #默认当前目录为CMakeLists.txt所在目录
@@ -17,8 +42,7 @@ add_subdirectory(source/load)
 add_subdirectory(source/constraint)
 
 
-# 指定可执行文件的名称和源文件
-add_executable(M3D source/main.cpp source/solve.cpp)
+
 
 # 链接子目录下的动态库
 target_link_libraries(M3D PRIVATE MeshLib)
@@ -45,33 +69,12 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
 target_link_libraries(M3D PRIVATE ConstraintLib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
 
-# 设置Eigen路径
-set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")
-include_directories(${EIGEN3_INCLUDE_DIR})
-# 设置MKL路径
-if(NOT DEFINED MKLROOT)
-    set(MKLROOT /home/ma/intel/oneapi/mkl/latest)
-endif()
-# 添加包含目录
-include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
-# 设置MKL库目录
-link_directories(${MKLROOT}/lib/intel64)
-# 链接MKL库
-target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core pthread dl m)
 
-#添加MKL相关定义 加速计算
-add_definitions(-DEIGEN_USE_MKL_ALL)
-
-# 链接静态库到可执行文件
-# target_link_libraries(MyExecutable ${MKL_INTEL_LP64} ${MKL_SEQUENTIAL} ${MKL_CORE} ${IOMP5})
-
-find_package(OpenMP REQUIRED)
-target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
 
 # 设置构建类型
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
-    # set(CMAKE_BUILD_TYPE "Debug")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # 设置编译器标志以优化执行速度
@@ -93,6 +96,7 @@ if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
     target_compile_options(M3D PRIVATE -g -fsanitize=address -fno-omit-frame-pointer)
     target_link_options(M3D PRIVATE -fsanitize=address -fno-omit-frame-pointer)
 endif()
+
 # 指定可执行文件的输出目录(可选)
 set_target_properties(M3D PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin"
