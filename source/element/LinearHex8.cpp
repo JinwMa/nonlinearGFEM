@@ -3,6 +3,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+using namespace std;
+
 void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
                                   std::vector<std::vector<double>> &GaussPoints,
                                   double elementmat[num_edofs][num_edofs])
@@ -15,9 +17,9 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
     double E = 1.E7;
     double v = 0.3;
     // 形函数和形函数导数
-    double *SF[8];
-    double *SF_dxyz[8][3];
-    double detJ[num_intergration_point];
+    vector<vector<double>> SF;
+    vector<vector<vector<double>>> SF_dxyz;
+    vector<double> detJ;
     this->getShapeFunction(nodes_coordinate, GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
 
     Eigen::Matrix<double, 6, 6> D;
@@ -41,7 +43,7 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
     for (int i = 0; i < num_intergration_point; i++)
     {
         double w = GaussPoints[i][3];
-        double J = detJ[i];  
+        double J = detJ[i];
         for (int ii = 0; ii < 8; ii++)
         {
             BT.setZero();
@@ -90,9 +92,9 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
 
 void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
                                   std::vector<std::vector<double>> &GaussPoints,
-                                  double *ShapeFunction[8],
-                                  double *ShapeFunction_dxy[8][3],
-                                  double *value_jkb,
+                                  vector<vector<double>> &ShapeFunction,
+                                  vector<vector<vector<double>>> &ShapeFunction_dxy,
+                                  vector<double> &value_jkb,
                                   const int num_GP)
 {
     if (!num_GP == GaussPoints.size())
@@ -100,7 +102,20 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
         std::cout << "数组长度不匹配" << std::endl;
         exit(0);
     }
-    std::cout<< "pass 0" << std::endl;
+    // 为形函数开辟空间
+    ShapeFunction.resize(num_GP);
+    for (int i = 0; i < num_GP; i++)
+        ShapeFunction[i].resize(8);
+    // 为形函数导数开辟空间
+    ShapeFunction_dxy.resize(num_GP);
+    for (int i = 0; i < num_GP; i++)
+        ShapeFunction_dxy[i].resize(8);
+    for (int i = 0; i < num_GP; i++)
+        for (int j = 0; j < 8; j++)
+            ShapeFunction_dxy[i][j].resize(3);
+    // 为积分点上的雅可比行列式值开辟空间
+    value_jkb.resize(num_GP);
+
     // 计算形函数
     for (int i = 0; i < num_GP; i++)
     {
@@ -113,7 +128,6 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
         ShapeFunction[i][6] = ((1.0 + GaussPoints[i][0]) * (1.0 + GaussPoints[i][1]) * (1.0 + GaussPoints[i][2])) / 8.0;
         ShapeFunction[i][7] = ((1.0 - GaussPoints[i][0]) * (1.0 + GaussPoints[i][1]) * (1.0 + GaussPoints[i][2])) / 8.0;
     }
-    std::cout << "pass 1" << std::endl;
     // 计算形函数导数和雅可比行列式值
     for (int i = 0; i < num_GP; i++)
     {
@@ -171,7 +185,7 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
     }
 }
 
-void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<std::vector<double>>& GaussPoints)
+void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<std::vector<double>> &GaussPoints)
 {
     if (intergrationorder < 1)
     {
@@ -252,6 +266,7 @@ void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<st
                 GaussPoints[index][1] = xs[j][0];
                 GaussPoints[index][2] = xs[k][0];
                 GaussPoints[index][3] = xs[i][1] * xs[j][1] * xs[k][1];
+                index++;
             }
         }
     }

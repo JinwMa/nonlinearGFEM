@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class LinearHex8 //: public BaseElement
+class LinearHex8 : public BaseElement
 {
     static const int num_edofs = 24;
     static const int num_nodes = 8;
@@ -18,15 +18,15 @@ class LinearHex8 //: public BaseElement
     void ComputeStiffness(double nodes_coordinates[8][3],
                           std::vector<std::vector<double>> &GaussPoints,
                           double elementmat[num_edofs][num_edofs]);
-    void ComputeInternalForce();
+    void ComputeInternalForce(){};
     void SetGaussIntegration(const int integrationorder, std::vector<std::vector<double>>&);
     void getShapeFunction(double nodes_coordinate[8][3],
                           std::vector<std::vector<double>>&,
-                          vector<vector<double>> ShapeFunction,
-                          vector<vector<vector<double>>> ShapeFunction_dxy,
-                          vector<double> value_jkb,
+                          vector<vector<double>>& ShapeFunction,
+                          vector<vector<vector<double>>>& ShapeFunction_dxy,
+                          vector<double>& value_jkb,
                           const int num_GP);
-    ~LinearHex8();
+    ~LinearHex8(){};
 };
 
 #endif
