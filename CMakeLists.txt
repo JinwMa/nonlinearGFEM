@@ -74,7 +74,7 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
 # 设置构建类型
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
-    set(CMAKE_BUILD_TYPE "Debug")
+    # set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # 设置编译器标志以优化执行速度

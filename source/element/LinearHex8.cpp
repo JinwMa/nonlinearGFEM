@@ -22,69 +22,139 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
     vector<double> detJ;
     this->getShapeFunction(nodes_coordinate, GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
 
-    Eigen::Matrix<double, 6, 6> D;
-    D.setZero();
+    // Eigen::Matrix<double, 6, 6> D;
+    // D.setZero();
+    double D[6][6] = {};
     double F = (E * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
-    D(0, 0) = F;
-    D(1, 1) = F;
-    D(2, 2) = F;
-    D(3, 3) = F * (1.0 - 2.0 * v) / (2.0 * (1.0 - v));
-    D(4, 4) = D(3, 3);
-    D(5, 5) = D(3, 3);
-    D(0, 1) = F * v / (1.0 - v);
-    D(0, 2) = D(0, 1);
-    D(1, 0) = D(0, 1);
-    D(1, 2) = D(0, 1);
-    D(2, 0) = D(0, 1);
-    D(2, 1) = D(0, 1);
+    // D(0, 0) = F;
+    // D(1, 1) = F;
+    // D(2, 2) = F;
+    // D(3, 3) = F * (1.0 - 2.0 * v) / (2.0 * (1.0 - v));
+    // D(4, 4) = D(3, 3);
+    // D(5, 5) = D(3, 3);
+    // D(0, 1) = F * v / (1.0 - v);
+    // D(0, 2) = D(0, 1);
+    // D(1, 0) = D(0, 1);
+    // D(1, 2) = D(0, 1);
+    // D(2, 0) = D(0, 1);
+    // D(2, 1) = D(0, 1);
+    D[0][0] = F;
+    D[1][1] = F;
+    D[2][2] = F;
+    D[3][3] = F * (1.0 - 2.0 * v) / (2.0 * (1.0 - v));
+    D[4][4] = D[3][3];
+    D[5][5] = D[3][3];
+    D[0][1] = F * v / (1.0 - v);
+    D[0][2] = D[0][1];
+    D[1][0] = D[0][1];
+    D[1][2] = D[0][1];
+    D[2][0] = D[0][1];
+    D[2][1] = D[0][1];
     // 循环积分点
-    Eigen::Matrix<double, 6, 3> B;
-    Eigen::Matrix<double, 3, 6> BT;
+    // Eigen::Matrix<double, 6, 3> B;
+    // Eigen::Matrix<double, 3, 6> BT;
+    // BT.setZero();
+    // B.setZero();
+    double B[6][3] = {};
+    double BT[3][6] = {};
+    double BTDB[3][3] = {};
     for (int i = 0; i < num_intergration_point; i++)
     {
         double w = GaussPoints[i][3];
         double J = detJ[i];
         for (int ii = 0; ii < 8; ii++)
         {
-            BT.setZero();
             double sf_dxnow = SF_dxyz[i][ii][0];
             double sf_dynow = SF_dxyz[i][ii][1];
             double sf_dznow = SF_dxyz[i][ii][2];
-            BT(0, 0) = sf_dxnow;
-            BT(0, 3) = sf_dynow;
-            BT(0, 5) = sf_dznow;
-            BT(1, 1) = sf_dynow;
-            BT(1, 3) = sf_dxnow;
-            BT(1, 4) = sf_dznow;
-            BT(2, 2) = sf_dznow;
-            BT(2, 4) = sf_dynow;
-            BT(2, 5) = sf_dxnow;
+            // BT(0, 0) = sf_dxnow;
+            // BT(0, 3) = sf_dynow;
+            // BT(0, 5) = sf_dznow;
+            // BT(1, 1) = sf_dynow;
+            // BT(1, 3) = sf_dxnow;
+            // BT(1, 4) = sf_dznow;
+            // BT(2, 2) = sf_dznow;
+            // BT(2, 4) = sf_dynow;
+            // BT(2, 5) = sf_dxnow;
+
+            BT[0][0] = sf_dxnow;
+            BT[0][3] = sf_dynow;
+            BT[0][5] = sf_dznow;
+            BT[1][1] = sf_dynow;
+            BT[1][3] = sf_dxnow;
+            BT[1][4] = sf_dznow;
+            BT[2][2] = sf_dznow;
+            BT[2][4] = sf_dynow;
+            BT[2][5] = sf_dxnow;
 
             for (int jj = 0; jj < 8; jj++)
-            {
-                B.setZero();
+            {                
                 double sf_dxnow = SF_dxyz[i][jj][0];
                 double sf_dynow = SF_dxyz[i][jj][1];
                 double sf_dznow = SF_dxyz[i][jj][2];
-                B(0, 0) = sf_dxnow;
-                B(1, 1) = sf_dynow;
-                B(2, 2) = sf_dznow;
-                B(3, 0) = sf_dynow;
-                B(3, 1) = sf_dxnow;
-                B(4, 1) = sf_dznow;
-                B(4, 2) = sf_dynow;
-                B(5, 0) = sf_dznow;
-                B(5, 2) = sf_dxnow;
-                Eigen::Matrix<double, 3, 3> BTDB = BT * D * B;
-                Eigen::Matrix<double, 3, 3> EK_IJ = BTDB * w * J;
+                // B(0, 0) = sf_dxnow;
+                // B(1, 1) = sf_dynow;
+                // B(2, 2) = sf_dznow;
+                // B(3, 0) = sf_dynow;
+                // B(3, 1) = sf_dxnow;
+                // B(4, 1) = sf_dznow;
+                // B(4, 2) = sf_dynow;
+                // B(5, 0) = sf_dznow;
+                // B(5, 2) = sf_dxnow;
+
+                B[0][0] = sf_dxnow;
+                B[1][1] = sf_dynow;
+                B[2][2] = sf_dznow;
+                B[3][0] = sf_dynow;
+                B[3][1] = sf_dxnow;
+                B[4][1] = sf_dznow;
+                B[4][2] = sf_dynow;
+                B[5][0] = sf_dznow;
+                B[5][2] = sf_dxnow;
+                // Eigen::Matrix<double, 3, 3> BTDB;// = BT * D * B;
+                // Eigen::Matrix<double, 3, 3> EK_IJ;// = BTDB * w * J;
+                double BTD[3][6] = {};
+                double BTDB[3][3] = {};
+                AXB3666(BT, D, BTD);
+                AXB3663(BTD, B, BTDB);
+                double EK_IJ[3][3] = {};
 
                 for (int iii = 0; iii < 3; iii++)
                     for (int jjj = 0; jjj < 3; jjj++)
                     {
                         int col = ii * 3 + iii;
                         int row = jj * 3 + jjj;
-                        elementmat[col][row] += EK_IJ(iii, jjj);
+                        elementmat[col][row] += EK_IJ[iii][jjj];
                     }
+            }
+        }
+    }
+}
+
+void LinearHex8::AXB3663(const double A[3][6], const double B[6][3], double C[3][3])
+{
+    // 矩阵乘法
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            for (int k = 0; k < 6; ++k)
+            {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+}
+void LinearHex8::AXB3666(const double A[3][6], const double B[6][6], double C[3][6])
+{
+    // 矩阵乘法
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 6; ++j)
+        {
+            for (int k = 0; k < 6; ++k)
+            {
+                C[i][j] += A[i][k] * B[k][j];
             }
         }
     }

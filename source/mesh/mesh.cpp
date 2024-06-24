@@ -57,16 +57,20 @@ void Mesh::readmeshfile()
                 }
 
                 int node_id;
+                std::vector<int> aelement;
                 while (iss >> node_id)
                 {
-                    mesh_element[element_id - 1].push_back(node_id);
-                }
-                if (!mesh_element[element_id - 1].empty())
-                {                    
+                    // mesh_element[element_id - 1].push_back(node_id);
+                    aelement.push_back(node_id);
+                }                
+                if (!aelement.empty())
+                {         
+                    NodesOnElements.push_back(aelement);           
                     ++actual_element_count;
-                    element_ids[actual_element_count - 1] = element_id;
+                    // element_ids[actual_element_count - 1] = element_id;
+                    ElementIdList.push_back(element_id);
+                    ElementOrderInList[element_id] = actual_element_count;
                     if (element_id > max_elementid) max_elementid = element_id;
-
                 }
             }
         }
@@ -98,14 +102,19 @@ void Mesh::readmeshfile()
                 }
 
                 double coordinate;
+                vector<double> coordinates_of_one_node;
                 while (iss >> coordinate)
                 {
-                    mesh_node[node_id - 1].push_back(coordinate);
-                }
-                if (!mesh_node[node_id - 1].empty())
+                    // mesh_node[node_id - 1].push_back(coordinate);
+                    coordinates_of_one_node.push_back(coordinate);
+                }                
+                if (!coordinates_of_one_node.empty())
                 {
+                    NodesCoordinate.push_back(coordinates_of_one_node);
                     ++actual_node_count;
-                    node_ids[actual_node_count - 1] = node_id;
+                    // node_ids[actual_node_count - 1] = node_id;
+                    NodeIdList.push_back(node_id);
+                    NodeOrderInList[node_id] = actual_node_count;
                     if (node_id > max_nodeid) max_nodeid = node_id;
                 }  
             }

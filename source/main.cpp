@@ -17,18 +17,26 @@ int main(int argc, char *argv[])
 {
   std::cout.precision(20);
   Input input(argv[1]); // 读入和解析input文件
+  std::clock_t c_start_mesh = std::clock();
   Mesh mesh(input.db["mesh_file_name"][0]); // 读入网格文件
-  Dof_Map dof_map(mesh.node_ids, mesh.actual_node_count);
 
-  Post post("aaa");
-  post.onlymesh(mesh);  //传入网格,输出网格
+
+  // std::cout<< "pass here" << std::endl;
+
+  // Post post("aaa");
+  // post.onlymesh(mesh);  //传入网格,输出网格
   // auto post2 = new Post("bbb");
   // post2->onlymesh(mesh);
 
   // for (int i = 0; i < mesh.actual_element_count; i++)
   // std::cout << mesh.element_ids[i] << std::endl;
+  std::clock_t c_start_solve = std::clock();
 
   solve(input, mesh);
+
+  std::clock_t c_start_exit = std::clock();
+  std::cout << "time of read mesh " << 1000.0 * (c_start_solve - c_start_mesh) / CLOCKS_PER_SEC << std::endl;
+  std::cout << "time of solve " << 1000.0 * (c_start_exit - c_start_solve) / CLOCKS_PER_SEC << std::endl;
 
 
   exit(0);

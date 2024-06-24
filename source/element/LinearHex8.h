@@ -27,6 +27,9 @@ class LinearHex8 : public BaseElement
                           vector<double>& value_jkb,
                           const int num_GP);
     ~LinearHex8(){};
+    private:
+    void AXB3663(const double A[3][6], const double B[6][3], double C[3][3]);
+    void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
 };
 
 #endif
