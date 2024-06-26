@@ -97,6 +97,7 @@
         "semaphore": "cpp",
         "shared_mutex": "cpp",
         "cfenv": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "iterativelinearsolvers": "cpp"
     }
 }

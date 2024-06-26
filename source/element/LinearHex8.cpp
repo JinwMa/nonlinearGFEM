@@ -22,22 +22,8 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
     vector<double> detJ;
     this->getShapeFunction(nodes_coordinate, GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
 
-    // Eigen::Matrix<double, 6, 6> D;
-    // D.setZero();
     double D[6][6] = {};
     double F = (E * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
-    // D(0, 0) = F;
-    // D(1, 1) = F;
-    // D(2, 2) = F;
-    // D(3, 3) = F * (1.0 - 2.0 * v) / (2.0 * (1.0 - v));
-    // D(4, 4) = D(3, 3);
-    // D(5, 5) = D(3, 3);
-    // D(0, 1) = F * v / (1.0 - v);
-    // D(0, 2) = D(0, 1);
-    // D(1, 0) = D(0, 1);
-    // D(1, 2) = D(0, 1);
-    // D(2, 0) = D(0, 1);
-    // D(2, 1) = D(0, 1);
     D[0][0] = F;
     D[1][1] = F;
     D[2][2] = F;
@@ -51,10 +37,6 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
     D[2][0] = D[0][1];
     D[2][1] = D[0][1];
     // 循环积分点
-    // Eigen::Matrix<double, 6, 3> B;
-    // Eigen::Matrix<double, 3, 6> BT;
-    // BT.setZero();
-    // B.setZero();
     double B[6][3] = {};
     double BT[3][6] = {};
     double BTDB[3][3] = {};
@@ -67,15 +49,6 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
             double sf_dxnow = SF_dxyz[i][ii][0];
             double sf_dynow = SF_dxyz[i][ii][1];
             double sf_dznow = SF_dxyz[i][ii][2];
-            // BT(0, 0) = sf_dxnow;
-            // BT(0, 3) = sf_dynow;
-            // BT(0, 5) = sf_dznow;
-            // BT(1, 1) = sf_dynow;
-            // BT(1, 3) = sf_dxnow;
-            // BT(1, 4) = sf_dznow;
-            // BT(2, 2) = sf_dznow;
-            // BT(2, 4) = sf_dynow;
-            // BT(2, 5) = sf_dxnow;
 
             BT[0][0] = sf_dxnow;
             BT[0][3] = sf_dynow;
@@ -92,15 +65,6 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
                 double sf_dxnow = SF_dxyz[i][jj][0];
                 double sf_dynow = SF_dxyz[i][jj][1];
                 double sf_dznow = SF_dxyz[i][jj][2];
-                // B(0, 0) = sf_dxnow;
-                // B(1, 1) = sf_dynow;
-                // B(2, 2) = sf_dznow;
-                // B(3, 0) = sf_dynow;
-                // B(3, 1) = sf_dxnow;
-                // B(4, 1) = sf_dznow;
-                // B(4, 2) = sf_dynow;
-                // B(5, 0) = sf_dznow;
-                // B(5, 2) = sf_dxnow;
 
                 B[0][0] = sf_dxnow;
                 B[1][1] = sf_dynow;
@@ -111,14 +75,18 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
                 B[4][2] = sf_dynow;
                 B[5][0] = sf_dznow;
                 B[5][2] = sf_dxnow;
-                // Eigen::Matrix<double, 3, 3> BTDB;// = BT * D * B;
-                // Eigen::Matrix<double, 3, 3> EK_IJ;// = BTDB * w * J;
                 double BTD[3][6] = {};
                 double BTDB[3][3] = {};
-                AXB3666(BT, D, BTD);
-                AXB3663(BTD, B, BTDB);
+                AmnXBpq(&BT[0][0], 3, 6, &D[0][0], 6, 6, &BTD[0][0]);
+                AmnXBpq(&BTD[0][0], 3, 6, &B[0][0], 6, 3, &BTDB[0][0]);
                 double EK_IJ[3][3] = {};
-
+                for (int iii = 0; iii < 3; iii++)
+                {
+                    for(int jjj = 0; jjj < 3; jjj++)
+                    {
+                        EK_IJ[iii][jjj] = BTDB[iii][jjj] * w * J;
+                    }
+                }
                 for (int iii = 0; iii < 3; iii++)
                     for (int jjj = 0; jjj < 3; jjj++)
                     {
@@ -126,35 +94,6 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
                         int row = jj * 3 + jjj;
                         elementmat[col][row] += EK_IJ[iii][jjj];
                     }
-            }
-        }
-    }
-}
-
-void LinearHex8::AXB3663(const double A[3][6], const double B[6][3], double C[3][3])
-{
-    // 矩阵乘法
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-            for (int k = 0; k < 6; ++k)
-            {
-                C[i][j] += A[i][k] * B[k][j];
-            }
-        }
-    }
-}
-void LinearHex8::AXB3666(const double A[3][6], const double B[6][6], double C[3][6])
-{
-    // 矩阵乘法
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 6; ++j)
-        {
-            for (int k = 0; k < 6; ++k)
-            {
-                C[i][j] += A[i][k] * B[k][j];
             }
         }
     }
@@ -201,62 +140,60 @@ void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
     // 计算形函数导数和雅可比行列式值
     for (int i = 0; i < num_GP; i++)
     {
-        Eigen::Matrix<double, 3, 8> jl;
+        double jl[3][8] = {};
         double x1[3] = {0.0};
         x1[0] = GaussPoints[i][0];
         x1[1] = GaussPoints[i][1];
         x1[2] = GaussPoints[i][2];
-        jl(0, 0) = -(1.0 - x1[1]) * (1.0 - x1[2]) / 8.0;
-        jl(0, 1) = -jl(0, 0);
-        jl(0, 2) = (1.0 + x1[1]) * (1.0 - x1[2]) / 8.0;
-        jl(0, 3) = -jl(0, 2);
-        jl(0, 4) = -(1.0 - x1[1]) * (1.0 + x1[2]) / 8.0;
-        jl(0, 5) = -jl(0, 4);
-        jl(0, 6) = (1.0 + x1[1]) * (1.0 + x1[2]) / 8.0;
-        jl(0, 7) = -jl(0, 6);
 
-        jl(1, 0) = -(1.0 - x1[0]) * (1.0 - x1[2]) / 8.0;
-        jl(1, 1) = -(1.0 + x1[0]) * (1.0 - x1[2]) / 8.0;
-        jl(1, 2) = (1.0 + x1[0]) * (1.0 - x1[2]) / 8.0;
-        jl(1, 3) = (1.0 - x1[0]) * (1.0 - x1[2]) / 8.0;
-        jl(1, 4) = -(1.0 - x1[0]) * (1.0 + x1[2]) / 8.0;
-        jl(1, 5) = -(1.0 + x1[0]) * (1.0 + x1[2]) / 8.0;
-        jl(1, 6) = (1.0 + x1[0]) * (1.0 + x1[2]) / 8.0;
-        jl(1, 7) = (1.0 - x1[0]) * (1.0 + x1[2]) / 8.0;
+        jl[0][0] = -(1.0 - x1[1]) * (1.0 - x1[2]) / 8.0;
+        jl[0][1] = -jl[0][0];
+        jl[0][2] = (1.0 + x1[1]) * (1.0 - x1[2]) / 8.0;
+        jl[0][3] = -jl[0][2];
+        jl[0][4] = -(1.0 - x1[1]) * (1.0 + x1[2]) / 8.0;
+        jl[0][5] = -jl[0][4];
+        jl[0][6] = (1.0 + x1[1]) * (1.0 + x1[2]) / 8.0;
+        jl[0][7] = -jl[0][6];
+
+        jl[1][0] = -(1.0 - x1[0]) * (1.0 - x1[2]) / 8.0;
+        jl[1][1] = -(1.0 + x1[0]) * (1.0 - x1[2]) / 8.0;
+        jl[1][2] = (1.0 + x1[0]) * (1.0 - x1[2]) / 8.0;
+        jl[1][3] = (1.0 - x1[0]) * (1.0 - x1[2]) / 8.0;
+        jl[1][4] = -(1.0 - x1[0]) * (1.0 + x1[2]) / 8.0;
+        jl[1][5] = -(1.0 + x1[0]) * (1.0 + x1[2]) / 8.0;
+        jl[1][6] = (1.0 + x1[0]) * (1.0 + x1[2]) / 8.0;
+        jl[1][7] = (1.0 - x1[0]) * (1.0 + x1[2]) / 8.0;
 
         // 第三行
-        jl(2, 0) = -(1.0 - x1[0]) * (1.0 - x1[1]) / 8.0;
-        jl(2, 1) = -(1.0 + x1[0]) * (1.0 - x1[1]) / 8.0;
-        jl(2, 2) = -(1.0 + x1[0]) * (1.0 + x1[1]) / 8.0;
-        jl(2, 3) = -(1.0 - x1[0]) * (1.0 + x1[1]) / 8.0;
-        jl(2, 4) = -jl(2, 0);
-        jl(2, 5) = -jl(2, 1);
-        jl(2, 6) = -jl(2, 2);
-        jl(2, 7) = -jl(2, 3);
-
-        Eigen::Matrix<double, 8, 3> nodes_coordinate_Eigen;
-        for (int row = 0; row < 8; row++)
-            for (int col = 0; col < 3; col++)
-            {
-                nodes_coordinate_Eigen(row, col) = nodes_coordinate[row][col];
-            }
-
-        Eigen::Matrix<double, 3, 3> jkb = jl * nodes_coordinate_Eigen;
-        Eigen::Matrix<double, 3, 3> jkb_inv = jkb.inverse();
-        Eigen::Matrix<double, 3, 8> DSF = jkb_inv * jl;
-        value_jkb[i] = jkb.determinant();
+        jl[2][0] = -(1.0 - x1[0]) * (1.0 - x1[1]) / 8.0;
+        jl[2][1] = -(1.0 + x1[0]) * (1.0 - x1[1]) / 8.0;
+        jl[2][2] = -(1.0 + x1[0]) * (1.0 + x1[1]) / 8.0;
+        jl[2][3] = -(1.0 - x1[0]) * (1.0 + x1[1]) / 8.0;
+        jl[2][4] = -jl[2][0];
+        jl[2][5] = -jl[2][1];
+        jl[2][6] = -jl[2][2];
+        jl[2][7] = -jl[2][3];
+        double jkb[3][3] = {};
+        AmnXBpq(&jl[0][0], 3, 8, &nodes_coordinate[0][0], 8, 3, &jkb[0][0]);
+        double jkb_inv[3][3] = {};
+        value_jkb[i] = invertMatrix(jkb, jkb_inv);
+        double DSF[3][8] = {};
+        // AmnXBpq(&jkb_inv[0][0], 3, 3, &jl[0][0], 3, 8, &DSF[0][0]);
+        AXB3338(jkb_inv, jl, DSF);
+        
 
         for (int ii = 0; ii < 8; ii++)
         {
-            ShapeFunction_dxy[i][ii][0] = DSF(0, ii);
-            ShapeFunction_dxy[i][ii][1] = DSF(1, ii);
-            ShapeFunction_dxy[i][ii][2] = DSF(2, ii);
+            ShapeFunction_dxy[i][ii][0] = DSF[0][ii];
+            ShapeFunction_dxy[i][ii][1] = DSF[1][ii];
+            ShapeFunction_dxy[i][ii][2] = DSF[2][ii];
         }
     }
 }
 
-void LinearHex8::SetGaussIntegration(const int intergrationorder, std::vector<std::vector<double>> &GaussPoints)
+void LinearHex8::SetGaussIntegration( std::vector<std::vector<double>> &GaussPoints)
 {
+    const int intergrationorder = integration_order;
     if (intergrationorder < 1)
     {
         std::cout << "积分阶次输入错误" << std::endl;

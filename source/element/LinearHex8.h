@@ -19,7 +19,7 @@ class LinearHex8 : public BaseElement
                           std::vector<std::vector<double>> &GaussPoints,
                           double elementmat[num_edofs][num_edofs]);
     void ComputeInternalForce(){};
-    void SetGaussIntegration(const int integrationorder, std::vector<std::vector<double>>&);
+    void SetGaussIntegration(std::vector<std::vector<double>>&);
     void getShapeFunction(double nodes_coordinate[8][3],
                           std::vector<std::vector<double>>&,
                           vector<vector<double>>& ShapeFunction,
@@ -27,9 +27,8 @@ class LinearHex8 : public BaseElement
                           vector<double>& value_jkb,
                           const int num_GP);
     ~LinearHex8(){};
-    private:
-    void AXB3663(const double A[3][6], const double B[6][3], double C[3][3]);
-    void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
+    
+    
 };
 
 #endif
