@@ -9,4 +9,4 @@ add_library(PostLib SHARED ${SOURCES})
 
 target_include_directories(PostLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(PostLib PRIVATE InputLib MeshLib)
+target_link_libraries(PostLib PRIVATE InputLib MeshLib ObjectLib)

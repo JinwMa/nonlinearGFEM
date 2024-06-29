@@ -10,6 +10,7 @@
 #include <Eigen/PardisoSupport>
 #include <map>
 #include <Eigen/Dense>
+#include "post.h"
 using namespace std;
 
 struct Equation
@@ -185,16 +186,7 @@ void solve(Input &input, Mesh &mesh)
     // Eigen::FullPivLU<Eigen::MatrixXd> lu(C_Dense);
     // Eigen::MatrixXd P = lu.kernel();
     Eigen::MatrixXd P = computeNullSpace(C);
-    std::cout << P.rows() << " " << P.cols() << std::endl;
-
-
     Eigen::MatrixXd jc = Eigen::MatrixXd(C) * P;
-    std::cout << jc << std::endl;
-    exit(0);
-
-    std::cout << P.rows() << " " << jc.rows() << std::endl;
-    std::cout << P.cols() << " " << jc.cols() << std::endl;
-
     // 使用 SparseQR 分解求解 Cx=g
     Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> solver;
     C.makeCompressed();
@@ -248,6 +240,9 @@ void solve(Input &input, Mesh &mesh)
     Eigen::VectorXd xxx = P * x + xx;
     std::cout << "解 xxx:\n"
               << xxx << std::endl;
+
+    Post post("tecplot");
+    post.onlymesh(mesh);
 
     // exit(0);
 

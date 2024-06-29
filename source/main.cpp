@@ -16,7 +16,7 @@ void solve(Input &input, Mesh &mesh);
 void test();
 int main(int argc, char *argv[])
 {
-  test();
+  // test();
 
   Input input(argv[1]); // 读入和解析input文件
 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   std::clock_t c_end_mesh = std::clock();
   std::cout << "time of read mesh " << 1000.0 * (c_end_mesh - c_start_mesh) / CLOCKS_PER_SEC << std::endl;
 
-  // solve(input, mesh);
+  solve(input, mesh);
   std::clock_t c_end_solve = std::clock();
   std::cout << "time of solve " << 1000.0 * (c_end_solve - c_end_mesh) / CLOCKS_PER_SEC << std::endl;
   
