@@ -26,7 +26,7 @@ void Dof_Map::BuildDofMap(Mesh & mesh)
     {
         int nodeid = mesh.NodeIdList[i];
         int nodeorder = mesh.NodeOrderInList[nodeid];
-        NodesIndex[nodeorder] = index;
+        NodesIndex[nodeorder - 1] = index;
         int dofsize = NodesDofs[nodeid].size();
         index += dofsize;
     }

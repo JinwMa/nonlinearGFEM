@@ -3,14 +3,16 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "mesh.h"
-#include "input.h"
-#include "element.h"
 #include <Eigen/Sparse>
 #include <Eigen/PardisoSupport>
 #include <map>
 #include <Eigen/Dense>
+
+#include <dof_map.h>
 #include "post.h"
+#include "mesh.h"
+#include "input.h"
+#include "element.h"
 using namespace std;
 
 struct Equation
@@ -36,6 +38,8 @@ Eigen::MatrixXd computeNullSpace(const Eigen::SparseMatrix<double>& C)
 
 void solve(Input &input, Mesh &mesh)
 {
+    Dof_Map DofMap(mesh);
+    DofMap.BuildDofMap(mesh);
     const double eps = 1.E-10;
     int equation_id = 0;
     vector<Equation> Equations;
@@ -243,6 +247,9 @@ void solve(Input &input, Mesh &mesh)
 
     Post post("tecplot");
     post.onlymesh(mesh);
+
+    std::vector<double> displacement(xxx.data(), xxx.data() + xxx.size());
+    post.ShowDisplacement(mesh, DofMap, displacement);
 
     // exit(0);
 
