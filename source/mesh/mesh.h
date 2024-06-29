@@ -39,6 +39,7 @@ public:
                                         // element_ids(maxnum_element)
     {
         readmeshfile();
+        checkmesh();
     }
     void checkmesh();
 

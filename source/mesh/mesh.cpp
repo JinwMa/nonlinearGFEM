@@ -125,6 +125,9 @@ void Mesh::readmeshfile()
 
 void Mesh::checkmesh()
 {
-    if (!actual_element_count == max_elementid || !actual_node_count == max_nodeid)
-    throw std::runtime_error("单元中节点编号或单元编号出问题");
+    if (!actual_node_count == NodeIdList.size())
+    throw std::runtime_error("单元中节点数目无法对齐");
+
+    if (!actual_element_count == ElementIdList.size())
+    throw std::runtime_error("单元中单元数目无法对齐");
 }

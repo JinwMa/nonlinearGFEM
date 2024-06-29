@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 指定可执行文件的名称和源文件
-add_executable(M3D source/main.cpp source/solve.cpp)
+add_executable(M3D source/main.cpp source/solve.cpp source/test.cpp)
 
 # 设置Eigen路径
 set(EIGEN3_INCLUDE_DIR "/home/ma/work/M3D-C/eigen-3.4.0")
