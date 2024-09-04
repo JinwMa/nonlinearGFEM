@@ -14,38 +14,20 @@
 
 void solve(Input &input, Mesh &mesh);
 void test();
-void getFlexibilitMatrix(double xa[3], double xb[3], double ZSS[36], double DIA, double slen)
-{
-  for (int i = 0; i < 36; i++) ZSS[i] = 0;
-  double r[3] = {0.0};
-  r[0] = xb[0] - xa[0];
-  r[1] = xb[1] - xa[1];
-  r[2] = xb[2] - xa[2];
-  slen = std::sqrt(r[0] * r[0] + r[1] * r[1] + r[2] * r[2]);
-  ZSS[21] = slen;
-  ZSS[28] = slen;
-  ZSS[35] = slen;
-  double fact = slen / 12.0 * ((3.0 * DIA * DIA) / (2.0 * slen * slen) - 1.0);
-  double l312 = slen * slen * slen / 12.0;
-  ZSS[0] = l312 + fact * r[0] * r[0];
-  ZSS[1] = fact * r[0] * r[1];
-  ZSS[2] = fact * r[0] * r[2];
-  ZSS[6] = ZSS[1];
-  ZSS[7] = l312 + fact * r[1] * r[1];
-  ZSS[8] = fact * r[1] * r[2];
-  ZSS[12] = ZSS[2];
-  ZSS[13] = ZSS[8];
-  ZSS[14] = l312 + fact * r[2] * r[2];
-};
+
 int main(int argc, char *argv[])
 {
   // test();
 
   Input input(argv[1]); // 读入和解析input文件
 
+  std::cout << "当前问题的输入参数:" << std::endl;
   for (auto & it : input.db)
   {
-    std::cout << it.first << " ";// << it.second;
+    std::cout << "##########-- a pice of db --##########" <<std::endl;
+    std::cout << it.first << " \n";// << it.second;
+    for (size_t i = 0; i < it.second.size(); i++)
+      std::cout << it.second[i] << std::endl;    
   }
   exit(0);
 
