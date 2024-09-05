@@ -24,12 +24,12 @@ int main(int argc, char *argv[])
   std::cout << "当前问题的输入参数:" << std::endl;
   for (auto & it : input.db)
   {
-    std::cout << "##########-- a pice of db --##########" <<std::endl;
+    std::cout << "##########-- a piece of db --##########" <<std::endl;
     std::cout << it.first << " \n";// << it.second;
     for (size_t i = 0; i < it.second.size(); i++)
       std::cout << it.second[i] << std::endl;    
   }
-  exit(0);
+  // exit(0);
 
   // 读入网格文件
   std::clock_t c_start_mesh = std::clock();

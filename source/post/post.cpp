@@ -87,7 +87,7 @@ void Post::ShowDisplacement(Mesh &mesh, Dof_Map &DofMap, vector<double> displace
     {
         outputFile << std::setw(20) << PostNodes[i].x << "   " << std::setw(20) << PostNodes[i].y << "   " << std::setw(20) << PostNodes[i].z 
                    << std::setw(20) << PostNodes[i].ux << "   " << std::setw(20) << PostNodes[i].uy << "   " << std::setw(20) << PostNodes[i].uz << std::endl;        
-        std::cout << PostNodes[i].ux << "  " << PostNodes[i].uz << std::endl;
+        // std::cout << PostNodes[i].ux << "  " << PostNodes[i].uz << std::endl;
     }
     
     // 输出单元

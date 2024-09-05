@@ -36,6 +36,29 @@ Eigen::MatrixXd computeNullSpace(const Eigen::SparseMatrix<double>& C)
     return Null_space;
 }
 
+Eigen::MatrixXd computeNullSpace2(const Eigen::SparseMatrix<double>& C)
+{
+    Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> qr;
+    qr.compute(C.transpose());
+    // 检查分解是否成功
+    if(qr.info() != Eigen::Success) {
+        std::cerr << "QR decomposition failed.\n";
+    }
+
+    auto Q=qr.matrixQ();
+    // 获取矩阵秩和零空间的维度
+    int rank = qr.rank();
+    int nullity = C.cols() - rank;
+    Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(C.cols(), C.cols());   
+
+    std::cout << "Rank of matrix C: " << rank << "\n";
+    std::cout << "Nullity of matrix A (dimension of null space): " << nullity << "\n";
+
+    // 通过计算零空间,构建正交基
+    Eigen::MatrixXd Q_rightCols = (Q * identity).rightCols(nullity);
+    return Q_rightCols;//.transpose();
+}
+
 void solve(Input &input, Mesh &mesh)
 {
     Dof_Map DofMap(mesh);
@@ -189,7 +212,7 @@ void solve(Input &input, Mesh &mesh)
     // Eigen::MatrixXd C_Dense = Eigen::MatrixXd(C);
     // Eigen::FullPivLU<Eigen::MatrixXd> lu(C_Dense);
     // Eigen::MatrixXd P = lu.kernel();
-    Eigen::MatrixXd P = computeNullSpace(C);
+    Eigen::MatrixXd P = computeNullSpace2(C);
     Eigen::MatrixXd jc = Eigen::MatrixXd(C) * P;
     // 使用 SparseQR 分解求解 Cx=g
     Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> solver;
@@ -242,8 +265,6 @@ void solve(Input &input, Mesh &mesh)
     // 还原解:
 
     Eigen::VectorXd xxx = P * x + xx;
-    std::cout << "解 xxx:\n"
-              << xxx << std::endl;
 
     Post post("tecplot");
     post.onlymesh(mesh);
