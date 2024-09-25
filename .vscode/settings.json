@@ -98,6 +98,8 @@
         "shared_mutex": "cpp",
         "cfenv": "cpp",
         "cinttypes": "cpp",
-        "iterativelinearsolvers": "cpp"
+        "iterativelinearsolvers": "cpp",
+        "geometry": "cpp",
+        "sparsecore": "cpp"
     }
 }
