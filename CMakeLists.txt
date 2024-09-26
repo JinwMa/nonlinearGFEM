@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(M3D)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
+#  
 message(STATUS "Current operating system: ${CMAKE_SYSTEM_NAME}")
 
 # 设置Eigen路径
@@ -16,13 +16,16 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     set(EIGEN3_INCLUDE_DIR "/home/ma/work/workspace/eigen-3.4.0")
 endif()
 # 添加包含目录
-include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
 # 设置MKL库目录
 link_directories(${MKLROOT}/lib/intel64)
 #添加MKL相关定义 加速计算
 add_definitions(-DEIGEN_USE_MKL_ALL)
 find_package(OpenMP REQUIRED)
+
+##############################################################################################
+#注意这里是一个明显的分界线，注意add_executable前后发生的事情和时机
+##############################################################################################
 # 指定可执行文件的名称和源文件
 add_executable(M3D source/main.cpp  source/test.cpp)
 target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
@@ -30,8 +33,54 @@ target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core mkl_intel_thread)
 
 
+# 添加mesh子目录,如果还有别的子目录,则继续添加即可,目前先做到手动添加 #默认当前目录为CMakeLists.txt所在目录
+add_subdirectory(source/input)
+add_subdirectory(source/mesh)
+add_subdirectory(source/post)
+add_subdirectory(source/object)
+add_subdirectory(source/solver)
 add_subdirectory(source/element)
-target_link_libraries(M3D PRIVATE mylib)
+add_subdirectory(source/load)
+add_subdirectory(source/constraint)
+add_subdirectory(source/pre)
+
+
+
+
+
+# 链接子目录下的动态库
+target_link_libraries(M3D PRIVATE meshlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
+
+target_link_libraries(M3D PRIVATE inputlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
+
+target_link_libraries(M3D PRIVATE postlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
+
+target_link_libraries(M3D PRIVATE objectlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/object)
+
+target_link_libraries(M3D PRIVATE solverlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
+
+target_link_libraries(M3D PRIVATE elementlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
+
+target_link_libraries(M3D PRIVATE loadlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
+
+target_link_libraries(M3D PRIVATE constraintlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
+
+target_link_libraries(M3D PRIVATE prelib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
+
+
+
+
+
+
 
 # 设置构建类型
 if(NOT CMAKE_BUILD_TYPE)
