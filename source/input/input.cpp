@@ -82,3 +82,126 @@ void Input::read_input_file(const string filename)
 
     inputFile.close(); // 关闭文件
 }
+
+
+int Input::getInt(std::string name)
+{
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    //判断value是不是只有一个值
+    if (it->second.size() != 0)
+    {
+        std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
+    }
+    int num = std::atoi(it->second[0].c_str());
+    return num;
+}
+
+double Input::getDouble(std::string name)
+{
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    //判断value是不是只有一个值
+    if (it->second.size() != 0)
+    {
+        std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
+    }
+    double value = std::stod(it->second[0].c_str());
+    return value;
+}
+
+std::vector<int> Input::getVectorInt(std::string name)
+{
+    std::vector<int> nums;
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    if (it->second.size() <= 0)
+    {
+        std::cout << "the size of value of " << it->first << " is less than one" << std::endl;
+        exit(1);
+    }
+    int count = it->second.size();
+    for (int i = 0; i < count; i++)
+    {
+        std::string temp = it->second[i];
+        int num = std::atoi(temp.c_str());
+        nums.push_back(num);
+    }
+    return nums;
+}
+
+std::vector<double> Input::getVectorDouble(std::string name)
+{
+    std::vector<double> values;
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    if (it->second.size() <= 0)
+    {
+        std::cout << "the size of value of " << it->first << " is less than one" << std::endl;
+        exit(1);
+    }
+    int count = it->second.size();
+    for (int i = 0; i < count; i++)
+    {
+        std::string temp = it->second[i];
+        double value = std::stod(temp.c_str());
+        values.push_back(value);
+    }
+    return values;
+}
+
+std::string Input::getString(string name)
+{
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    //判断value是不是只有一个值
+    if (it->second.size() != 0)
+    {
+        std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
+    }
+    string str = it->second[0];
+    return str;
+}
+
+std::vector<std::string> Input::getVectorString(std::string name)
+{
+    std::vector<std::string> strings;
+    auto it = db.find(name);
+    if (it == db.end())
+    {
+        std::cout << "not found " << name << " in input" << std::endl;
+        exit(1);
+    }
+    if (it->second.size() <= 0)
+    {
+        std::cout << "the size of value of " << it->first << " is less than one" << std::endl;
+        exit(1);
+    }
+    int count = it->second.size();
+    for (int i = 0; i < count; i++)
+    {
+        std::string temp = it->second[i];
+        strings.push_back(temp);
+    }
+    return strings;
+}

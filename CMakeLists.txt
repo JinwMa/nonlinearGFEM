@@ -43,6 +43,7 @@ add_subdirectory(source/element)
 add_subdirectory(source/load)
 add_subdirectory(source/constraint)
 add_subdirectory(source/pre)
+add_subdirectory(source/toolbox)
 
 
 
@@ -75,6 +76,9 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
 
 target_link_libraries(M3D PRIVATE prelib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
+
+target_link_libraries(M3D PRIVATE toolboxlib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
 
 
 

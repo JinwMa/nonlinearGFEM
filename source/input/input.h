@@ -18,6 +18,12 @@ class Input
     {
         read_input_file(filename);
     }
+    vector<int> getVectorInt(string);
+    vector<double> getVectorDouble(string);
+    int getInt(string);
+    double getDouble(string);
+    string getString(string);
+    vector<string> getVectorString(string);
     private:
     void read_input_file(const string filename);
 };

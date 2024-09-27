@@ -12,7 +12,8 @@
 #include "input.h"
 #include "dof_map.h"
 #include "post.h"
-#include "LinearStaticSolver.h"
+#include "SolverInterface.h"
+#include "ConstraintManager.h"
 
 void solve(Input &input, Mesh &mesh);
 void test();
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
 
   Input input(argv[1]); // 读入和解析input文件
 
-  std::cout << "当前问题的输入参数:" << std::endl;
+  std::cout << "The input parameters for the current problem:" << std::endl;
   for (auto & it : input.db)
   {
     std::cout << "##########-- a piece of db --##########" <<std::endl;
@@ -33,12 +34,24 @@ int main(int argc, char *argv[])
   }
 
   auto solver = new LinearStaticSolver;
-  solver->solve();
+  solver->solve();  
+
+  std::clock_t c_start_mesh = std::clock();
+  Mesh mesh(input.db["mesh_file_name"][0]); 
+
+  auto constraint_manager = new ConstraintManager();
+
+  constraint_manager->takeDB(input, mesh);
+
+
+
+
+
+
   exit(0);
 
   // 读入网格文件
-  std::clock_t c_start_mesh = std::clock();
-  Mesh mesh(input.db["mesh_file_name"][0]); 
+  
   std::clock_t c_end_mesh = std::clock();
   std::cout << "time of read mesh " << 1000.0 * (c_end_mesh - c_start_mesh) / CLOCKS_PER_SEC << std::endl;
 
