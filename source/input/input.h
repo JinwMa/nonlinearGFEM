@@ -24,6 +24,7 @@ class Input
     double getDouble(string);
     string getString(string);
     vector<string> getVectorString(string);
+    bool ifExist(string);
     private:
     void read_input_file(const string filename);
 };

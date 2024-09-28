@@ -101,5 +101,6 @@
         "iterativelinearsolvers": "cpp",
         "geometry": "cpp",
         "sparsecore": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

@@ -9,18 +9,18 @@ using namespace std;
 class toolbox
 {
     public:
-    void error(string info)
+    static void error(string info)
     {
         cout << info << endl;
         exit(1);
     }
-    void printvector(vector<double> vec)
+    static void printvector(vector<double> vec)
     {
         for (size_t i = 0; i < vec.size(); i++)
         std::cout << vec[i] << " ";
         std::cout << std::endl;
     }
-    void printvector(vector<int> vec)
+    static void printvector(vector<int> vec)
     {
         for (size_t i = 0; i < vec.size(); i++)
         std::cout << vec[i] << " ";

@@ -26,6 +26,10 @@ class SPC
 
     private:
     vector<int> d_node_ids;
+    vector<double> d_geometry_expression;
+    double d_value;
+    vector<double> d_value_expression;
+    void getNodesFromGeometry(Mesh & mesh);
 };
 
 

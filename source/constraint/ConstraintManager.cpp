@@ -33,8 +33,9 @@ void ConstraintManager::takeDB(Input & input, Mesh & mesh)
         std::cout << it->second[0] << std::endl;
         if (it->second[0] == "SPC")
         {
-            // auto constrain = new SPC(it->first);
-            // constrain->takeDB(input, mesh);
+            auto constrain = new SPC(constraints[i]);
+            constrain->takeDB(input, mesh);
+            std::cout << "ppppppppp" << std::endl;
             // constrain->buildDofMap();
             // equations = constrain->buildEquations();
             // delete constrain;

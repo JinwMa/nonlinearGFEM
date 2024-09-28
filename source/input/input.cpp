@@ -205,3 +205,10 @@ std::vector<std::string> Input::getVectorString(std::string name)
     }
     return strings;
 }
+
+bool Input::ifExist(std::string name)
+{
+    auto it = db.find(name);
+    if (it != db.end()) return true;
+    else return false;
+}

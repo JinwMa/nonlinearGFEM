@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 #  
 message(STATUS "Current operating system: ${CMAKE_SYSTEM_NAME}")
+add_definitions(-DNDIM=3)
 
 # 设置Eigen路径
 set(EIGEN3_INCLUDE_DIR "E:/work/project/workspace/eigen-3.4.0")
@@ -108,8 +109,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-    target_compile_options(M3D PRIVATE -g -fsanitize=address -fno-omit-frame-pointer)
-    target_link_options(M3D PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+    # target_compile_options(M3D PRIVATE -g -fsanitize=address -fno-omit-frame-pointer)
+    # target_link_options(M3D PRIVATE -fsanitize=address -fno-omit-frame-pointer)
 endif()
 
 # 指定可执行文件的输出目录(可选)

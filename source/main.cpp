@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 
   Input input(argv[1]); // 读入和解析input文件
 
+
   std::cout << "The input parameters for the current problem:" << std::endl;
   for (auto & it : input.db)
   {
