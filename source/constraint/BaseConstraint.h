@@ -19,7 +19,7 @@ struct EquationTerm
 struct ConstraintEquation
 {
     int master_node_id = 0;
-    string mater_node_dof;
+    string mater_node_dof = "null";
     vector<EquationTerm> equationterms;
 };
 

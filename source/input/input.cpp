@@ -93,7 +93,7 @@ int Input::getInt(std::string name)
         exit(1);
     }
     //判断value是不是只有一个值
-    if (it->second.size() != 0)
+    if (it->second.size() != 1)
     {
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
     }
@@ -110,7 +110,7 @@ double Input::getDouble(std::string name)
         exit(1);
     }
     //判断value是不是只有一个值
-    if (it->second.size() != 0)
+    if (it->second.size() != 1)
     {
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
     }
@@ -175,7 +175,7 @@ std::string Input::getString(string name)
         exit(1);
     }
     //判断value是不是只有一个值
-    if (it->second.size() != 0)
+    if (it->second.size() != 1)
     {
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
     }

@@ -14,16 +14,19 @@ using namespace std;
 
 class ConstraintManager
 {
-    public:
-    vector<vector<ConstraintEquation>> FinalConstraintEquations;
+    public:    
     ConstraintManager(){};
     ~ConstraintManager(){};
     void takeDB(Input & input, Mesh & mesh);
     void buildDofMap();
     vector<ConstraintEquation> buildConstrintEquation();
-    Eigen::SparseMatrix<double> buildConstrintMatrix();
+    Eigen::SparseMatrix<double> buildConstrintMatrix(Mesh & mesh);
     Eigen::SparseMatrix<double> buildConstrintStiffness(){};
     Eigen::SparseMatrix<double> buildConstrintForce(){};
+    
+    int d_equations_num = 0;
+    vector<vector<ConstraintEquation>> FinalConstraintEquations;
+    vector<string> d_boundary_conditions;
 };
 
 
