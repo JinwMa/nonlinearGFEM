@@ -25,13 +25,16 @@ link_directories(${MKLROOT}/lib/intel64)
 find_package(OpenMP REQUIRED)
 
 ##############################################################################################
-#注意这里是一个明显的分界线，注意add_executable前后发生的事情和时机
+#注意这里是一个明显的分界线,注意add_executable前后发生的事情和时机
 ##############################################################################################
 # 指定可执行文件的名称和源文件
-add_executable(M3D source/main.cpp  source/test.cpp source/solve.cpp)
+add_executable(M3D source/main.cpp  source/test.cpp)
 target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
 # 链接MKL库
 target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core mkl_intel_thread)
+
+# target_link_libraries(M3D PRIVATE  pthread dl m)
+
 
 
 # 添加mesh子目录,如果还有别的子目录,则继续添加即可,目前先做到手动添加 #默认当前目录为CMakeLists.txt所在目录

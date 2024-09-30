@@ -25,7 +25,7 @@ target_include_directories(constraintlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(constraintlib PRIVATE inputlib meshlib toolboxlib)
 
-# 指定静态库的输出目录（可选）
+# 指定静态库的输出目录(可选)
 set_target_properties(constraintlib PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE}"
 )
