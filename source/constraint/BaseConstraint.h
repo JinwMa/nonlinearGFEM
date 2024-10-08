@@ -21,6 +21,7 @@ struct ConstraintEquation
     int master_node_id = 0;
     string mater_node_dof = "null";
     vector<EquationTerm> equationterms;
+    double rhs = 0.0;
 };
 
 

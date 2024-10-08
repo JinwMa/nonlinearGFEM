@@ -22,7 +22,7 @@ Eigen::VectorXd linear_solver(Eigen::SparseMatrix<double> K,
                               Eigen::VectorXd P,
                               Eigen::SparseMatrix<double> C,
                               Eigen::VectorXd G,
-                              const std::string type);
+                              const std::string type = "L");
 // void solve(Input &input, Mesh &mesh);
 // void test();
 // Eigen::MatrixXd computeNullSpace(const Eigen::SparseMatrix<double>& C);
@@ -74,27 +74,27 @@ void a_eigen_test();
 int main(int argc, char *argv[])
 {
 
-    // a_eigen_test();
-    Eigen::SparseMatrix<double> K(2, 2);
-    K.setZero();
-    K.coeffRef(0, 0) = 1.0;
-    K.coeffRef(1, 1) = 3.0;
-    Eigen::SparseMatrix<double> C(1, 2);
-    C.setZero();
-    C.coeffRef(0, 0) = 2.0;
+    // // a_eigen_test();
+    // Eigen::SparseMatrix<double> K(2, 2);
+    // K.setZero();
+    // K.coeffRef(0, 0) = 1.0;
+    // K.coeffRef(1, 1) = 3.0;
+    // Eigen::SparseMatrix<double> C(1, 2);
+    // C.setZero();
+    // C.coeffRef(0, 0) = 2.0;
 
-    Eigen::VectorXd P(2);
-    P(0) = 1.0;
-    P(1) = 1.0;
-    Eigen::VectorXd G(1);
-    G(0) = 3.0;
-    const std::string type = "largin";
-    Eigen::VectorXd u = linear_solver(K, P, C, G, type);
+    // Eigen::VectorXd P(2);
+    // P(0) = 1.0;
+    // P(1) = 1.0;
+    // Eigen::VectorXd G(1);
+    // G(0) = 3.0;
+    // const std::string type = "largin";
+    // Eigen::VectorXd u = linear_solver(K, P, C, G, type);
 
-    std::cout << u << std::endl;
+    // std::cout << u << std::endl;
     // test();
 
-    // Input input(argv[1]); // 读入和解析input文件
+    Input input(argv[1]); // 读入和解析input文件
 
     // std::cout << "The input parameters for the current problem:" << std::endl;
     // for (auto & it : input.db)
@@ -109,15 +109,91 @@ int main(int argc, char *argv[])
     // // solver->solve();
 
     // std::clock_t c_start_mesh = std::clock();
-    // Mesh mesh(input.db["mesh_file_name"][0]);
+    Mesh mesh(input.db["mesh_file_name"][0]);
 
-    // Dof_Map DofMap(mesh);
-    // DofMap.BuildDofMap(mesh);
+    Dof_Map DofMap(mesh);
+    DofMap.BuildDofMap(mesh);
 
-    // auto constraint_manager = new ConstraintManager();
+    auto constraint_manager = new ConstraintManager();
 
-    // constraint_manager->takeDB(input, mesh);
-    // Eigen::SparseMatrix<double> C = constraint_manager->buildConstrintMatrix(mesh);
+    constraint_manager->takeDB(input, mesh);
+    Eigen::SparseMatrix<double> C = constraint_manager->buildConstrintMatrix(mesh);
+    Eigen::VectorXd G = constraint_manager->buildConstrintForce(mesh);
+
+
+    int num_dofs = mesh.actual_node_count * 3;
+    // int num_dof_constrain = Equations.size();
+    // int num_all = num_dofs + num_dof_constrain;
+    Eigen::SparseMatrix<double> K(num_dofs, num_dofs);
+    // Eigen::SparseMatrix<double> C(num_dof_constrain, num_dofs);
+
+    K.setZero();
+    Eigen::VectorXd b(num_dofs);
+    b.setZero();
+
+    std::vector<Eigen::Triplet<double>> tripletList;
+
+    vector<vector<double>> GaussPoint;
+    auto elem = new LinearHex8;
+    elem->SetGaussIntegration(GaussPoint);
+    delete elem;
+    for (int element_now = 0; element_now < mesh.actual_element_count; element_now++)
+    {
+        int element_id = mesh.ElementIdList[element_now];
+        int element_location = mesh.ElementOrderInList[element_id];
+        vector<int> node_ids_in_a_element = mesh.NodesOnElements[element_location - 1];
+        auto elem = new LinearHex8;
+        double nodes_coordinates[8][3];
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 3; j++)
+            {
+                int node_id = node_ids_in_a_element[i];
+                int node_location = mesh.NodeOrderInList[node_id];
+                nodes_coordinates[i][j] = mesh.NodesCoordinate[node_location - 1][j];
+            }
+
+        double elementmat[24][24];
+        elem->ComputeStiffness(nodes_coordinates, GaussPoint, elementmat);
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    for (int jj = 0; jj < 3; jj++)
+                    {
+                        int iii = i * 3 + ii;
+                        int jjj = j * 3 + jj;
+                        double value = elementmat[iii][jjj];
+                        int row = (node_ids_in_a_element[i] - 1) * 3 + ii;
+                        int col = (node_ids_in_a_element[j] - 1) * 3 + jj;
+                        tripletList.push_back(Eigen::Triplet<double>(row, col, value));
+                    }
+                }
+            }
+        }
+        delete elem;
+    }
+    for (const auto &triplet : tripletList)
+    {
+        K.coeffRef(triplet.row(), triplet.col()) += triplet.value();
+    }
+
+    Eigen::VectorXd solution = linear_solver(K, b, C, G);
+
+    std::cout << solution;
+
+    Post post("tecplot");
+    post.onlymesh(mesh);
+
+    std::vector<double> displacement(solution.data(), solution.data() + num_dofs);
+    post.ShowDisplacement(mesh, DofMap, displacement);
+
+
+
+    // std::cout << G;
+
+    // std::cout << C << std::endl;
 
     return 0;
 }
@@ -201,7 +277,7 @@ void a_eigen_test()
     B.coeffRef(0, 0) = 3.0;
     B.coeffRef(2, 1) = 4.0;
 
-    // 创建一个新的稀疏矩阵来存储拼接结果，维度为 (3, 4)
+    // 创建一个新的稀疏矩阵来存储拼接结果,维度为 (3, 4)
     Eigen::SparseMatrix<double> C(3, 4);
 
     // 将 A 的元素插入到 C 的前两列
@@ -249,6 +325,7 @@ Eigen::VectorXd linear_solver(Eigen::SparseMatrix<double> K,
     // 判断K是否为方阵
     if (K_row != K_col) toolbox::error("K size is wrong in linear solver");
     // 判断C和K是否列数相同
+    std::cout << C_col << "  C_size  " << C_row << std::endl;
     if (K_col != C_col) toolbox::error("C size is wrong in linear solver");
     // 检查P和G的正确性
     if (P.size() != K_row) toolbox::error("P size is wrong in linear solver");

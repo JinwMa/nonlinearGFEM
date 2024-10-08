@@ -82,9 +82,10 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh & mesh)
         equation.equationterms.resize(1);
         equation.equationterms[0].node_id = node_id;
         equation.equationterms[0].node_dof = d_dof;
+        equation.equationterms[0].factor = 1.0;
         if (d_is_value)
-        {
-            equation.equationterms[0].factor = d_value;
+        {            
+            equation.rhs = d_value;
         }
         else if ( d_is_value_expression )
         {
@@ -112,7 +113,7 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh & mesh)
             value = expression[0] + expression[1] * x + expression[2] * y + expression[3] * z +
                     expression[4] * x * x + expression[5] * y * y + expression[6] * z * z + 
                     expression[7] * x * y + expression[8] * y * z + expression[9] * x * z;
-            equation.equationterms[0].factor = value;
+            equation.rhs = value;
         }
         equations.push_back(equation);
     }

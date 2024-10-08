@@ -11,10 +11,11 @@ add_definitions(-DNDIM=3)
 set(EIGEN3_INCLUDE_DIR "E:/work/project/workspace/eigen-3.4.0")
 # 设置MKL路径
 set(MKLROOT "C:/Program Files (x86)/Intel/oneAPI/mkl/2023.2.0")
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     message(STATUS "The operating system is Linux")
     set(MKLROOT "/home/ma/intel/oneapi/mkl/latest")
-    set(EIGEN3_INCLUDE_DIR "/home/ma/work/wal-nonlinearfem/eigen-3.4.0")
+    set(EIGEN3_INCLUDE_DIR "/home/ma/work/workspace/eigen-3.4.0")
 endif()
 # 添加包含目录
 include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)

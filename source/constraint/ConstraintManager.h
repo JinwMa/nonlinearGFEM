@@ -21,8 +21,8 @@ class ConstraintManager
     void buildDofMap();
     vector<ConstraintEquation> buildConstrintEquation();
     Eigen::SparseMatrix<double> buildConstrintMatrix(Mesh & mesh);
+    Eigen::VectorXd buildConstrintForce(Mesh & mesh);
     Eigen::SparseMatrix<double> buildConstrintStiffness(){};
-    Eigen::SparseMatrix<double> buildConstrintForce(){};
     
     int d_equations_num = 0;
     vector<vector<ConstraintEquation>> FinalConstraintEquations;

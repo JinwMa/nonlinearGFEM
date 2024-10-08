@@ -15,7 +15,7 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
             elementmat[i][j] = 0.0;
     // 材料参数先给一个默认值
     double E = 1.E7;
-    double v = 0.0;
+    double v = 0.3;
     // 形函数和形函数导数
     vector<vector<double>> SF;
     vector<vector<vector<double>>> SF_dxyz;

@@ -10,7 +10,7 @@ void ConstraintManager::takeDB(Input & input, Mesh & mesh)
 {
     //首先检查是否存在boundary_conditions
     d_boundary_conditions = input.getVectorString("boundary_conditions");    
-    // 若存在，则一一读取    
+    // 若存在,则一一读取    
     for (size_t i = 0; i < d_boundary_conditions.size(); i++)
     {
         vector<ConstraintEquation> equations;
@@ -39,9 +39,9 @@ void ConstraintManager::takeDB(Input & input, Mesh & mesh)
 
 Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh & mesh)
 {
-    //TODO:: 临时写死--第一个分支：实体单元
+    //TODO:: 临时写死--第一个分支:实体单元
     int numdofs = mesh.actual_node_count * NDIM;
-    Eigen::SparseMatrix<double> C(numdofs, d_equations_num);
+    Eigen::SparseMatrix<double> C(d_equations_num, numdofs);
     C.setZero();
     std::vector<Eigen::Triplet<double>> tripletList;
     map<string, int> dof_map = { 
@@ -68,7 +68,7 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh & mesh)
                 double factor = terms[k].factor;
                 int row, col;
                 row = (sid - 1) * NDIM + dof_map[sdof] - 1;
-                tripletList.push_back(Eigen::Triplet<double>(row, equation_id, factor));
+                tripletList.push_back(Eigen::Triplet<double>(equation_id, row, factor));
             }
             equation_id++;
         }
@@ -78,6 +78,28 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh & mesh)
     {
         C.coeffRef(triplet.row(), triplet.col()) += triplet.value();
     }
-    std::cout << C.transpose();
-    return C.transpose();
+    // std::cout << C.transpose();
+    return C;
+}
+
+Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh & mesh)
+{
+    Eigen::VectorXd G(d_equations_num);
+    G.setZero();
+
+    int equation_id = 0;
+
+    for (size_t i = 0; i < FinalConstraintEquations.size(); i++)
+    {
+        auto equations = FinalConstraintEquations[i];
+        for (size_t j = 0; j < equations.size(); j++)
+        {            
+            auto equation = equations[j];
+            G(equation_id) = equation.rhs;
+            equation_id++;
+        }
+    }
+    if (equation_id != d_equations_num) toolbox::error("equation_id is wrong");
+    
+    return G;
 }
