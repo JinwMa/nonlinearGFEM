@@ -16,6 +16,7 @@
 #include "ConstraintManager.h"
 #include "element.h"
 #include "toolbox.h"
+#include "SolverInterface.h"
 
 
 Eigen::VectorXd linear_solver(Eigen::SparseMatrix<double> K,
@@ -74,39 +75,14 @@ void a_eigen_test();
 int main(int argc, char *argv[])
 {
 
-    // // a_eigen_test();
-    // Eigen::SparseMatrix<double> K(2, 2);
-    // K.setZero();
-    // K.coeffRef(0, 0) = 1.0;
-    // K.coeffRef(1, 1) = 3.0;
-    // Eigen::SparseMatrix<double> C(1, 2);
-    // C.setZero();
-    // C.coeffRef(0, 0) = 2.0;
-
-    // Eigen::VectorXd P(2);
-    // P(0) = 1.0;
-    // P(1) = 1.0;
-    // Eigen::VectorXd G(1);
-    // G(0) = 3.0;
-    // const std::string type = "largin";
-    // Eigen::VectorXd u = linear_solver(K, P, C, G, type);
-
-    // std::cout << u << std::endl;
-    // test();
+    BaseSolver * structsolver;
+    structsolver = new LinearStaticSolver();
+    structsolver->solve();
+    // delete structsolver;
+    // exit(0);
 
     Input input(argv[1]); // 读入和解析input文件
 
-    // std::cout << "The input parameters for the current problem:" << std::endl;
-    // for (auto & it : input.db)
-    // {
-    //   std::cout << "##########-- a piece of db --##########" <<std::endl;
-    //   std::cout << it.first << " \n";// << it.second;
-    //   for (size_t i = 0; i < it.second.size(); i++)
-    //     std::cout << it.second[i] << std::endl;
-    // }
-
-    // // auto solver = new LinearStaticSolver;
-    // // solver->solve();
 
     // std::clock_t c_start_mesh = std::clock();
     Mesh mesh(input.db["mesh_file_name"][0]);
@@ -119,6 +95,7 @@ int main(int argc, char *argv[])
     constraint_manager->takeDB(input, mesh);
     Eigen::SparseMatrix<double> C = constraint_manager->buildConstrintMatrix(mesh);
     Eigen::VectorXd G = constraint_manager->buildConstrintForce(mesh);
+    delete constraint_manager;
 
 
     int num_dofs = mesh.actual_node_count * 3;
@@ -179,7 +156,9 @@ int main(int argc, char *argv[])
         K.coeffRef(triplet.row(), triplet.col()) += triplet.value();
     }
 
-    Eigen::VectorXd solution = linear_solver(K, b, C, G);
+    // Eigen::VectorXd solution = linear_solver(K, b, C, G);
+    Eigen::VectorXd solution = structsolver->linear_solver(K, b, C, G);
+    delete structsolver;
 
     std::cout << solution;
 
@@ -224,92 +203,6 @@ void solve_equation(Eigen::SparseMatrix<double> &K,
     // bigMatrix.bottomLeftCorner(rowsC, colsK) = temp;  // 再进行赋值
 };
 
-void a_eigen_test()
-{
-    std::cout << "pass here!!!" << std::endl;
-    Eigen::SparseMatrix<double> A(3, 2); // 3x2 矩阵
-    Eigen::SparseMatrix<double> B(3, 2); // 3x2 矩阵
-
-    const int num = 1000000;
-
-    Eigen::SparseMatrix<double> K(num, num);
-    K.setZero();
-
-    // std::cout << K << std::endl;
-
-    for (int i = 0; i < num; i++)
-        K.coeffRef(i, i) = 2.0;
-
-    Eigen::VectorXd P(num);
-
-    for (int i = 0; i < num; i++)
-        P(i) = i + 1.0;
-
-    // std::cout << P << std::endl;
-
-
-    Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
-
-    solver.compute(K);
-
-    if (solver.info() != Eigen::Success)
-    {
-        // 分解失败
-        std::cerr << "分解失败" << std::endl;
-        exit(0);
-    }
-    Eigen::VectorXd x = solver.solve(P);
-    if (solver.info() != Eigen::Success)
-    {
-        // 求解失败
-        std::cerr << "求解失败" << std::endl;
-        // exit(0);
-    }
-
-    std::cout << " the solution is " << std::endl;
-
-    std::cout << x << std::endl;
-
-
-    A.coeffRef(0, 0) = 1.0;
-    A.coeffRef(1, 1) = 2.0;
-
-    B.coeffRef(0, 0) = 3.0;
-    B.coeffRef(2, 1) = 4.0;
-
-    // 创建一个新的稀疏矩阵来存储拼接结果,维度为 (3, 4)
-    Eigen::SparseMatrix<double> C(3, 4);
-
-    // 将 A 的元素插入到 C 的前两列
-    for (int k = 0; k < A.outerSize(); ++k)
-    {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it)
-        {
-            C.coeffRef(it.row(), it.col()) = it.value();
-        }
-    }
-
-    // 将 B 的元素插入到 C 的后两列
-    for (int k = 0; k < B.outerSize(); ++k)
-    {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(B, k); it; ++it)
-        {
-            C.coeffRef(it.row(), it.col() + A.cols()) = it.value();
-        }
-    }
-
-    // 输出拼接结果
-    for (int k = 0; k < C.outerSize(); ++k)
-    {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(C, k); it; ++it)
-        {
-            std::cout << "Element (" << it.row() << ", " << it.col()
-                      << ") = " << it.value() << std::endl;
-        }
-    }
-
-    // return 0;
-}
 
 
 Eigen::VectorXd linear_solver(Eigen::SparseMatrix<double> K,

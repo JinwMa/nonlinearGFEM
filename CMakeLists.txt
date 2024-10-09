@@ -21,8 +21,10 @@ endif()
 include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
 # 设置MKL库目录
 link_directories(${MKLROOT}/lib/intel64)
+# link_directories(/home/ma/intel/oneapi/2024.1/lib)
+
 #添加MKL相关定义 加速计算
-# add_definitions(-DEIGEN_USE_MKL_ALL)
+add_definitions(-DEIGEN_USE_MKL_ALL)
 find_package(OpenMP REQUIRED)
 
 ##############################################################################################
@@ -32,7 +34,7 @@ find_package(OpenMP REQUIRED)
 add_executable(M3D source/main.cpp  source/test.cpp)
 target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
 # 链接MKL库
-target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core mkl_intel_thread)
+target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core mkl_intel_thread iomp5)
 
 # target_link_libraries(M3D PRIVATE  pthread dl m)
 
@@ -93,13 +95,13 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
 
 # 设置构建类型
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release")
-    # set(CMAKE_BUILD_TYPE "Debug")
+    # set(CMAKE_BUILD_TYPE "Release")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # 设置编译器标志以优化执行速度
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math -fsanitize=address")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3 -g -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
     set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} -flto")
