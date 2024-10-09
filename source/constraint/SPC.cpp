@@ -118,10 +118,10 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh & mesh)
         equations.push_back(equation);
     }
 
-    for (size_t i = 0; i < equations.size(); i++)
-    {
-        std::cout << equations[i].equationterms[0].node_id << " " << equations[i].equationterms[0].factor << std::endl;
-    }
+    // for (size_t i = 0; i < equations.size(); i++)
+    // {
+    //     std::cout << equations[i].equationterms[0].node_id << " " << equations[i].equationterms[0].factor << std::endl;
+    // }
 
     return equations;
 

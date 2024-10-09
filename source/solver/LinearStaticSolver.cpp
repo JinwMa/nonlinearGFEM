@@ -2,5 +2,5 @@
 
 void LinearStaticSolver:: solve()
 {
-    std::cout << "pass here" << std::endl;
+    // std::cout << "pass here" << std::endl;
 }

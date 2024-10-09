@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     Eigen::VectorXd solution = structsolver->linear_solver(K, b, C, G);
     delete structsolver;
 
-    std::cout << solution;
+    // std::cout << solution;
 
     Post post("tecplot");
     post.onlymesh(mesh);
