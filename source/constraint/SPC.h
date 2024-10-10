@@ -11,7 +11,7 @@
 #include"mesh.h"
 
 
-//input文件的输入格式：
+//input文件的输入格式:
 /*
 boundary_conditions = SPC0, SPC1, ...
 SPC0_type = SPC
@@ -29,18 +29,15 @@ SPC0_dof = "ux"
 
 using namespace std;
 
-class SPC
+class SPC : public BaseConstraint
 {
     string name;
     public:    
-    SPC(string SPC_name)
-    {
-        name = SPC_name;
-    };
+    SPC(string SPC_name) : name(SPC_name){};
     ~SPC(){};
-    void takeDB(Input & input, Mesh & mesh);
+    void takeDB(Input * input, Mesh * mesh);
     void buildDofMap(){};
-    vector<ConstraintEquation> buildEquations(Mesh & mesh);
+    vector<ConstraintEquation> buildEquations(Mesh * mesh);
 
     private:
     vector<int> d_node_ids;
@@ -51,7 +48,7 @@ class SPC
     vector<double> d_value_expression;
     bool d_is_value = false;
     bool d_is_value_expression = false;
-    void getNodesFromGeometry(Mesh & mesh);
+    void getNodesFromGeometry(Mesh * mesh);
 };
 
 

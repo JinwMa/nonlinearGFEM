@@ -1,13 +1,13 @@
 #include"SPC.h"
 #include"toolbox.h"
 
-void SPC::takeDB(Input & input, Mesh & mesh)
+void SPC::takeDB(Input * input, Mesh * mesh)
 {
     // 读节点
-    std::string nodes_type = input.getString(name + "_nodes_type");
+    std::string nodes_type = input->getString(name + "_nodes_type");
     if (nodes_type == "geometry")
     {
-        d_geometry_expression = input.getVectorDouble(name + "_geometry_expression");
+        d_geometry_expression = input->getVectorDouble(name + "_geometry_expression");
         getNodesFromGeometry(mesh);
     }
     else
@@ -17,19 +17,19 @@ void SPC::takeDB(Input & input, Mesh & mesh)
 
 
     // 读自由度
-    d_dof = input.getString(name + "_dof");
+    d_dof = input->getString(name + "_dof");
 
 
     // 读值
-    if (input.ifExist(name + "_value"))
+    if (input->ifExist(name + "_value"))
     {
         d_is_value = true;
-        d_value = input.getDouble(name + "_value");
+        d_value = input->getDouble(name + "_value");
     }
-    else if (input.ifExist(name + "_value_expression"))
+    else if (input->ifExist(name + "_value_expression"))
     {
         d_is_value_expression = true;
-        d_value_expression = input.getVectorDouble(name + "_value_expression");
+        d_value_expression = input->getVectorDouble(name + "_value_expression");
     }
     else
     {
@@ -38,7 +38,7 @@ void SPC::takeDB(Input & input, Mesh & mesh)
     
 }
 
-void SPC::getNodesFromGeometry(Mesh & mesh)
+void SPC::getNodesFromGeometry(Mesh * mesh)
 {
     // d_node_ids
     const double eps = 1.E-10;
@@ -50,15 +50,15 @@ void SPC::getNodesFromGeometry(Mesh & mesh)
     double expression[10] = {0.0};
     for (int i = 0; i < count; i++)expression[i] = d_geometry_expression[i];
 
-    int node_num = mesh.actual_node_count;
+    int node_num = mesh->actual_node_count;
     for (int i = 0; i < node_num; i++)
     {
-        int node_id = mesh.NodeIdList[i];
-        int node_order = mesh.NodeOrderInList[node_id] - 1;        
-        double x = mesh.NodesCoordinate[node_order][0]; 
-        double y = mesh.NodesCoordinate[node_order][1]; 
+        int node_id = mesh->NodeIdList[i];
+        int node_order = mesh->NodeOrderInList[node_id] - 1;        
+        double x = mesh->NodesCoordinate[node_order][0]; 
+        double y = mesh->NodesCoordinate[node_order][1]; 
         double z = 0.0;
-        if (NDIM == 3) z = mesh.NodesCoordinate[node_order][2];
+        if (NDIM == 3) z = mesh->NodesCoordinate[node_order][2];
         double value = 1E10;
         if (NDIM != 3) toolbox::error("2D or 1D cases are not supported");
         else
@@ -72,7 +72,7 @@ void SPC::getNodesFromGeometry(Mesh & mesh)
     // std::cout << d_node_ids.size() << std::endl;
 }
 
-std::vector<ConstraintEquation> SPC::buildEquations(Mesh & mesh)
+std::vector<ConstraintEquation> SPC::buildEquations(Mesh * mesh)
 {
     std::vector<ConstraintEquation> equations;
     for (size_t i = 0; i < d_node_ids.size(); i++)
@@ -100,12 +100,12 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh & mesh)
             for (int ii = 0; ii < count; ii++)
                 expression[ii] = d_value_expression[ii];
 
-            int node_order = mesh.NodeOrderInList[node_id] - 1;
-            double x = mesh.NodesCoordinate[node_order][0];
-            double y = mesh.NodesCoordinate[node_order][1];
+            int node_order = mesh->NodeOrderInList[node_id] - 1;
+            double x = mesh->NodesCoordinate[node_order][0];
+            double y = mesh->NodesCoordinate[node_order][1];
             double z = 0.0;
             if (NDIM == 3)
-                z = mesh.NodesCoordinate[node_order][2];
+                z = mesh->NodesCoordinate[node_order][2];
             double value = 1E10;
             if (NDIM != 3)
                 toolbox::error("2D or 1D cases are not supported");

@@ -5,6 +5,9 @@
 #include<string>
 #include<vector>
 
+#include"input.h"
+#include"mesh.h"
+
 using namespace std;
 
 
@@ -22,6 +25,18 @@ struct ConstraintEquation
     string mater_node_dof = "null";
     vector<EquationTerm> equationterms;
     double rhs = 0.0;
+};
+
+class BaseConstraint
+{
+    public:
+    BaseConstraint(){};
+    ~BaseConstraint(){};
+    void takeDB(Input * input, Mesh * mesh);
+
+    Input * d_input;
+    Mesh * d_mesh;
+
 };
 
 

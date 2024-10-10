@@ -1,21 +1,19 @@
 #include"ConstraintManager.h"
 #include"toolbox.h"
-// #include"SPC.h"
-
 
 
 using namespace std;
 
-void ConstraintManager::takeDB(Input & input, Mesh & mesh)
+void ConstraintManager::takeDB(Input * input, Mesh * mesh)
 {
     //首先检查是否存在boundary_conditions
-    d_boundary_conditions = input.getVectorString("boundary_conditions");    
+    d_boundary_conditions = input->getVectorString("boundary_conditions");    
     // 若存在,则一一读取    
     for (size_t i = 0; i < d_boundary_conditions.size(); i++)
     {
         vector<ConstraintEquation> equations;
         auto constraint_name = d_boundary_conditions[i];
-        auto constraint_type = input.getString(constraint_name + "_type");
+        auto constraint_type = input->getString(constraint_name + "_type");
 
         if (constraint_type == "SPC")
         {
@@ -37,10 +35,10 @@ void ConstraintManager::takeDB(Input & input, Mesh & mesh)
 }
 
 
-Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh & mesh)
+Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * mesh)
 {
     //TODO:: 临时写死--第一个分支:实体单元
-    int numdofs = mesh.actual_node_count * NDIM;
+    int numdofs = mesh->actual_node_count * NDIM;
     Eigen::SparseMatrix<double> C(d_equations_num, numdofs);
     C.setZero();
     std::vector<Eigen::Triplet<double>> tripletList;
@@ -82,7 +80,7 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh & mesh)
     return C;
 }
 
-Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh & mesh)
+Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * mesh)
 {
     Eigen::VectorXd G(d_equations_num);
     G.setZero();

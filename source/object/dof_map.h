@@ -10,12 +10,12 @@ class Dof_Map
     public:
     map<int, vector<string>> NodesDofs;
     vector<int> NodesIndex;
-    Dof_Map(Mesh & mesh)
+    Dof_Map(Mesh * mesh)
     {
         BuildNodesDofs(mesh);
     }
-    void BuildNodesDofs(Mesh & mesh);
-    void BuildDofMap(Mesh & mesh);
+    void BuildNodesDofs(Mesh * mesh);
+    void BuildDofMap(Mesh * mesh);
 
 };
 

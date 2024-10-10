@@ -1,6 +1,9 @@
 #include "LinearStaticSolver.h"
 
-void LinearStaticSolver:: solve()
+void LinearStaticSolver::takeDB()
 {
-    // std::cout << "pass here" << std::endl;
+    
+}
+void LinearStaticSolver:: solve()
+{  
 }

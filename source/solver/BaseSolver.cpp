@@ -19,13 +19,12 @@
 #include "toolbox.h"
 #include "SolverInterface.h"
 
-Eigen::VectorXd BaseSolver::linear_solver(Eigen::SparseMatrix<double> K,
-                                          Eigen::VectorXd P,
-                                          Eigen::SparseMatrix<double> C,
-                                          Eigen::VectorXd G,
+Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> & K,
+                                          Eigen::VectorXd & P,
+                                          const Eigen::SparseMatrix<double> & C,
+                                          Eigen::VectorXd & G,
                                           const std::string type)
 {
-    std::cout << "aaaaaaaaaaaaaa" << std::endl;
     int K_row = K.rows();
     int K_col = K.cols();
     int C_row = C.rows();
@@ -84,20 +83,9 @@ Eigen::VectorXd BaseSolver::linear_solver(Eigen::SparseMatrix<double> K,
 
     solver.compute(K_AL);
 
-    if (solver.info() != Eigen::Success)
-    {
-        // 分解失败
-        std::cerr << "分解失败" << std::endl;
-        exit(0);
-    }
+    if (solver.info() != Eigen::Success) toolbox::error("分解失败");
     Eigen::VectorXd x = solver.solve(PG);
-    if (solver.info() != Eigen::Success)
-    {
-        // 求解失败
-        std::cerr << "求解失败" << std::endl;
-        // exit(0);
-    }
-
+    if (solver.info() != Eigen::Success) toolbox::error("求解失败");
 
     // std::cout << x << std::endl;
 
