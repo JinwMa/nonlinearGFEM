@@ -13,7 +13,7 @@ class LinearStaticSolver : public BaseSolver
     ~LinearStaticSolver(){
         std::cout << "delete LinearStaticSolver" << std::endl;
     }
-    void solve();
+    void solve(Input * pinput, Mesh * pmesh);
     void takeDB();
 
 };

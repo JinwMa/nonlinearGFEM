@@ -18,9 +18,9 @@ class Post
     Post(const std::string &filename): outputFilename(filename)
     {
     }
-    void onlymesh(Mesh & mesh);
-    void ShowDisplacement(Mesh& mesh, Dof_Map& DofMap, vector<double> dis);
-    vector<Node> BuildPostNodes(Mesh& mesh, Dof_Map& DofMap, vector<double> dis);
+    void onlymesh(Mesh * pmesh);
+    void ShowDisplacement(Mesh * pmesh, Dof_Map& DofMap, vector<double> dis);
+    vector<Node> BuildPostNodes(Mesh * pmesh, Dof_Map& DofMap, vector<double> dis);
     private:
     string outputFilename;
 

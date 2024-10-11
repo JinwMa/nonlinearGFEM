@@ -35,9 +35,11 @@ class SPC : public BaseConstraint
     public:    
     SPC(string SPC_name) : name(SPC_name){};
     ~SPC(){};
-    void takeDB(Input * input, Mesh * mesh);
-    void buildDofMap(){};
-    vector<ConstraintEquation> buildEquations(Mesh * mesh);
+    void takeDB(Input * pinput, Mesh * pmesh);
+    void buildDofMap(){
+        std::cout << "calling buildDofMap" << std::endl;
+    };
+    vector<ConstraintEquation> buildEquations(Mesh * pmesh);
 
     private:
     vector<int> d_node_ids;
@@ -48,7 +50,7 @@ class SPC : public BaseConstraint
     vector<double> d_value_expression;
     bool d_is_value = false;
     bool d_is_value_expression = false;
-    void getNodesFromGeometry(Mesh * mesh);
+    void getNodesFromGeometry(Mesh * pmesh);
 };
 
 

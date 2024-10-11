@@ -18,16 +18,11 @@
 #include "dof_map.h"
 #include "input.h"
 #include "mesh.h"
-#include "input.h"
-#include "mesh.h"
-#include "SPC.h"
-#include "BaseConstraint.h"
 class BaseSolver
 {
 public:
-    Mesh * d_mesh;
-    Input * d_input;
-    BaseSolver(){
+    BaseSolver()
+    {
         std::cout << "build BaseSolver" << std::endl;
     };
     virtual ~BaseSolver()
@@ -35,16 +30,10 @@ public:
         std::cout << "delete BaseSolver" << std::endl;
     };
 
-    virtual void solve() = 0;
-    virtual void takeDB(){};
+    virtual void solve(Input * pinput, Mesh * pmesh) = 0;
+    virtual void takeDB() {};
 
-
-
-
-
-
-
-    
+// protected:
     Eigen::VectorXd linear_solver(const Eigen::SparseMatrix<double> &K,
                                   Eigen::VectorXd &P,
                                   const Eigen::SparseMatrix<double> &C,

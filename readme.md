@@ -50,3 +50,16 @@ C++编程常用知识:
 
 构造函数的调用逻辑 先调用基类的构造函数,再调用子类的构造函数
 析构函数的调用逻辑 先调用子类的析构函数 再调用基类的析构函数
+
+
+
+useful head file
+#include <Eigen/Sparse>
+#include <Eigen/PardisoSupport>
+#include <Eigen/Dense>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <omp.h>
+#include <chrono>

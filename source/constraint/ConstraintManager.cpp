@@ -4,41 +4,44 @@
 
 using namespace std;
 
-void ConstraintManager::takeDB(Input * input, Mesh * mesh)
+void ConstraintManager::takeDB(Input * pinput, Mesh * pmesh)
 {
     //首先检查是否存在boundary_conditions
-    d_boundary_conditions = input->getVectorString("boundary_conditions");    
+    d_boundary_conditions = pinput->getVectorString("boundary_conditions");    
     // 若存在,则一一读取    
     for (size_t i = 0; i < d_boundary_conditions.size(); i++)
     {
         vector<ConstraintEquation> equations;
         auto constraint_name = d_boundary_conditions[i];
-        auto constraint_type = input->getString(constraint_name + "_type");
+        auto constraint_type = pinput->getString(constraint_name + "_type");
+
+        BaseConstraint * constrain;
 
         if (constraint_type == "SPC")
         {
-            auto constrain = new SPC(constraint_name);
-            constrain->takeDB(input, mesh);
-            // constrain->buildDofMap();
-            equations = constrain->buildEquations(mesh);
-            d_equations_num = d_equations_num + equations.size();
-            delete constrain;
-            // FinalConstraintEquations.push_back(equations);
+            constrain = new SPC(constraint_name);            
         }
         else
         {
             cout << "not support this type : " << constraint_type << endl;
             exit(1);
         }
-        FinalConstraintEquations.push_back(equations);        
+
+        constrain->takeDB(pinput, pmesh);
+        constrain->buildDofMap();
+        equations = constrain->buildEquations(pmesh);
+        d_equations_num = d_equations_num + equations.size();
+        delete constrain;
+
+        FinalConstraintEquations.push_back(equations);
     }
 }
 
 
-Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * mesh)
+Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh)
 {
     //TODO:: 临时写死--第一个分支:实体单元
-    int numdofs = mesh->actual_node_count * NDIM;
+    int numdofs = pmesh->actual_node_count * NDIM;
     Eigen::SparseMatrix<double> C(d_equations_num, numdofs);
     C.setZero();
     std::vector<Eigen::Triplet<double>> tripletList;
@@ -80,7 +83,7 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * mesh)
     return C;
 }
 
-Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * mesh)
+Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * pmesh)
 {
     Eigen::VectorXd G(d_equations_num);
     G.setZero();

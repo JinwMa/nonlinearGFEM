@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void Post::onlymesh(Mesh &mesh)
+void Post::onlymesh(Mesh * pmesh)
 {
 
     string filename = outputFilename + "_mesh.dat";
@@ -22,22 +22,22 @@ void Post::onlymesh(Mesh &mesh)
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
-    outputFile << "Zone N=  " << mesh.actual_node_count << ", E=  " << mesh.actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
 
     // 输出节点
-    for (int i = 0; i < mesh.actual_node_count; i++)
+    for (int i = 0; i < pmesh->actual_node_count; i++)
     {
-        int nodeid = mesh.NodeIdList[i];
-        int nodeorder = mesh.NodeOrderInList[nodeid];
-        outputFile << std::setw(20) << mesh.NodesCoordinate[nodeorder - 1][0] << "   " << std::setw(20) << mesh.NodesCoordinate[nodeorder - 1][1] << "   " << std::setw(20) << mesh.NodesCoordinate[nodeorder - 1][2] << std::endl;
+        int nodeid = pmesh->NodeIdList[i];
+        int nodeorder = pmesh->NodeOrderInList[nodeid];
+        outputFile << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][2] << std::endl;
     }
 
     // 输出单元
-    for (int i = 0; i < mesh.actual_element_count; i++)
+    for (int i = 0; i < pmesh->actual_element_count; i++)
     {
-        int elementid = mesh.ElementIdList[i];
-        int elementorder = mesh.ElementOrderInList[elementid];
-        vector<int> element_connect = mesh.NodesOnElements[elementorder - 1];
+        int elementid = pmesh->ElementIdList[i];
+        int elementorder = pmesh->ElementOrderInList[elementid];
+        vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
 
         if (element_connect.size() == 4) // 四面体单元
         {
@@ -64,7 +64,7 @@ void Post::onlymesh(Mesh &mesh)
     outputFile.close();
 }
 
-void Post::ShowDisplacement(Mesh &mesh, Dof_Map &DofMap, vector<double> displacement)
+void Post::ShowDisplacement(Mesh * pmesh, Dof_Map &DofMap, vector<double> displacement)
 {
     string filename = outputFilename + "_displacement.dat";
     std::ofstream outputFile(filename); // 打开文件
@@ -74,13 +74,13 @@ void Post::ShowDisplacement(Mesh &mesh, Dof_Map &DofMap, vector<double> displace
         exit(0);
     }
     outputFile << std::fixed << std::setprecision(7);
-    vector<Node> PostNodes = BuildPostNodes(mesh, DofMap, displacement);
+    vector<Node> PostNodes = BuildPostNodes(pmesh, DofMap, displacement);
 
     outputFile << std::fixed << std::setprecision(7);
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-    outputFile << "Zone N=  " << mesh.actual_node_count << ", E=  " << mesh.actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
 
      // 输出节点
     for (size_t i = 0; (int)i < PostNodes.size(); i++)
@@ -91,11 +91,11 @@ void Post::ShowDisplacement(Mesh &mesh, Dof_Map &DofMap, vector<double> displace
     }
     
     // 输出单元
-    for (int i = 0; i < mesh.actual_element_count; i++)
+    for (int i = 0; i < pmesh->actual_element_count; i++)
     {
-        int elementid = mesh.ElementIdList[i];
-        int elementorder = mesh.ElementOrderInList[elementid];
-        vector<int> element_connect = mesh.NodesOnElements[elementorder - 1];
+        int elementid = pmesh->ElementIdList[i];
+        int elementorder = pmesh->ElementOrderInList[elementid];
+        vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
 
         if (element_connect.size() == 4) // 四面体单元
         {
@@ -122,17 +122,17 @@ void Post::ShowDisplacement(Mesh &mesh, Dof_Map &DofMap, vector<double> displace
     outputFile.close();
 }
 
-vector<Node> Post::BuildPostNodes(Mesh &mesh, Dof_Map &DofMap, vector<double> displacement)
+vector<Node> Post::BuildPostNodes(Mesh * pmesh, Dof_Map &DofMap, vector<double> displacement)
 {
     vector<Node> PostNodes;
-    PostNodes.resize(mesh.actual_node_count);
-    for (int i = 0; i < mesh.actual_node_count; i++)
+    PostNodes.resize(pmesh->actual_node_count);
+    for (int i = 0; i < pmesh->actual_node_count; i++)
     {
-        int nodeid = mesh.NodeIdList[i];
-        int nodeorder = mesh.NodeOrderInList[nodeid];
-        PostNodes[i].x = mesh.NodesCoordinate[nodeorder - 1][0];
-        PostNodes[i].y = mesh.NodesCoordinate[nodeorder - 1][1];
-        PostNodes[i].z = mesh.NodesCoordinate[nodeorder - 1][2];
+        int nodeid = pmesh->NodeIdList[i];
+        int nodeorder = pmesh->NodeOrderInList[nodeid];
+        PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0];
+        PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1];
+        PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2];
 
         int index = DofMap.NodesIndex[nodeorder - 1];
         PostNodes[i].ux = displacement[index];

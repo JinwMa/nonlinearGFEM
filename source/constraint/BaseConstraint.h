@@ -31,11 +31,10 @@ class BaseConstraint
 {
     public:
     BaseConstraint(){};
-    ~BaseConstraint(){};
-    void takeDB(Input * input, Mesh * mesh);
-
-    Input * d_input;
-    Mesh * d_mesh;
+    virtual ~BaseConstraint(){};
+    virtual void takeDB(Input * pinput, Mesh * pmesh){};
+    virtual void buildDofMap(){};
+    virtual vector<ConstraintEquation> buildEquations(Mesh * pmesh) {};
 
 };
 
