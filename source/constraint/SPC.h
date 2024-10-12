@@ -37,7 +37,7 @@ class SPC : public BaseConstraint
     ~SPC(){};
     void takeDB(Input * pinput, Mesh * pmesh);
     void buildDofMap(){
-        std::cout << "calling buildDofMap" << std::endl;
+        // std::cout << "calling buildDofMap" << std::endl;
     };
     vector<ConstraintEquation> buildEquations(Mesh * pmesh);
 

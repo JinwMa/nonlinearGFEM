@@ -12,6 +12,11 @@ set(EIGEN3_INCLUDE_DIR "E:/work/project/workspace/eigen-3.4.0")
 # 设置MKL路径
 set(MKLROOT "C:/Program Files (x86)/Intel/oneAPI/mkl/2023.2.0")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     message(STATUS "The operating system is Linux")
     set(MKLROOT "/home/ma/intel/oneapi/mkl/latest")
@@ -32,11 +37,13 @@ find_package(OpenMP REQUIRED)
 ##############################################################################################
 # 指定可执行文件的名称和源文件
 add_executable(M3D source/main.cpp  source/test.cpp)
-target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(M3D PUBLIC OpenMP::OpenMP_CXX)
 # 链接MKL库
-target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_sequential mkl_core mkl_intel_thread iomp5)
+target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_core mkl_intel_thread iomp5)
 
-# target_link_libraries(M3D PRIVATE  pthread dl m)
+target_link_libraries(M3D PRIVATE  pthread dl m)
+
+# target_link_libraries(M3D PRIVATE  mkl_sequential)
 
 
 

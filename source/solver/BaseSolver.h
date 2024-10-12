@@ -33,7 +33,13 @@ public:
     virtual void solve(Input * pinput, Mesh * pmesh) = 0;
     virtual void takeDB() {};
 
-// protected:
+
+    virtual void vector_assembler(Input * pinput, Mesh * pmesh, Eigen::VectorXd & Vector){};
+    // virtual void matrix_assembler(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
+    virtual void assembleElementStiffness(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
+
+
+protected:
     Eigen::VectorXd linear_solver(const Eigen::SparseMatrix<double> &K,
                                   Eigen::VectorXd &P,
                                   const Eigen::SparseMatrix<double> &C,

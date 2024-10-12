@@ -7,6 +7,7 @@
 #include <string>
 #include <omp.h>
 #include <chrono>
+#include <thread>
 
 #include "BaseSolver.h"
 #include "mesh.h"
@@ -19,10 +20,10 @@
 #include "toolbox.h"
 #include "SolverInterface.h"
 
-Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> & K,
-                                          Eigen::VectorXd & P,
-                                          const Eigen::SparseMatrix<double> & C,
-                                          Eigen::VectorXd & G,
+Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
+                                          Eigen::VectorXd &P,
+                                          const Eigen::SparseMatrix<double> &C,
+                                          Eigen::VectorXd &G,
                                           const std::string type)
 {
     int K_row = K.rows();
@@ -83,11 +84,14 @@ Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> & K,
 
     solver.compute(K_AL);
 
-    if (solver.info() != Eigen::Success) toolbox::error("分解失败");
+    if (solver.info() != Eigen::Success)
+        toolbox::error("分解失败");
     Eigen::VectorXd x = solver.solve(PG);
-    if (solver.info() != Eigen::Success) toolbox::error("求解失败");
+    if (solver.info() != Eigen::Success)
+        toolbox::error("求解失败");
 
     // std::cout << x << std::endl;
 
     return x;
+    // return x.head(P.size());
 }
