@@ -70,8 +70,10 @@ void LinearStaticSolver::assembleElementStiffness(Input *pinput, Mesh *pmesh, Ei
     auto elem = new LinearHex8;
     elem->SetGaussIntegration(GaussPoint);
     delete elem;
-    omp_set_num_threads(6);
+    omp_set_num_threads(60);
     std::vector<std::vector<Eigen::Triplet<double>>> tripletLists(omp_get_max_threads());
+
+    std::cout << "the max num of threads is " << omp_get_max_threads() << std::endl;
 
     auto start = std::chrono::high_resolution_clock::now();
 
