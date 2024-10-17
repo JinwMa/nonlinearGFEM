@@ -28,6 +28,11 @@
    NodeOrderInList: 节点在list中的位置         对应的位置都没有-1,在取用的时候注意下标
    ElementOrderInList: 单元在list中的位置
 
+3. 约束中的重复约束
+   约束基类中定义了unordered_set m_set: 参考了NSC手册
+   在构造约束时,每个约束的自由度都会跟已经施加过约束的自由度进行搜索,
+   如果已经施加过约束,则跳过该约束
+
 
 
 

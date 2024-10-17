@@ -21,11 +21,11 @@ public:
     std::vector<int> ElementIdList;
     std::vector<std::vector<double>> NodesCoordinate;
     std::vector<std::vector<int>> NodesOnElements;
-    map<int, int> NodeOrderInList;
-    map<int, int> ElementOrderInList;
+    // map<int, int> NodeOrderInList;
+    // map<int, int> ElementOrderInList;
 
-    // int NodeOrderInList[maxnum_node] = {};
-    // int ElementOrderInList[maxnum_element] = {};
+    int NodeOrderInList[maxnum_node] = {};
+    int ElementOrderInList[maxnum_element] = {};
 
 
     // std::vector<std::vector<int>> mesh_element;

@@ -25,9 +25,9 @@ add_library(objectlib STATIC ${SOURCES})
 target_include_directories(objectlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-target_link_libraries(objectlib PRIVATE inputlib meshlib)
+target_link_libraries(objectlib PRIVATE inputlib meshlib toolboxlib)
 
-# 指定静态库的输出目录（可选）
+# 指定静态库的输出目录(可选)
 set_target_properties(objectlib PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE}"
 )

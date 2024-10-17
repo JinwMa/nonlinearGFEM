@@ -27,6 +27,8 @@ class ConstraintManager
     int d_equations_num = 0;
     vector<vector<ConstraintEquation>> FinalConstraintEquations;
     vector<string> d_boundary_conditions;
+
+    unordered_set<int> all_m_set;
 };
 
 

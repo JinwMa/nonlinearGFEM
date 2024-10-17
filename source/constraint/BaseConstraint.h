@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<unordered_set>
 
 #include"input.h"
 #include"mesh.h"
@@ -35,6 +36,14 @@ class BaseConstraint
     virtual void takeDB(Input * pinput, Mesh * pmesh){};
     virtual void buildDofMap(){};
     virtual vector<ConstraintEquation> buildEquations(Mesh * pmesh) {};
+
+    bool if_dof_in_mset(const int node_id, const string dof);
+    bool if_dof_in_mset(const int node_dof_index);
+    void addToMset(const int node_id, const string dof);
+    void addToMset(const int node_dof_index);
+
+    public:
+    unordered_set<int> m_set;
 
 };
 

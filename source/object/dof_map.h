@@ -2,20 +2,24 @@
 #define DOF_MAP1_H
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "mesh.h"
 using namespace std;
 class Dof_Map
 {
+
     public:
-    map<int, vector<string>> NodesDofs;
+    const int reserve_size = 1000;
+    unordered_map<int, vector<string>> NodesDofs;
     vector<int> NodesIndex;
+    vector<int> NodesDofIndex;
     Dof_Map(Mesh * pmesh)
     {
         BuildNodesDofs(pmesh);
     }
     void BuildNodesDofs(Mesh * pmesh);
     void BuildDofMap(Mesh * pmesh);
+
 
 };
 
