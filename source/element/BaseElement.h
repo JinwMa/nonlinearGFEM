@@ -1,17 +1,29 @@
 #ifndef BASEELEMENT1_H
 #define BASEELEMENT1_H
+
+#include <iostream>
+#include <vector>
+#include "input.h"
+#include "mesh.h"
 class BaseElement
 {
     private:
     int num_edofs;
     int num_nodes;
+
     public:
     int integration_order = 2;
+    BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
-    virtual void ComputeStiffness() {};
+    void takeDB(Input * pinput, Mesh * pmesh, std::string & name);
+    virtual void ComputeStiffness(double nodes_coordinates[8][3],
+                                  std::vector<std::vector<double>> &GaussPoints,
+                                  double elementmat[24][24]) = 0;
     virtual void ComputeInternalForce(){};
-    virtual void SetGaussIntegration(){};
+    virtual void SetGaussIntegration(std::vector<std::vector<double>>& ) = 0;
     virtual void getShapeFunction(){};
+    
+
     void AmnXBpq(const double * A, const int m, const int n,
                  const double * B, const int p, const int q,
                  double * C);
@@ -20,6 +32,10 @@ class BaseElement
     void AXB3883(const double A[3][8], const double B[8][3], double C[3][3]);
     double invertMatrix(const double input[3][3], double inverse[3][3]);
     void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
+
+
+    public:
+    std::vector<int> element_ids;
     
 };
 

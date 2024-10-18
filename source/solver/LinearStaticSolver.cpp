@@ -74,3 +74,5 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     std::vector<double> displacement(solution.data(), solution.data() + P.size());
     post.ShowDisplacement(pmesh, pdofmap, displacement);
 }
+
+

@@ -16,8 +16,11 @@
 #include "input.h"
 #include "mesh.h"
 #include "dof_map.h"
+#include "toolbox.h"
 class ElementAssembler
 {
+    private:
+    int max_threads = 6;
     public:
     ElementAssembler(){};
     ~ElementAssembler(){};
@@ -31,10 +34,22 @@ class ElementAssembler
                                   Dof_Map * pdofmap, 
                                   Eigen::SparseMatrix<double> & Matrix);
 
+    
+    
+    
     void assembleElementForce(Input * pinput,
                               Mesh * pmesh,
                               Dof_Map * pdofmap, 
                               Eigen::VectorXd & P);
+
+
+     
+    void elementSetStiffnessAssemble(Input * pinput,   
+                                Mesh * pmesh,
+                                Dof_Map * pdofmap,
+                                std::vector<int> & element_ids,
+                                BaseElement * pelement,
+                                std::vector<std::vector<Eigen::Triplet<double>>> &);
 
 };
 

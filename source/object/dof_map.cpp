@@ -74,5 +74,6 @@ void Dof_Map::BuildDofMap(Mesh * pmesh)
             dofmap[(node_id - 1) * 6 + j] = NodesDofIndex[(node_order - 1) * 6 + j];
         }        
     }
+    dof_size = max_dof_index;
 
 }

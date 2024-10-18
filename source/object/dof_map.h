@@ -16,6 +16,7 @@ class Dof_Map
     vector<int> NodesDofIndex;  // get dof_index by node order order: (node_order - 1) * 6 + dof_index
     unordered_map<int, int> dofmap; // get dof_index by node id
     int max_dof_index = 0;
+    int dof_size = 0;
     Dof_Map(Mesh * pmesh)
     {
         BuildNodesDofs(pmesh);
