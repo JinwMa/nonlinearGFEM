@@ -16,7 +16,7 @@
 #include "post.h"
 #include "SolverInterface.h"
 #include "ConstraintManager.h"
-#include "element.h"
+#include "elementassembler.h"
 #include "toolbox.h"
 #include "SolverInterface.h"
 

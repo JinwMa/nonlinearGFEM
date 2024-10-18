@@ -19,8 +19,8 @@ class Post
     {
     }
     void onlymesh(Mesh * pmesh);
-    void ShowDisplacement(Mesh * pmesh, Dof_Map& DofMap, vector<double> dis);
-    vector<Node> BuildPostNodes(Mesh * pmesh, Dof_Map& DofMap, vector<double> dis);
+    void ShowDisplacement(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
+    vector<Node> BuildPostNodes(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
     private:
     string outputFilename;
 

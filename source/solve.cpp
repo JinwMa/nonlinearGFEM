@@ -13,7 +13,7 @@
 #include "post.h"
 #include "mesh.h"
 #include "input.h"
-#include "element.h"
+#include "elementassembler.h"
 using namespace std;
 
 struct Equation

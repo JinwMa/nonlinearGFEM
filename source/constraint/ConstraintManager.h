@@ -9,6 +9,7 @@
 #include"mesh.h"
 #include"SPC.h"
 #include"BaseConstraint.h"
+#include"dof_map.h"
 #include<Eigen/Sparse>
 using namespace std;
 
@@ -20,8 +21,8 @@ class ConstraintManager
     void takeDB(Input * pinput, Mesh * pmesh);
     void buildDofMap();
     vector<ConstraintEquation> buildConstrintEquation();
-    Eigen::SparseMatrix<double> buildConstrintMatrix(Mesh * pmesh);
-    Eigen::VectorXd buildConstrintForce(Mesh * pmesh);
+    Eigen::SparseMatrix<double> buildConstrintMatrix(Mesh * pmesh, Dof_Map * pdofmap);
+    Eigen::VectorXd buildConstrintForce(Mesh * pmesh, Dof_Map * pdofmap);
     Eigen::SparseMatrix<double> buildConstrintStiffness(){};
     
     int d_equations_num = 0;

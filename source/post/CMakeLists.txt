@@ -26,9 +26,9 @@ target_include_directories(postlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # message("XXXXXXXXXXXX  ${CMAKE_CURRENT_SOURCE_DIR}")
 
 
-target_link_libraries(postlib PRIVATE inputlib meshlib objectlib)
+target_link_libraries(postlib PRIVATE inputlib meshlib objectlib toolboxlib)
 
-# 指定静态库的输出目录（可选）
+# 指定静态库的输出目录(可选)
 set_target_properties(postlib PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE}"
 )

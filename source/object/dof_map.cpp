@@ -22,16 +22,16 @@ void Dof_Map::BuildNodesDofs(Mesh * pmesh)
 void Dof_Map::BuildDofMap(Mesh * pmesh)
 {
     // 先为数组开辟空间
-    NodesIndex.resize(pmesh->actual_node_count);
-    int index = 0;
-    for (int i = 0; i < pmesh->actual_node_count; i++)
-    {
-        int nodeid = pmesh->NodeIdList[i];
-        int nodeorder = pmesh->NodeOrderInList[nodeid];
-        NodesIndex[nodeorder - 1] = index;
-        int dofsize = NodesDofs[nodeid].size();
-        index += dofsize;
-    }
+    // NodesIndex.resize(pmesh->actual_node_count);
+    // int index = 0;
+    // for (int i = 0; i < pmesh->actual_node_count; i++)
+    // {
+    //     int nodeid = pmesh->NodeIdList[i];
+    //     int nodeorder = pmesh->NodeOrderInList[nodeid];
+    //     NodesIndex[nodeorder - 1] = index;
+    //     int dofsize = NodesDofs[nodeid].size();
+    //     index += dofsize;
+    // }
 
     NodesDofIndex.resize(pmesh->actual_node_count * 6 + reserve_size);
     std::fill(NodesDofIndex.begin(), NodesDofIndex.end(), -1);
@@ -55,11 +55,24 @@ void Dof_Map::BuildDofMap(Mesh * pmesh)
             // std::cout << node_id << " " << node_order << " " << index << std::endl;
         }
     }
-    // for (size_t i = 0; i < NodesDofIndex.size(); i++)
-    //    std::cout << NodesDofIndex[i] << std::endl;
 
-    exit(0);
-
-
+    for (int i = 0; i < NodesDofIndex.size(); i++)
+    {
+        int index = NodesDofIndex[i];
+        if (index == 1) 
+        {
+            max_dof_index++;
+            NodesDofIndex[i] = max_dof_index - 1;
+        }
+    }
+    for (int i = 0; i < pmesh->NodeIdList.size(); i++)
+    {
+        int node_id = pmesh->NodeIdList[i];
+        int node_order = pmesh->NodeOrderInList[node_id];
+        for (int j = 0; j < 6; j++)
+        {
+            dofmap[(node_id - 1) * 6 + j] = NodesDofIndex[(node_order - 1) * 6 + j];
+        }        
+    }
 
 }

@@ -23,7 +23,7 @@ add_library(constraintlib STATIC ${SOURCES})
 target_include_directories(constraintlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-target_link_libraries(constraintlib PRIVATE inputlib meshlib toolboxlib)
+target_link_libraries(constraintlib PRIVATE inputlib meshlib toolboxlib objectlib)
 
 # 指定静态库的输出目录(可选)
 set_target_properties(constraintlib PROPERTIES

@@ -10,7 +10,7 @@ target_include_directories(prelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(prelib PRIVATE elementlib)
 
-# 指定静态库的输出目录（可选）
+# 指定静态库的输出目录(可选)
 set_target_properties(prelib PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE}"
 )

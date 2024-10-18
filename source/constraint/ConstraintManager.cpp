@@ -39,7 +39,7 @@ void ConstraintManager::takeDB(Input * pinput, Mesh * pmesh)
 }
 
 
-Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh)
+Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh, Dof_Map * pdofmap)
 {
     //TODO:: 临时写死--第一个分支:实体单元
     int numdofs = pmesh->actual_node_count * NDIM;
@@ -69,7 +69,9 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh
                 string sdof = terms[k].node_dof;
                 double factor = terms[k].factor;
                 int row, col;
-                row = (sid - 1) * NDIM + dof_map[sdof] - 1;
+                // row = (sid - 1) * NDIM + dof_map[sdof] - 1;
+                // row = (pmesh->NodeOrderInList[sid] - 1) * NDIM + dof_map[sdof] - 1;
+                row = pdofmap->getDofIndex(sid, sdof);
                 tripletList.push_back(Eigen::Triplet<double>(equation_id, row, factor));
             }
             equation_id++;
@@ -84,7 +86,7 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh
     return C;
 }
 
-Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * pmesh)
+Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * pmesh, Dof_Map * pdofmap)
 {
     Eigen::VectorXd G(d_equations_num);
     G.setZero();

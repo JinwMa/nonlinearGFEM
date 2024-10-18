@@ -55,7 +55,7 @@ void Post::onlymesh(Mesh * pmesh)
         {
             for (int ii = 0; ii < 8; ii++)
             {
-                outputFile << std::setw(20) << element_connect[ii];
+                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -64,7 +64,7 @@ void Post::onlymesh(Mesh * pmesh)
     outputFile.close();
 }
 
-void Post::ShowDisplacement(Mesh * pmesh, Dof_Map &DofMap, vector<double> displacement)
+void Post::ShowDisplacement(Mesh * pmesh, Dof_Map * pdofmap, vector<double> displacement)
 {
     string filename = outputFilename + "_displacement.dat";
     std::ofstream outputFile(filename); // 打开文件
@@ -74,7 +74,7 @@ void Post::ShowDisplacement(Mesh * pmesh, Dof_Map &DofMap, vector<double> displa
         exit(0);
     }
     outputFile << std::fixed << std::setprecision(7);
-    vector<Node> PostNodes = BuildPostNodes(pmesh, DofMap, displacement);
+    vector<Node> PostNodes = BuildPostNodes(pmesh, pdofmap, displacement);
 
     outputFile << std::fixed << std::setprecision(7);
 
@@ -113,7 +113,7 @@ void Post::ShowDisplacement(Mesh * pmesh, Dof_Map &DofMap, vector<double> displa
         {
             for (int ii = 0; ii < 8; ii++)
             {
-                outputFile << std::setw(20) << element_connect[ii];
+                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -122,7 +122,7 @@ void Post::ShowDisplacement(Mesh * pmesh, Dof_Map &DofMap, vector<double> displa
     outputFile.close();
 }
 
-vector<Node> Post::BuildPostNodes(Mesh * pmesh, Dof_Map &DofMap, vector<double> displacement)
+vector<Node> Post::BuildPostNodes(Mesh * pmesh, Dof_Map * pdofmap, vector<double> displacement)
 {
     vector<Node> PostNodes;
     PostNodes.resize(pmesh->actual_node_count);
@@ -134,10 +134,10 @@ vector<Node> Post::BuildPostNodes(Mesh * pmesh, Dof_Map &DofMap, vector<double> 
         PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1];
         PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2];
 
-        int index = DofMap.NodesIndex[nodeorder - 1];
-        PostNodes[i].ux = displacement[index];
-        PostNodes[i].uy = displacement[index + 1];
-        PostNodes[i].uz = displacement[index + 2];
+        // int index = pdofmap->NodesIndex[nodeorder - 1];
+        PostNodes[i].ux = displacement[pdofmap->getDofIndex(nodeid, "ux")];
+        PostNodes[i].uy = displacement[pdofmap->getDofIndex(nodeid, "uy")];
+        PostNodes[i].uz = displacement[pdofmap->getDofIndex(nodeid, "uz")];
     }
     return PostNodes;
 }
