@@ -40,10 +40,11 @@ public:
 
 
 protected:
-    Eigen::VectorXd linear_solver(const Eigen::SparseMatrix<double> &K,
-                                  Eigen::VectorXd &P,
-                                  const Eigen::SparseMatrix<double> &C,
-                                  Eigen::VectorXd &G,
+    void linear_solver(const Eigen::SparseMatrix<double> & K,
+                                  Eigen::VectorXd & P,
+                                  const Eigen::SparseMatrix<double> & C,
+                                  Eigen::VectorXd & G,
+                                  Eigen::VectorXd & x,
                                   const std::string type = "L");
 
     Eigen::MatrixXd computeNullSpace(const Eigen::SparseMatrix<double> &C)

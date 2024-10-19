@@ -20,10 +20,11 @@
 #include "toolbox.h"
 #include "SolverInterface.h"
 
-Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
+void BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
                                           Eigen::VectorXd &P,
                                           const Eigen::SparseMatrix<double> &C,
                                           Eigen::VectorXd &G,
+                                          Eigen::VectorXd & x,
                                           const std::string type)
 {
     int K_row = K.rows();
@@ -86,12 +87,19 @@ Eigen::VectorXd BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
 
     if (solver.info() != Eigen::Success)
         toolbox::error("分解失败");
-    Eigen::VectorXd x = solver.solve(PG);
+    x = solver.solve(PG);
     if (solver.info() != Eigen::Success)
         toolbox::error("求解失败");
 
-    // std::cout << x << std::endl;
 
-    return x;
-    // return x.head(P.size());
+    if(std::getenv("CHECKSOLVER") != nullptr)
+    {
+        std::cout << "checking the error of linear_equation_solver:" << std::endl;
+        Eigen::VectorXd test = K_AL * x;
+        std::vector<double> a(PG.size());
+        std::vector<double> b(test.size());
+        for (int i = 0; i < PG.size(); i++) a[i] = PG[i];
+        for (int i = 0; i < test.size(); i++) b[i] = test[i];
+        toolbox::checkvector(a, b);
+    }
 }
