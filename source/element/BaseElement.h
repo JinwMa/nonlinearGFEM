@@ -12,18 +12,18 @@ class BaseElement
     int num_nodes;
 
     public:
-    int integration_order = 2;
+    int integration_order = 3;
+    int num_intergration_point;
     BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);
 
     virtual void ComputeStiffness(std::vector<std::vector<double>> & nodes_coordinates,
-                                  std::vector<std::vector<double>> & GaussPoints,
                                   std::vector<double> & elementmat) = 0;
 
 
     virtual void ComputeInternalForce(){};
-    virtual void SetGaussIntegration(std::vector<std::vector<double>>& ) = 0;
+    virtual void SetGaussIntegration() = 0;
     virtual void getShapeFunction(){};
     
 
@@ -39,6 +39,7 @@ class BaseElement
 
     public:
     std::vector<int> element_ids;
+    std::vector<std::vector<double>> d_GaussPoints;
     
 };
 

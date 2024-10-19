@@ -6,7 +6,6 @@
 using namespace std;
 
 void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
-                                  std::vector<std::vector<double>> & GaussPoints,
                                   vector<double> & elementmat)
 {
     // 先给elementmat清零
@@ -18,7 +17,7 @@ void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
     vector<vector<double>> SF;
     vector<vector<vector<double>>> SF_dxyz;
     vector<double> detJ;
-    this->getShapeFunction(nodes_coordinate, GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
+    this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
 
     double D[6][6] = {};
     double F = (E * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
@@ -40,7 +39,7 @@ void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
     double BTDB[3][3] = {};
     for (int i = 0; i < num_intergration_point; i++)
     {
-        double w = GaussPoints[i][3];
+        double w = d_GaussPoints[i][3];
         double J = detJ[i];
         for (int ii = 0; ii < 8; ii++)
         {
@@ -193,7 +192,7 @@ void LinearHex8::getShapeFunction(vector<vector<double>> & nodes_coordinate,
     }
 }
 
-void LinearHex8::SetGaussIntegration( std::vector<std::vector<double>> &GaussPoints)
+void LinearHex8::SetGaussIntegration()
 {
     const int intergrationorder = integration_order;
     if (intergrationorder < 1)
@@ -202,10 +201,10 @@ void LinearHex8::SetGaussIntegration( std::vector<std::vector<double>> &GaussPoi
         exit(0);
     }
     const int number_Gauss_point = intergrationorder * intergrationorder * intergrationorder;
-    GaussPoints.resize(number_Gauss_point);
+    d_GaussPoints.resize(number_Gauss_point);
     for (int i = 0; i < number_Gauss_point; i++)
     {
-        GaussPoints[i].resize(4);
+        d_GaussPoints[i].resize(4);
     }
 
     double xs[intergrationorder][2];
@@ -271,10 +270,10 @@ void LinearHex8::SetGaussIntegration( std::vector<std::vector<double>> &GaussPoi
         {
             for (int k = 0; k < intergrationorder; k++)
             {
-                GaussPoints[index][0] = xs[i][0];
-                GaussPoints[index][1] = xs[j][0];
-                GaussPoints[index][2] = xs[k][0];
-                GaussPoints[index][3] = xs[i][1] * xs[j][1] * xs[k][1];
+                d_GaussPoints[index][0] = xs[i][0];
+                d_GaussPoints[index][1] = xs[j][0];
+                d_GaussPoints[index][2] = xs[k][0];
+                d_GaussPoints[index][3] = xs[i][1] * xs[j][1] * xs[k][1];
                 index++;
             }
         }

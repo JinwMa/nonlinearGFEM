@@ -27,8 +27,11 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         {
             toolbox::error("not supprot this type of element: " + element_type);
         }
+        
+        // 读单元参数和设置
         elem->takeDB(pinput, pmesh, name);
-        elem->SetGaussIntegration(GaussPoint);
+        // 设置高斯积分点
+        elem->SetGaussIntegration();
         std::vector<int> element_ids = elem->element_ids;
         std::vector<std::vector<Eigen::Triplet<double>>> tripletLists;
         elementSetStiffnessAssemble(pinput, pmesh, pdofmap, element_ids, elem, tripletLists);
@@ -38,6 +41,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
             finalTripletList.insert(finalTripletList.end(), localList.begin(), localList.end());
         }
     }    
+
+
     // 设置稀疏矩阵
     K.setFromTriplets(finalTripletList.begin(), finalTripletList.end());
     auto end = std::chrono::high_resolution_clock::now();
@@ -67,8 +72,7 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
     //openmp 并行设置
     omp_set_num_threads(max_threads);    
     tripletLists.resize(omp_get_max_threads());
-    vector<vector<double>> GaussPoint;
-    pelement->SetGaussIntegration(GaussPoint);
+    pelement->SetGaussIntegration();
 
     #pragma omp parallel for
     for (int element_now = 0; element_now < element_ids.size(); element_now++)
@@ -92,7 +96,7 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
             }
 
         std::vector<double> elementmat;
-        pelement->ComputeStiffness(nodes_coordinates, GaussPoint, elementmat);
+        pelement->ComputeStiffness(nodes_coordinates, elementmat);
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)

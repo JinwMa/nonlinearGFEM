@@ -22,7 +22,16 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
     {
         toolbox::error("not support the type of " + element_set_type + " for element ids");
     }
+    if (pinput->ifExist(name + "_integration_order"))
+    {
+        integration_order = pinput->getInt(name + "_integration_order");
+    }
+    if (integration_order <= 0) toolbox::error("the integration_order of " + name + " is wrong");
+    num_intergration_point = integration_order * integration_order * integration_order; 
 }
+
+
+
 
 void BaseElement::AmnXBpq(const double *A, const int m, const int n,
                           const double *B, const int p, const int q,
