@@ -30,8 +30,6 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         
         // 读单元参数和设置
         elem->takeDB(pinput, pmesh, name);
-        // 设置高斯积分点
-        elem->SetGaussIntegration();
         std::vector<int> element_ids = elem->element_ids;
         std::vector<std::vector<Eigen::Triplet<double>>> tripletLists;
         elementSetStiffnessAssemble(pinput, pmesh, pdofmap, element_ids, elem, tripletLists);
@@ -72,7 +70,7 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
     //openmp 并行设置
     omp_set_num_threads(max_threads);    
     tripletLists.resize(omp_get_max_threads());
-    pelement->SetGaussIntegration();
+    pelement->SetElement();
 
     #pragma omp parallel for
     for (int element_now = 0; element_now < element_ids.size(); element_now++)
@@ -82,39 +80,62 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
         auto &tripletList = tripletLists[thread_id];
 
         int element_location = pmesh->ElementOrderInList[element_id];
+        // 拿到节点编号
         vector<int> node_ids_in_a_element = pmesh->NodesOnElements[element_location - 1];
-        // auto elem = new LinearHex8;
-        std::vector<std::vector<double>> nodes_coordinates;
-        nodes_coordinates.resize(8);
-        for (int i = 0; i < 8; i++) nodes_coordinates[i].resize(3);
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 3; j++)
+        double nodes_coordinates[20][3] = {0.0, 0.0};
+        
+        // 拿到节点坐标
+        for (int i = 0; i < pelement->numNodes; i++)
+            for (int j = 0; j < pelement->dim; j++)
             {
                 int node_id = node_ids_in_a_element[i];
                 int node_location = pmesh->NodeOrderInList[node_id];
                 nodes_coordinates[i][j] = pmesh->NodesCoordinate[node_location - 1][j];
             }
 
+        // 计算单元矩阵
         std::vector<double> elementmat;
         pelement->ComputeStiffness(nodes_coordinates, elementmat);
-        for (int i = 0; i < 8; i++)
+
+        // 单刚组装
+        std::vector<Eigen::Triplet<double>> local_tripletLists;
+        assembleAElement(pdofmap, node_ids_in_a_element, pelement->dofs, elementmat, local_tripletLists);
+        tripletList.insert(tripletList.end(), local_tripletLists.begin(), local_tripletLists.end());
+
+
+    }
+}
+
+
+void ElementAssembler::assembleAElement(Dof_Map * pdofmap,
+                          std::vector<int> & nodes_ids,
+                          std::vector<std::string> & dofs,
+                          std::vector<double> & elementmat,
+                          std::vector<Eigen::Triplet<double>> & local_tripletLists)
+{
+    local_tripletLists.resize(nodes_ids.size() * dofs.size() * nodes_ids.size() * dofs.size());
+    int numNode = nodes_ids.size();
+    int numdof = dofs.size();
+    
+    int index = 0;
+    for (int i = 0; i < numNode; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < numNode; j++)
             {
-                for (int ii = 0; ii < 3; ii++)
+                for (int ii = 0; ii < numdof; ii++)
                 {
-                    for (int jj = 0; jj < 3; jj++)
+                    for (int jj = 0; jj < numdof; jj++)
                     {
-                        int iii = i * 3 + ii;
-                        int jjj = j * 3 + jj;
+                        int iii = i * numdof + ii;
+                        int jjj = j * numdof + jj;
                         double value = elementmat[iii * 24 + jjj];
-                        int row = pdofmap->dofmap[(node_ids_in_a_element[i] - 1) * 6 + ii];
-                        int col = pdofmap->dofmap[(node_ids_in_a_element[j] - 1) * 6 + jj];
-                        tripletList.push_back(Eigen::Triplet<double>(row, col, value));
+                        int row = pdofmap->dofmap[(nodes_ids[i] - 1) * 6 + ii];
+                        int col = pdofmap->dofmap[(nodes_ids[j] - 1) * 6 + jj];
+                        local_tripletLists[index] = Eigen::Triplet<double>(row, col, value);
+                        index++;
                     }
                 }
             }
         }
-        // delete elem;
-    }
+
 }

@@ -44,16 +44,24 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     std::chrono::duration<double, std::milli> duration_constraint = end_constraint - start_constraint;
     std::cout << "build Constraint time: " << duration_constraint.count() << " ms" << std::endl;
 
+    
+    /// 组装刚度矩阵
     auto * pelementassembler = new ElementAssembler;
-
-    pelementassembler->takeDB(pinput, pmesh, pdofmap);
-    // exit(0);    
-
+    pelementassembler->takeDB(pinput, pmesh, pdofmap); //读单元列表
     // 构造刚度矩阵,构造右端项
     std::cout << "building stiffness" << std::endl;
     pelementassembler->assembleElementStiffness(pinput, pmesh, pdofmap, K);
     std::cout << "complete the stiffness " << std::endl;
+    // 节点内力向量   
     pelementassembler->assembleElementForce(pinput, pmesh, pdofmap, P);
+    //释放组装器指针
+    delete pelementassembler;
+
+
+    /// TODO:组装节点力向量 
+
+
+    /// 求解线性方程组
     std::cout << "solving the linear equations" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     Eigen::VectorXd solution = linear_solver(K, P, C, G);
@@ -63,8 +71,7 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     std::chrono::duration<double, std::milli> duration = end - start;
     std::cout << "solve Ax=b time: " << duration.count() << " ms" << std::endl;
     
-    //释放组装器指针
-    delete pelementassembler;
+    
 
     // 进行后处理
     Post post("tecplot");

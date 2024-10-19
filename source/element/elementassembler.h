@@ -51,6 +51,14 @@ class ElementAssembler
                                 BaseElement * pelement,
                                 std::vector<std::vector<Eigen::Triplet<double>>> &);
 
+
+
+    void assembleAElement(Dof_Map * pdofmap,
+                          std::vector<int> & nodes_ids,
+                          std::vector<std::string> & dofs,
+                          std::vector<double> & elementmat,
+                          std::vector<Eigen::Triplet<double>> & local_tripletLists);
+
 };
 
 

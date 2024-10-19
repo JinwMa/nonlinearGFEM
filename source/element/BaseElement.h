@@ -3,30 +3,36 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include "input.h"
 #include "mesh.h"
 class BaseElement
 {
     private:
-    int num_edofs;
-    int num_nodes;
+
+    public:
+    int dim;
+    int numNodeDof;
+    int numNodes;
+    std::vector<std::string> dofs;
 
     public:
     int integration_order = 3;
     int num_intergration_point;
     BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
-    void takeDB(Input * pinput, Mesh * pmesh, std::string & name);
+    void takeDB(Input * pinput, Mesh * pmesh, std::string & name);    
+    virtual void SetElement() = 0;
 
-    virtual void ComputeStiffness(std::vector<std::vector<double>> & nodes_coordinates,
+    virtual void ComputeStiffness(double nodes_coordinates[20][3],
                                   std::vector<double> & elementmat) = 0;
 
 
     virtual void ComputeInternalForce(){};
-    virtual void SetGaussIntegration() = 0;
     virtual void getShapeFunction(){};
     
 
+    protected:
     void AmnXBpq(const double * A, const int m, const int n,
                  const double * B, const int p, const int q,
                  double * C);

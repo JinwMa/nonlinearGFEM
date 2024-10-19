@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
+void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
                                   vector<double> & elementmat)
 {
     // 先给elementmat清零
@@ -96,7 +96,7 @@ void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
     }
 }
 
-void LinearHex8::getShapeFunction(vector<vector<double>> & nodes_coordinate,
+void LinearHex8::getShapeFunction(double nodes_coordinate[20][3],
                                   std::vector<std::vector<double>> &GaussPoints,
                                   vector<vector<double>> &ShapeFunction,
                                   vector<vector<vector<double>>> &ShapeFunction_dxy,
@@ -171,11 +171,7 @@ void LinearHex8::getShapeFunction(vector<vector<double>> & nodes_coordinate,
         jl[2][6] = -jl[2][2];
         jl[2][7] = -jl[2][3];
         double jkb[3][3] = {};
-        double nodes_coord[8][3] = {0.0, 0.0};
-        for (int node_index = 0; node_index < 8; node_index++)
-           for (int dim = 0; dim < 3; dim++)
-              nodes_coord[node_index][dim] = nodes_coordinate[node_index][dim];
-        AmnXBpq(&jl[0][0], 3, 8, &nodes_coord[0][0], 8, 3, &jkb[0][0]);
+        AmnXBpq(&jl[0][0], 3, 8, &nodes_coordinate[0][0], 8, 3, &jkb[0][0]);
         double jkb_inv[3][3] = {};
         value_jkb[i] = invertMatrix(jkb, jkb_inv);
         double DSF[3][8] = {};
@@ -192,8 +188,20 @@ void LinearHex8::getShapeFunction(vector<vector<double>> & nodes_coordinate,
     }
 }
 
-void LinearHex8::SetGaussIntegration()
+void LinearHex8::SetElement()
 {
+    // 设置维度
+    dim = 3;
+    // 设置节点自由度数
+    numNodeDof = 3;
+    // 设置节点数目
+    numNodes = 8;
+    // 设置自由度标签
+    dofs.resize(dim);
+    dofs[0] = "ux";
+    dofs[1] = "uy";
+    dofs[2] = "uz";
+    // 设置高斯积分点
     const int intergrationorder = integration_order;
     if (intergrationorder < 1)
     {

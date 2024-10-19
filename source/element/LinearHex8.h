@@ -8,17 +8,17 @@ using namespace std;
 
 class LinearHex8 : public BaseElement
 {
+    
+    public:
     static const int num_edofs = 24;
     static const int num_nodes = 8;
     static const int num_node_dof = 3;
-    // static const int integration_order = 3;
-    // int num_intergration_point = integration_order * integration_order * integration_order;
     public:
-    void ComputeStiffness(vector<vector<double>> & nodes_coordinates,
+    void ComputeStiffness(double nodes_coordinates[20][3],
                           vector<double> & elementmat);
     void ComputeInternalForce(){};
-    void SetGaussIntegration();
-    void getShapeFunction(vector<vector<double>> &  nodes_coordinate,
+    void SetElement();
+    void getShapeFunction(double nodes_coordinate[20][3],
                           std::vector<std::vector<double>>&,
                           vector<vector<double>>& ShapeFunction,
                           vector<vector<vector<double>>>& ShapeFunction_dxy,
