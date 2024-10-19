@@ -16,9 +16,12 @@ class BaseElement
     BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);
-    virtual void ComputeStiffness(double nodes_coordinates[8][3],
-                                  std::vector<std::vector<double>> &GaussPoints,
-                                  double elementmat[24][24]) = 0;
+
+    virtual void ComputeStiffness(std::vector<std::vector<double>> & nodes_coordinates,
+                                  std::vector<std::vector<double>> & GaussPoints,
+                                  std::vector<double> & elementmat) = 0;
+
+
     virtual void ComputeInternalForce(){};
     virtual void SetGaussIntegration(std::vector<std::vector<double>>& ) = 0;
     virtual void getShapeFunction(){};

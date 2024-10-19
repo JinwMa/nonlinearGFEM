@@ -5,14 +5,12 @@
 
 using namespace std;
 
-void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
-                                  std::vector<std::vector<double>> &GaussPoints,
-                                  double elementmat[num_edofs][num_edofs])
+void LinearHex8::ComputeStiffness(vector<vector<double>> & nodes_coordinate,
+                                  std::vector<std::vector<double>> & GaussPoints,
+                                  vector<double> & elementmat)
 {
     // 先给elementmat清零
-    for (int i = 0; i < num_edofs; i++)
-        for (int j = 0; j < num_edofs; j++)
-            elementmat[i][j] = 0.0;
+    elementmat.resize(num_edofs * num_edofs);
     // 材料参数先给一个默认值
     double E = 1.E7;
     double v = 0.3;
@@ -92,14 +90,14 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[8][3],
                     {
                         int col = ii * 3 + iii;
                         int row = jj * 3 + jjj;
-                        elementmat[col][row] += EK_IJ[iii][jjj];
+                        elementmat[col * num_edofs + row] += EK_IJ[iii][jjj];
                     }
             }
         }
     }
 }
 
-void LinearHex8::getShapeFunction(double nodes_coordinate[8][3],
+void LinearHex8::getShapeFunction(vector<vector<double>> & nodes_coordinate,
                                   std::vector<std::vector<double>> &GaussPoints,
                                   vector<vector<double>> &ShapeFunction,
                                   vector<vector<vector<double>>> &ShapeFunction_dxy,

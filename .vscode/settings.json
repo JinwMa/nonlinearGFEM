@@ -100,7 +100,8 @@
         "cinttypes": "cpp",
         "iterativelinearsolvers": "cpp",
         "geometry": "cpp",
-        "sparsecore": "cpp"
+        "sparsecore": "cpp",
+        "*.input": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

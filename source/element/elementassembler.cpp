@@ -80,7 +80,9 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
         int element_location = pmesh->ElementOrderInList[element_id];
         vector<int> node_ids_in_a_element = pmesh->NodesOnElements[element_location - 1];
         // auto elem = new LinearHex8;
-        double nodes_coordinates[8][3];
+        std::vector<std::vector<double>> nodes_coordinates;
+        nodes_coordinates.resize(8);
+        for (int i = 0; i < 8; i++) nodes_coordinates[i].resize(3);
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 3; j++)
             {
@@ -89,7 +91,7 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
                 nodes_coordinates[i][j] = pmesh->NodesCoordinate[node_location - 1][j];
             }
 
-        double elementmat[24][24];
+        std::vector<double> elementmat;
         pelement->ComputeStiffness(nodes_coordinates, GaussPoint, elementmat);
         for (int i = 0; i < 8; i++)
         {
@@ -101,7 +103,7 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
                     {
                         int iii = i * 3 + ii;
                         int jjj = j * 3 + jj;
-                        double value = elementmat[iii][jjj];
+                        double value = elementmat[iii * 24 + jjj];
                         int row = pdofmap->dofmap[(node_ids_in_a_element[i] - 1) * 6 + ii];
                         int col = pdofmap->dofmap[(node_ids_in_a_element[j] - 1) * 6 + jj];
                         tripletList.push_back(Eigen::Triplet<double>(row, col, value));

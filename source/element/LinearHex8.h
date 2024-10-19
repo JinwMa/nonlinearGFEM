@@ -14,12 +14,12 @@ class LinearHex8 : public BaseElement
     static const int integration_order = 3;
     int num_intergration_point = integration_order * integration_order * integration_order;
     public:
-    void ComputeStiffness(double nodes_coordinates[8][3],
-                          std::vector<std::vector<double>> &GaussPoints,
-                          double elementmat[num_edofs][num_edofs]);
+    void ComputeStiffness(vector<vector<double>> & nodes_coordinates,
+                          vector<vector<double>> & GaussPoints,
+                          vector<double> & elementmat);
     void ComputeInternalForce(){};
     void SetGaussIntegration(std::vector<std::vector<double>>&);
-    void getShapeFunction(double nodes_coordinate[8][3],
+    void getShapeFunction(vector<vector<double>> &  nodes_coordinate,
                           std::vector<std::vector<double>>&,
                           vector<vector<double>>& ShapeFunction,
                           vector<vector<vector<double>>>& ShapeFunction_dxy,
