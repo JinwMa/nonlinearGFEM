@@ -11,12 +11,12 @@ int main(int argc, char *argv[])
     Input input(argv[1]);
     auto end = std::chrono::high_resolution_clock::now();    
     std::chrono::duration<double, std::milli> duration = end - start;    
-    std::cout << " time of read input data: " << duration.count() << " ms" << std::endl;
+    std::cout << "time of read input data: " << duration.count() << " ms" << std::endl;
 
     Mesh mesh(input.db["mesh_file_name"][0]);
     start = std::chrono::high_resolution_clock::now();  
     duration = start - end;
-    std::cout << " time of read mesh data: " << duration.count() << " ms" << std::endl;
+    std::cout << "time of read mesh data: " << duration.count() << " ms" << std::endl;
 
 
     // 构造输入和网格的指针
