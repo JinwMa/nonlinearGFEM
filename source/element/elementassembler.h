@@ -13,6 +13,7 @@
 #include <chrono>
 
 #include "LinearHex8.h"
+#include "LinearTet4.h"
 #include "input.h"
 #include "mesh.h"
 #include "dof_map.h"

@@ -45,7 +45,12 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     std::cout << "build Constraint time: " << duration_constraint.count() << " ms" << std::endl;
 
     
-    /// 组装刚度矩阵
+    /// 组装刚度矩阵**********************************************************************************************************
+    /*
+    *******************************************
+    *******************************************
+    *******************************************
+    */
     auto * pelementassembler = new ElementAssembler;
     pelementassembler->takeDB(pinput, pmesh, pdofmap); //读单元列表
     // 构造刚度矩阵,构造右端项
@@ -55,7 +60,7 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     // 节点内力向量   
     pelementassembler->assembleElementForce(pinput, pmesh, pdofmap, P);
     //释放组装器指针
-    delete pelementassembler;
+    delete pelementassembler;   
 
 
     /// TODO:组装节点力向量 
@@ -81,6 +86,7 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     // 输出位移场:
     std::vector<double> displacement(solution.data(), solution.data() + P.size());
     post.ShowDisplacement(pmesh, pdofmap, displacement);
+    if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, pdofmap);
 }
 
 

@@ -18,10 +18,14 @@ int main(int argc, char *argv[])
     duration = start - end;
     std::cout << "time of read mesh data: " << duration.count() << " ms" << std::endl;
 
+   
 
     // 构造输入和网格的指针
     Input *p_input = &input;
     Mesh *p_mesh = &mesh;
+
+    // std::cout << p_mesh->actual_element_count << " " << p_mesh->actual_node_count << std::endl;
+    // exit(0);
 
     BaseSolver *structsolver;
     structsolver = new LinearStaticSolver;

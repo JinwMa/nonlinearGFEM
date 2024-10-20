@@ -23,6 +23,10 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         {
             elem = new LinearHex8;
         }
+        else if (element_type == "LinearTet4")
+        {
+            elem = new LinearTet4;
+        }
         else
         {
             toolbox::error("not supprot this type of element: " + element_type);
@@ -128,7 +132,7 @@ void ElementAssembler::assembleAElement(Dof_Map * pdofmap,
                     {
                         int iii = i * numdof + ii;
                         int jjj = j * numdof + jj;
-                        double value = elementmat[iii * 24 + jjj];
+                        double value = elementmat[iii * numNode * numdof + jjj];
                         int row = pdofmap->dofmap[(nodes_ids[i] - 1) * 6 + ii];
                         int col = pdofmap->dofmap[(nodes_ids[j] - 1) * 6 + jj];
                         local_tripletLists[index] = Eigen::Triplet<double>(row, col, value);

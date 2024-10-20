@@ -8,9 +8,11 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include "input.h"
 #include "mesh.h"
 #include "dof_map.h"
 #include "node.h"
+#include "toolbox.h"
 using namespace std;
 class Post
 {
@@ -20,9 +22,11 @@ class Post
     }
     void onlymesh(Mesh * pmesh);
     void ShowDisplacement(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
-    vector<Node> BuildPostNodes(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
+    void BuildPostNodes(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
+    void check_error(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap);
     private:
     string outputFilename;
+    vector<Node> PostNodes;
 
 };
 
