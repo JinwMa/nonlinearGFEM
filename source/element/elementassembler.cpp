@@ -1,4 +1,5 @@
 #include "elementassembler.h"
+#include <omp.h>
 
 void ElementAssembler::takeDB(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap)
 {

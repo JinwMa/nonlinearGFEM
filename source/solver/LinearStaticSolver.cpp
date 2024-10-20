@@ -60,7 +60,7 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     // 节点内力向量   
     pelementassembler->assembleElementForce(pinput, pmesh, pdofmap, P);
     //释放组装器指针
-    delete pelementassembler;   
+    delete pelementassembler;
 
 
     /// TODO:组装节点力向量 

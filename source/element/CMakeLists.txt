@@ -7,6 +7,8 @@ add_library(elementlib STATIC ${SOURCES})
 target_include_directories(elementlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(elementlib PRIVATE inputlib meshlib toolboxlib objectlib)
+target_link_libraries(elementlib PRIVATE OpenMP::OpenMP_CXX)
+
 
 
 # 指定静态库的输出目录(可选)

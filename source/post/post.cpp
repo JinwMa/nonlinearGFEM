@@ -22,7 +22,9 @@ void Post::onlymesh(Mesh *pmesh)
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
-    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    // outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+
 
     // 输出节点
     for (int i = 0; i < pmesh->actual_node_count; i++)
@@ -41,13 +43,9 @@ void Post::onlymesh(Mesh *pmesh)
 
         if (element_connect.size() == 4) // 四面体单元
         {
-            for (int ii = 0; ii < 3; ii++)
+            for (int ii = 0; ii < 4; ii++)
             {
                 outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
-            }
-            for (int ii = 0; ii < 5; ii++)
-            {
-                outputFile << std::setw(20) << element_connect[3];
             }
             outputFile << std::endl;
         }
@@ -80,14 +78,15 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displa
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    // outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+
 
     // 输出节点
     for (size_t i = 0; (int)i < PostNodes.size(); i++)
     {
         outputFile << std::setw(20) << PostNodes[i].x << "   " << std::setw(20) << PostNodes[i].y << "   " << std::setw(20) << PostNodes[i].z
                    << std::setw(20) << PostNodes[i].ux << "   " << std::setw(20) << PostNodes[i].uy << "   " << std::setw(20) << PostNodes[i].uz << std::endl;
-        // std::cout << PostNodes[i].ux << "  " << PostNodes[i].uz << std::endl;
     }
 
     // 输出单元
@@ -99,13 +98,9 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displa
 
         if (element_connect.size() == 4) // 四面体单元
         {
-            for (int ii = 0; ii < 3; ii++)
+            for (int ii = 0; ii < 4; ii++)
             {
                 outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
-            }
-            for (int ii = 0; ii < 5; ii++)
-            {
-                outputFile << std::setw(20) << element_connect[3];
             }
             outputFile << std::endl;
         }
