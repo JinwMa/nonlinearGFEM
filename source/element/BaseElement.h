@@ -24,8 +24,12 @@ class BaseElement
     virtual ~BaseElement() {}; //定义纯虚析构函数
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);    
     virtual void SetElement() = 0;
+    virtual std::string element_type() = 0;
 
     virtual void ComputeStiffness(double nodes_coordinates[20][3],
+                                  std::vector<double> & displacement,
+                                  std::vector<double> & du,
+                                  std::vector<double> & ddu,
                                   std::vector<double> & elementmat) = 0;
 
 

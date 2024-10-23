@@ -100,7 +100,10 @@ void ElementAssembler::elementSetStiffnessAssemble(Input * pinput,
 
         // 计算单元矩阵
         std::vector<double> elementmat;
-        pelement->ComputeStiffness(nodes_coordinates, elementmat);
+        std::vector<double> u;
+        std::vector<double> du;
+        std::vector<double> ddu;
+        pelement->ComputeStiffness(nodes_coordinates, u, du, ddu, elementmat);
 
         // 单刚组装
         std::vector<Eigen::Triplet<double>> local_tripletLists;

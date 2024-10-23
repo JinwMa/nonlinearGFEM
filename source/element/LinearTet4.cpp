@@ -302,6 +302,9 @@ void LinearTet4::getShapeFunction(double nodes_coordinate[20][3],
 
 
 void LinearTet4::ComputeStiffness(double nodes_coordinate[20][3],
+                                  std::vector<double> & displacement,
+                                  std::vector<double> & du,
+                                  std::vector<double> & ddu,
                                   vector<double> & elementmat)
 {
     // 先给elementmat清零
