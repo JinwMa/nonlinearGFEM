@@ -21,7 +21,9 @@ class Post
     {
     }
     void onlymesh(Mesh * pmesh);
+    void onlymesh(Input * pinput, Mesh * pmesh);
     void ShowDisplacement(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
+    void ShowDisplacement(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
     void BuildPostNodes(Mesh * pmesh, Dof_Map * pdofmap, vector<double> dis);
     void check_error(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap);
     private:

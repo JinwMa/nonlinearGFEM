@@ -82,10 +82,10 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     // 进行后处理
     Post post("tecplot");
     // 输出网格:
-    post.onlymesh(pmesh);
+    post.onlymesh(pinput, pmesh);
     // 输出位移场:
     std::vector<double> displacement(solution.data(), solution.data() + P.size());
-    post.ShowDisplacement(pmesh, pdofmap, displacement);
+    post.ShowDisplacement(pinput, pmesh, pdofmap, displacement);
     if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, pdofmap);
 }
 
