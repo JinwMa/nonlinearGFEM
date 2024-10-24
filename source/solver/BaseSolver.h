@@ -20,6 +20,8 @@
 #include "mesh.h"
 class BaseSolver
 {
+    private:
+    const int num_nonzero = 100;
 public:
     BaseSolver()
     {
@@ -38,6 +40,8 @@ public:
     // virtual void matrix_assembler(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
     virtual void assembleElementStiffness(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
 
+    void sparseMatrixMultiply(const Eigen::SparseMatrix<double> & A, const Eigen::SparseMatrix<double> & B, Eigen::SparseMatrix<double> & C);
+
 
 protected:
     void linear_solver(const Eigen::SparseMatrix<double> & K,
@@ -46,6 +50,13 @@ protected:
                                   Eigen::VectorXd & G,
                                   Eigen::VectorXd & x,
                                   const std::string type = "L");
+
+    void linear_solver2(const Eigen::SparseMatrix<double> &K,
+                       Eigen::VectorXd &P,
+                       const Eigen::SparseMatrix<double> &C,
+                       Eigen::VectorXd &G,
+                       Eigen::VectorXd &x,
+                       const std::string type = "P");
 
     Eigen::MatrixXd computeNullSpace(const Eigen::SparseMatrix<double> &C)
     {
