@@ -3,6 +3,11 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <unordered_map>
+
+#include "input.h"
+#include "toolbox.h"
+
 
 using namespace std;
 class Mesh
@@ -25,6 +30,7 @@ public:
     map<int, vector<int>> node_sets;
     map<int, vector<int>> element_sets;
     map<int, vector<vector<int>>> segment_sets;
+    unordered_map<int, string> element_setname;
     // map<int, int> NodeOrderInList;
     // map<int, int> ElementOrderInList;
 
@@ -36,7 +42,7 @@ public:
     // std::vector<std::vector<double>> mesh_node;
     // std::vector<int> node_ids;
     // std::vector<int> element_ids;
-    Mesh(const std::string &filename) : meshfilename(filename)//,
+    Mesh(Input * pinput, const std::string &filename) : meshfilename(filename)//,
                                         // mesh_element(maxnum_element),
                                         // mesh_node(maxnum_node),
                                         // node_ids(maxnum_node),
@@ -44,11 +50,13 @@ public:
     {
         readmeshfile();
         checkmesh();
+        getElementSetName(pinput);
     }
     void checkmesh();
 
 private:
     void readmeshfile();
+    void getElementSetName(Input * pinput);
 };
 
 #endif // FILE1_H

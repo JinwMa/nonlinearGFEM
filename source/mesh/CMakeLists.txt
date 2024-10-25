@@ -22,7 +22,7 @@ file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(meshlib STATIC ${SOURCES})
 target_include_directories(meshlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(meshlib PRIVATE inputlib)
+target_link_libraries(meshlib PRIVATE inputlib toolboxlib)
 
 # 指定静态库的输出目录(可选)
 set_target_properties(meshlib PROPERTIES

@@ -336,3 +336,34 @@ void Mesh::checkmesh()
     if (!actual_element_count == ElementIdList.size())
     throw std::runtime_error("单元中单元数目无法对齐");
 }
+
+
+void Mesh::getElementSetName(Input * pinput)
+{
+    std::vector<std::string>element_list = pinput->getVectorString("element_list");
+    for (auto name : element_list)
+    {
+        std::vector<int> element_ids;
+        std::string element_set_type = pinput->getString(name + "_set_type");
+        if (element_set_type == "range")
+        {
+            std::vector<int> begin_end = pinput->getVectorInt(name + "_range");
+            if (begin_end.size() != 2) toolbox::error("element range of " + name + " is wrong");
+            int begin = begin_end[0];
+            int end = begin_end[1];
+            for (int i = begin; i <= end; i++)
+            {
+                element_ids.push_back(i);
+            }
+        }
+        else
+        {
+            toolbox::error("not support teyp of " + element_set_type + "in " + "name");
+        }
+        for (int i = 0; i < element_ids.size(); i++)
+        {
+            element_setname[i] = name;
+        }
+    }
+
+}

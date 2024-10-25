@@ -10,6 +10,14 @@ void SPC::takeDB(Input *pinput, Mesh *pmesh)
         d_geometry_expression = pinput->getVectorDouble(name + "_geometry_expression");
         getNodesFromGeometry(pmesh);
     }
+    else if (nodes_type == "node_set")
+    {
+        d_node_set_id = pinput->getInt(name + "_node_set_id");
+        if (pmesh->node_sets.find(d_node_set_id) != pmesh->node_sets.end())
+            d_node_ids = pmesh->node_sets[d_node_set_id];
+        else
+            toolbox::error("the node_set of" + name + " does not exist");
+    }
     else
     {
         toolbox::error("not found " + name + "nodes_type");

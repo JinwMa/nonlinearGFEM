@@ -42,6 +42,7 @@ class SPC : public BaseConstraint
     vector<ConstraintEquation> buildEquations(Mesh * pmesh);
 
     private:
+    int d_node_set_id;
     vector<int> d_node_ids;
     vector<double> d_geometry_expression;
     string d_dof;    

@@ -3,6 +3,7 @@
 #include "LinearStaticSolver.h"
 #include "ConstraintManager.h"
 #include "elementassembler.h"
+#include "LoadManger.h"
 #include "post.h"
 
 #include "dof_map.h"
@@ -64,6 +65,13 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
 
 
     /// TODO:组装节点力向量 
+
+    auto loadmanger = new LoadManger;
+
+    loadmanger->takeDB(pinput, pmesh, pdofmap);
+    
+    delete loadmanger;
+    exit(0);
 
 
     /// 求解线性方程组

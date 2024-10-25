@@ -21,7 +21,7 @@ add_library(solverlib STATIC ${SOURCES})
 target_include_directories(solverlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-target_link_libraries(solverlib PRIVATE toolboxlib elementlib inputlib meshlib postlib objectlib constraintlib)
+target_link_libraries(solverlib PRIVATE toolboxlib elementlib inputlib meshlib postlib objectlib constraintlib loadlib)
 target_link_libraries(solverlib PRIVATE OpenMP::OpenMP_CXX)
 
 
