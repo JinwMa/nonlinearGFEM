@@ -21,6 +21,10 @@ public:
     std::vector<int> ElementIdList;
     std::vector<std::vector<double>> NodesCoordinate;
     std::vector<std::vector<int>> NodesOnElements;
+
+    map<int, vector<int>> node_sets;
+    map<int, vector<int>> element_sets;
+    map<int, vector<vector<int>>> segment_sets;
     // map<int, int> NodeOrderInList;
     // map<int, int> ElementOrderInList;
 

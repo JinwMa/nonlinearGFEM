@@ -119,6 +119,211 @@ void Mesh::readmeshfile()
                 }  
             }
         }
+        else if (line_lower.substr(0, 5) == "*nset" || line_lower.substr(0, 9) == "*node_set")
+        {
+            int node_set_id;
+            
+            // 读取下一行
+            if (!std::getline(inputFile, line))
+            {
+                throw std::runtime_error("Error: Expected an integer on the next line, but no more lines are available.");
+            }
+            // 去除前后的空白字符
+            line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+            line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+            // 检查是否为空行
+            if (line.empty())
+            {
+                throw std::runtime_error("Error: Expected an integer, but the line is empty.");
+            }
+            try
+            {
+                node_set_id = std::stoi(line);
+            }
+            catch (const std::invalid_argument &)
+            {
+                throw std::runtime_error("Error: Expected an integer, but found a non-integer value.");
+            }
+            catch (const std::out_of_range &)
+            {
+                throw std::runtime_error("Error: Integer value out of range.");
+            }
+
+            if (node_sets.find(node_set_id) != node_sets.end())
+            {
+                throw std::runtime_error("Error: Key already exists in the map.");
+            }
+
+            if (line.find_first_not_of("0123456789+-") != std::string::npos)
+            {
+                std::cout << line << std::endl;
+                throw std::runtime_error("Error: Expected a single integer, but found additional characters.");
+            }
+            while (true)
+            {
+                pos = inputFile.tellg();
+                if(!std::getline(inputFile, line))break;
+                // 去除前后的空白字符
+                line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+                line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+                if (line.empty())
+                    continue;
+
+                if (line[0] == '*')
+                {
+                    inputFile.clear();
+                    inputFile.seekg(pos);
+                    break;
+                }
+                // 移除所有逗号
+                line.erase(std::remove(line.begin(), line.end(), ','), line.end());
+                std::istringstream iss(line);
+                int node_id;
+                while (iss >> node_id)
+                {
+                    node_sets[node_set_id].push_back(node_id);
+                }
+            }
+        }
+        else if (line_lower.substr(0, 6) == "*elset" || line_lower.substr(0, 12) == "*element_set")
+        {
+            int element_set_id;
+            
+            // 读取下一行
+            if (!std::getline(inputFile, line))
+            {
+                throw std::runtime_error("Error: Expected an integer on the next line, but no more lines are available.");
+            }
+            // 去除前后的空白字符
+            line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+            line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+            // 检查是否为空行
+            if (line.empty())
+            {
+                throw std::runtime_error("Error: Expected an integer, but the line is empty.");
+            }
+            try
+            {
+                element_set_id = std::stoi(line);
+            }
+            catch (const std::invalid_argument &)
+            {
+                throw std::runtime_error("Error: Expected an integer, but found a non-integer value.");
+            }
+            catch (const std::out_of_range &)
+            {
+                throw std::runtime_error("Error: Integer value out of range.");
+            }
+
+            if (element_sets.find(element_set_id) != element_sets.end())
+            {
+                throw std::runtime_error("Error: Key already exists in the map.");
+            }
+
+            if (line.find_first_not_of("0123456789+-") != std::string::npos)
+            {
+                std::cout << line << std::endl;
+                throw std::runtime_error("Error: Expected a single integer, but found additional characters.");
+            }
+            while (true)
+            {
+                pos = inputFile.tellg();
+                if(!std::getline(inputFile, line))break;
+                // 去除前后的空白字符
+                line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+                line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+                if (line.empty())
+                    continue;
+
+                if (line[0] == '*')
+                {
+                    inputFile.clear();
+                    inputFile.seekg(pos);
+                    break;
+                }
+                // 移除所有逗号
+                line.erase(std::remove(line.begin(), line.end(), ','), line.end());
+                std::istringstream iss(line);
+                int element_id;
+                while (iss >> element_id)
+                {
+                    element_sets[element_set_id].push_back(element_id);
+                }
+            }
+        }
+
+        else if (line_lower.substr(0, 12) == "*segment_set")
+        {
+            int segment_set_id;
+            
+            // 读取下一行
+            if (!std::getline(inputFile, line))
+            {
+                throw std::runtime_error("Error: Expected an integer on the next line, but no more lines are available.");
+            }
+            // 去除前后的空白字符
+            line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+            line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+            // 检查是否为空行
+            if (line.empty())
+            {
+                throw std::runtime_error("Error: Expected an integer, but the line is empty.");
+            }
+            try
+            {
+                segment_set_id = std::stoi(line);
+            }
+            catch (const std::invalid_argument &)
+            {
+                throw std::runtime_error("Error: Expected an integer, but found a non-integer value.");
+            }
+            catch (const std::out_of_range &)
+            {
+                throw std::runtime_error("Error: Integer value out of range.");
+            }
+
+            if (segment_sets.find(segment_set_id) != segment_sets.end())
+            {
+                throw std::runtime_error("Error: Key already exists in the map.");
+            }
+
+            if (line.find_first_not_of("0123456789+-") != std::string::npos)
+            {
+                std::cout << line << std::endl;
+                throw std::runtime_error("Error: Expected a single integer, but found additional characters.");
+            }
+            while (true)
+            {
+                pos = inputFile.tellg();
+                if(!std::getline(inputFile, line))break;
+                // 去除前后的空白字符
+                line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+                line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+                if (line.empty())
+                    continue;
+
+                if (line[0] == '*')
+                {
+                    inputFile.clear();
+                    inputFile.seekg(pos);
+                    break;
+                }
+                // 移除所有逗号
+                line.erase(std::remove(line.begin(), line.end(), ','), line.end());
+                std::istringstream iss(line);
+                int node_id;
+                std::vector<int> asegment;
+                while (iss >> node_id)
+                {
+                    // mesh_element[element_id - 1].push_back(node_id);
+                    asegment.push_back(node_id);
+                }                
+                if (!asegment.empty())
+                {         
+                    segment_sets[segment_set_id].push_back(asegment);
+                }
+            }
+        }
     }
     inputFile.close();
 }
