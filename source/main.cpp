@@ -8,8 +8,6 @@ void test2();
 
 int main(int argc, char *argv[])
 {
-    test2();
-    exit(0);
     // 读入和解析input文件    
     auto start = std::chrono::high_resolution_clock::now();
     Input input(argv[1]);

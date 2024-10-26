@@ -28,6 +28,18 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
     }
     if (integration_order <= 0) toolbox::error("the integration_order of " + name + " is wrong");
     num_intergration_point = integration_order * integration_order * integration_order; 
+
+    std::string material_name = pinput->getString(name + "_material");
+    std::string material_type = pinput->getString(material_name + "_type");
+    if(material_type == "LinearElasticity")
+    {
+        pmaterial = std::make_shared<LinearElasticity>();
+    }
+    else
+    {
+        toolbox::error("not support material type: " + material_type);
+    }
+    pmaterial->takeDB(pinput, material_name);
 }
 
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 #include "input.h"
 #include "mesh.h"
 #include "toolbox.h"
@@ -60,6 +61,9 @@ class BaseElement
     public:
     std::vector<int> element_ids;
     std::vector<std::vector<double>> d_GaussPoints;
+
+    protected:
+    std::shared_ptr<BaseMaterial> pmaterial;
     
 };
 
