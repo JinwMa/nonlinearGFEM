@@ -11,6 +11,8 @@
 #include <map>
 #include <Eigen/Dense>
 
+#include "LinearElasticity.h"
+
 
 void getFlexibilitMatrix(double xa[3], double xb[3], double ZSS[36], double DIA, double slen)
 {
@@ -106,4 +108,14 @@ void test()
     std::cout << "CPU 时间(毫秒): " << cpu_time << " ms" << std::endl;
     // 输出解 x
     // std::cout << "解 x:\n" << x << std::endl;
+}
+
+void test2()
+{
+    std::cout << " pass here" << std::endl;
+    BaseMaterial * material;
+
+    material = new LinearElasticity;
+
+    delete material;
 }

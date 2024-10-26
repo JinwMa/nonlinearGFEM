@@ -6,7 +6,7 @@ file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(elementlib STATIC ${SOURCES})
 target_include_directories(elementlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(elementlib PRIVATE inputlib meshlib toolboxlib objectlib)
+target_link_libraries(elementlib PRIVATE inputlib meshlib toolboxlib objectlib materiallib)
 target_link_libraries(elementlib PRIVATE OpenMP::OpenMP_CXX)
 
 

@@ -53,6 +53,8 @@ add_subdirectory(source/mesh)
 add_subdirectory(source/post)
 add_subdirectory(source/object)
 add_subdirectory(source/solver)
+
+add_subdirectory(source/material)
 add_subdirectory(source/element)
 add_subdirectory(source/load)
 add_subdirectory(source/constraint)
@@ -64,6 +66,11 @@ add_subdirectory(source/toolbox)
 
 
 # 链接子目录下的动态库
+
+
+target_link_libraries(M3D PRIVATE materiallib)
+target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/material)
+
 target_link_libraries(M3D PRIVATE meshlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
 
@@ -93,6 +100,7 @@ target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
 
 target_link_libraries(M3D PRIVATE toolboxlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
+
 
 
 

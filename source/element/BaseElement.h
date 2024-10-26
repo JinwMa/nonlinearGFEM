@@ -7,6 +7,7 @@
 #include "input.h"
 #include "mesh.h"
 #include "toolbox.h"
+#include "materialinterface.h"
 class BaseElement
 {
     private:

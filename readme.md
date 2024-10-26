@@ -68,3 +68,9 @@ useful head file
 #include <string>
 #include <omp.h>
 #include <chrono>
+
+
+
+注意一点很重要的CMake概念:
+1. 有时候提示#include不到某个头文件时,是因为这个库不仅需要被包含在当前目录下的库中,还要在它所有的上级路径中都要包含
+2. 举一个例子,我希望在element这个目录的代码中包含material目录下的头文件,但它老是提示找不到该目录或文件,这是因为还得在element的上层调用关系中包含这个materiallib库,如最重要的main函数同级目录下的CMakeLists.txt和solver目录下的CMakeLists.txt中也要包含这个库
