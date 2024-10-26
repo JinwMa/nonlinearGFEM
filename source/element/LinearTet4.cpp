@@ -395,3 +395,14 @@ void LinearTet4::ComputeStiffness(double nodes_coordinate[20][3],
         }
     }
 }
+
+void LinearTet4::getShapeFunctionOnIntegrationPoint(std::vector<double> &p_coord,
+                                                std::vector<double> &sf)
+{
+    if (p_coord.size() != 5)toolbox::error("the size of p_coord is wrong");
+    sf.resize(4);
+    sf[0] = p_coord[0];
+    sf[1] = p_coord[1];
+    sf[2] = p_coord[2];
+    sf[3] = p_coord[3];
+}

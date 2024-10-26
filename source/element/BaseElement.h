@@ -34,7 +34,15 @@ class BaseElement
 
 
     virtual void ComputeInternalForce(){};
-    virtual void getShapeFunction(){};
+    virtual void getShapeFunction(double nodes_coordinate[20][3],
+                                  std::vector<std::vector<double>> &,
+                                  vector<vector<double>> &ShapeFunction,
+                                  vector<vector<vector<double>>> &ShapeFunction_dxy,
+                                  vector<double> &value_jkb,
+                                  const int num_GP) = 0;
+
+    virtual void getShapeFunctionOnIntegrationPoint(std::vector<double> & p_coord,
+                                                    std::vector<double> & sf) = 0;
     
 
     protected:

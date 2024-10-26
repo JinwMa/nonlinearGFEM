@@ -29,6 +29,10 @@ class LinearHex8 : public BaseElement
                               vector<double> &value_jkb,
                               const int num_GP);
         ~LinearHex8() {};
+
+
+        void getShapeFunctionOnIntegrationPoint(std::vector<double> & p_coord,
+                                                std::vector<double> & sf);
     
     
 };

@@ -10,6 +10,8 @@ using namespace std;
 
 class toolbox
 {
+    private:
+    const double eps = 1.E-15;
 public:
     static void error(string info)
     {
@@ -47,6 +49,50 @@ public:
         std::cout << "the absolute error is " << absolute_error << std::endl;
         std::cout << "the relative error is " << relative_error << std::endl;
     }
+
+    static double a3_dot_b3(const double a[3], const double b[3])
+    {
+        return  a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+
+    static void a3_cross_b3(const double a[3], const double b[3], double c[3])
+    {
+        c[0] = a[1] * b[2] - a[2] * b[1];
+        c[1] = a[2] * b[0] - a[0] * b[2];
+        c[2] = a[0] * b[1] - a[1] * b[0];
+    }
+
+    static void normalize_a3(double a[3])
+    {
+        double normal = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+        normal = std::sqrt(normal);
+        if (normal < 1.e-15) error("the normal of a3 is too small for normalizing");
+        a[0] = a[0] / normal;
+        a[1] = a[1] / normal;
+        a[2] = a[2] / normal;
+    }
+
+    static double get_normal(const double a[3])
+    {
+        return std::sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+    }
+
+    // 参数:参考点,直线方向,待求点
+    static double distance_point_to_line(const double refer_point[3], const double dir[3], const double point[3])
+    {
+        double r[3] = {0.0};
+        r[0] = point[0] - refer_point[0];
+        r[1] = point[1] - refer_point[1];
+        r[2] = point[1] - refer_point[2];
+        double dir_temp[3] = {0.0};
+        for (int i = 0; i < 3; i++) dir_temp[i] = dir[i];
+        normalize_a3(dir_temp);
+        double ty = a3_dot_b3(dir_temp, r);
+        double normal = get_normal(r);
+        return std::sqrt(normal * normal - ty * ty);
+    }
+
 };
 
 #endif

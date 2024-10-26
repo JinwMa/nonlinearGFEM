@@ -290,3 +290,19 @@ void LinearHex8::SetElement()
         }
     }
 }
+
+
+void LinearHex8::getShapeFunctionOnIntegrationPoint(std::vector<double> & p_coord,
+                                                    std::vector<double> & sf)
+{
+    if (p_coord.size() != 4) toolbox::error(" the size of p_coord is wrong");
+    sf.resize(8);
+    sf[0] = ((1.0 - p_coord[0]) * (1.0 - p_coord[1]) * (1.0 - p_coord[2])) / 8.0;
+    sf[1] = ((1.0 + p_coord[0]) * (1.0 - p_coord[1]) * (1.0 - p_coord[2])) / 8.0;
+    sf[2] = ((1.0 + p_coord[0]) * (1.0 + p_coord[1]) * (1.0 - p_coord[2])) / 8.0;
+    sf[3] = ((1.0 - p_coord[0]) * (1.0 + p_coord[1]) * (1.0 - p_coord[2])) / 8.0;
+    sf[4] = ((1.0 - p_coord[0]) * (1.0 - p_coord[1]) * (1.0 + p_coord[2])) / 8.0;
+    sf[5] = ((1.0 + p_coord[0]) * (1.0 - p_coord[1]) * (1.0 + p_coord[2])) / 8.0;
+    sf[6] = ((1.0 + p_coord[0]) * (1.0 + p_coord[1]) * (1.0 + p_coord[2])) / 8.0;
+    sf[7] = ((1.0 - p_coord[0]) * (1.0 + p_coord[1]) * (1.0 + p_coord[2])) / 8.0;    
+}

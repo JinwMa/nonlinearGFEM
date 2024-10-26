@@ -14,8 +14,11 @@ class LoadManger
     ~LoadManger(){};
     void takeDB(Input * pinput, Mesh * mesh, Dof_Map * pdofmap);
 
-    void buildLoadForce(Input * pinput, Mesh * mesh, Dof_Map * pdofmap);
+    void buildLoadForce(Input * pinput, Mesh * mesh, Dof_Map * pdofmap, Eigen::VectorXd & forcevector);
 
+    void assembleForceVector(std::vector<int> & dof_index,
+                             std::vector<double> & force,
+                             Eigen::VectorXd & forcevector);
     private:
     std::vector<std::string> d_load_list;
 

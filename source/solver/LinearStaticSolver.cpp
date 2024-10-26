@@ -69,11 +69,8 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     auto loadmanger = new LoadManger;
 
     loadmanger->takeDB(pinput, pmesh, pdofmap);
-    
+    loadmanger->buildLoadForce(pinput, pmesh, pdofmap, P);    
     delete loadmanger;
-    exit(0);
-
-
     /// 求解线性方程组
     std::cout << "solving the linear equations" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();

@@ -16,8 +16,16 @@ class BaseLoad
     BaseLoad(){};
     virtual ~BaseLoad(){};
     virtual void takeDB(Input * pinput, Mesh * pmesh, std::string name = "") = 0;
-    virtual void buildLoadVector(std::vector<int> & dofs_index, std::vector<double> & loadvector) = 0;
-    virtual void buildLoadStiffnessMatrix(std::vector<int> & dofs_index, std::vector<double> & loadstiffnessmatrix) = 0;
+    virtual void buildLoadVector(Input * pinput,
+                                 Mesh * pmesh,
+                                 Dof_Map * pdofmap,
+                                 std::vector<int> & dofs_index,
+                                 std::vector<double> & loadvector) = 0;
+    virtual void buildLoadStiffnessMatrix(Input * pinput,
+                                          Mesh * pmesh,
+                                          Dof_Map * pdofmap,
+                                          std::vector<int> & dofs_index,
+                                          std::vector<double> & loadvector) = 0;
     private:
 
 };

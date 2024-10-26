@@ -362,7 +362,8 @@ void Mesh::getElementSetName(Input * pinput)
         }
         for (int i = 0; i < element_ids.size(); i++)
         {
-            element_setname[i] = name;
+            int element_id = element_ids[i];
+            element_setname[element_id] = name;
         }
     }
 

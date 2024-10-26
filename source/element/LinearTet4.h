@@ -29,8 +29,10 @@ class LinearTet4 : public BaseElement
                               vector<double> &value_jkb,
                               const int num_GP);
         ~LinearTet4() {};
-    
-    
+
+    public:
+        void getShapeFunctionOnIntegrationPoint(std::vector<double> &p_coord,
+                                                std::vector<double> &sf);
 };
 
 
