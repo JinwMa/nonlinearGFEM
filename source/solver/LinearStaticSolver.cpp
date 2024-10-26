@@ -64,10 +64,9 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     delete pelementassembler;
 
 
-    /// TODO:组装节点力向量 
+    //组装节点力向量 
 
     auto loadmanger = new LoadManger;
-
     loadmanger->takeDB(pinput, pmesh, pdofmap);
     loadmanger->buildLoadForce(pinput, pmesh, pdofmap, P);    
     delete loadmanger;
@@ -76,6 +75,7 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     auto start = std::chrono::high_resolution_clock::now();
     Eigen::VectorXd solution;
     linear_solver(K, P, C, G, solution);
+    // linear_solver2(K, P, C, G, solution);
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << "complete the solve" << std::endl;
     // 计算持续时间并转换为毫秒

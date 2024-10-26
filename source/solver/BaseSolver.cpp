@@ -137,14 +137,13 @@ void BaseSolver::linear_solver2(const Eigen::SparseMatrix<double> &K,
     Eigen::SparseMatrix<double> CT = C.transpose();
     Eigen::SparseMatrix<double> CTC;
     sparseMatrixMultiply(CT, C, CTC);
-    std::cout << "pass here" << std::endl;
     CTC = CTC * 1.E11;
     Eigen::SparseMatrix<double> K_AL = K + CTC;
 
     
 
     // 设置PG向量
-    Eigen::VectorXd PG = CT * G * 1.E11;
+    Eigen::VectorXd PG = CT * G * 1.E11 + P;
     // 求解 K_AL * x = PG
     // Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
     Eigen::PardisoLDLT<Eigen::SparseMatrix<double>> solver;            // 23.6s
