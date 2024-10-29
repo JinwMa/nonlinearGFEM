@@ -10,9 +10,6 @@ class LinearElasticity : public BaseMaterial
     LinearElasticity(){};
     ~LinearElasticity(){};
     void takeDB(Input * pinput, std::string & name);
-    private:
-    double E = 0.0;
-    double u = 0.0;
 };
 
 

@@ -17,6 +17,10 @@ class BaseMaterial
     BaseMaterial(){};
     virtual ~BaseMaterial(){};
     virtual void takeDB(Input * pinput, std::string &) = 0;
+
+    public:
+        double E = 0.0;
+        double u = 0.0;
 };
 
 

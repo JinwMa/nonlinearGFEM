@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "E:/work/project/workspace/eigen-3.4.0/**",
+                "E:/work/project/wal-nonlinearfem/eigen-3.4.0/**",
                 "C:/Program Files (x86)/Intel/oneAPI/mkl/2023.2.0/**"
             ],
             "defines": [
