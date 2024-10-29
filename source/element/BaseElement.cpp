@@ -27,22 +27,20 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
         integration_order = pinput->getInt(name + "_integration_order");
     }
     if (integration_order <= 0) toolbox::error("the integration_order of " + name + " is wrong");
-    num_intergration_point = integration_order * integration_order * integration_order; 
+    num_intergration_point = integration_order * integration_order * integration_order;
 
-    if (pinput->ifExist(name + "_material"))
+    //read material
+    std::string material_name = pinput->getString(name + "_material");
+    std::string material_type = pinput->getString(material_name + "_type");
+    if (material_type == "LinearElasticity")
     {
-        std::string material_name = pinput->getString(name + "_material");
-        std::string material_type = pinput->getString(material_name + "_type");
-        if(material_type == "LinearElasticity")
-        {
-            pmaterial = std::make_shared<LinearElasticity>();
-        }
-        else
-        {
-            toolbox::error("not support material type: " + material_type);
-        }
-        pmaterial->takeDB(pinput, material_name);
+        pmaterial = std::make_shared<LinearElasticity>();
     }
+    else
+    {
+        toolbox::error("not support material type: " + material_type);
+    }
+    pmaterial->takeDB(pinput, material_name);
 }
 
 void BaseElement::AmnXBpq(const double *A, const int m, const int n,

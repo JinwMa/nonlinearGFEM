@@ -14,8 +14,8 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
     // 先给elementmat清零
     elementmat.resize(num_edofs * num_edofs);
     // 材料参数先给一个默认值
-    double E = 1.E7;
-    double v = 0.3;
+    double matE = pmaterial->E;    
+    double v = pmaterial->u;
     // 形函数和形函数导数
     vector<vector<double>> SF;
     vector<vector<vector<double>>> SF_dxyz;
@@ -23,7 +23,7 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
     this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
 
     double D[6][6] = {};
-    double F = (E * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
+    double F = (matE * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
     D[0][0] = F;
     D[1][1] = F;
     D[2][2] = F;
