@@ -20,6 +20,10 @@ void LoadManger::buildLoadForce(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap,
         {
             load = new RotateBodyForce;
         }
+        else if (load_type == "nodal_force")
+        {
+            load = new NodalForce;
+        }
         else
         {
             toolbox::error("not support type of " + load_type + " in " + name);

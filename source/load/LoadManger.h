@@ -7,6 +7,7 @@
 
 #include "BaseLoad.h"
 #include "RotateBodyForce.h"
+#include "NodalForce.h"
 class LoadManger
 {
     public:
