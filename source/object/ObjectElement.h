@@ -15,6 +15,7 @@ struct ObjectElement
         vector<double> effecitve_plastic_strain_on_Gauss_points;
         vector<vector<double>> stress_vector_on_Gauss_points;    
         bool if_element_sf_is_exist; 
+        string test = "show for a test";
 };
 
 
