@@ -36,7 +36,7 @@ find_package(OpenMP REQUIRED)
 #注意这里是一个明显的分界线,注意add_executable前后发生的事情和时机
 ##############################################################################################
 # 指定可执行文件的名称和源文件
-add_executable(M3D source/main.cpp  source/test.cpp)
+add_executable(M3D source/main.cpp  source/test.cpp source/solve.cpp)
 target_link_libraries(M3D PUBLIC OpenMP::OpenMP_CXX)
 # 链接MKL库
 target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_core mkl_intel_thread iomp5)

@@ -62,7 +62,7 @@ class BaseElement
     public:
     std::vector<int> element_ids;
     std::vector<std::vector<double>> d_GaussPoints;
-    ObjectElement elementdata;
+    ObjectElement * elementdata;
 
     protected:
     std::shared_ptr<BaseMaterial> pmaterial;

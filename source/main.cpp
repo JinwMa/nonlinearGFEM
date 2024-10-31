@@ -4,8 +4,7 @@
 #include <iostream>
 #include <ctime>
 
-void test2();
-
+void solve(Input * pinput, Mesh * pmesh);
 int main(int argc, char *argv[])
 {
     // 读入和解析input文件    
@@ -22,12 +21,11 @@ int main(int argc, char *argv[])
     duration = start - end;
     std::cout << "time of read mesh data: " << duration.count() << " ms" << std::endl;
 
+    solve(p_input, p_mesh);
+    end = std::chrono::high_resolution_clock::now();
+    duration = end - start;    
+    std::cout << "time for all solve: " << duration.count() << " ms" << std::endl;
+
     
-
-    BaseSolver *structsolver;
-    structsolver = new LinearStaticSolver;
-    structsolver->solve(p_input, p_mesh);
-
-    delete structsolver;
     return 0;
 }
