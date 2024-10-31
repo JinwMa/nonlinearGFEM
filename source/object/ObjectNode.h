@@ -3,7 +3,7 @@
 
 #include<iostream>
 using namespace std;
-class Node
+struct ObjectNode
 {
     public:
     double X = 0.0;

@@ -4,8 +4,6 @@
 #include <string>
 #include <unordered_set>
 #include <iomanip>
-#include "node.h"
-
 using namespace std;
 
 void Post::onlymesh(Mesh *pmesh)

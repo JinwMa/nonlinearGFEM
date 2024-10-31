@@ -9,6 +9,7 @@
 #include "mesh.h"
 #include "toolbox.h"
 #include "materialinterface.h"
+#include "ObjectElement.h"
 class BaseElement
 {
     private:
@@ -61,6 +62,7 @@ class BaseElement
     public:
     std::vector<int> element_ids;
     std::vector<std::vector<double>> d_GaussPoints;
+    ObjectElement elementdata;
 
     protected:
     std::shared_ptr<BaseMaterial> pmaterial;

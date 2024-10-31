@@ -11,7 +11,7 @@
 #include "input.h"
 #include "mesh.h"
 #include "dof_map.h"
-#include "node.h"
+#include "ObjectNode.h"
 #include "toolbox.h"
 using namespace std;
 class Post
@@ -28,7 +28,7 @@ class Post
     void check_error(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap);
     private:
     string outputFilename;
-    vector<Node> PostNodes;
+    vector<ObjectNode> PostNodes;
 
 };
 
