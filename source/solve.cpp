@@ -7,7 +7,6 @@
 using namespace std;
 void solve(Input * pinput, Mesh * pmesh)
 {
-
     BaseSolver *structsolver;
     vector<string> solver_name = pinput->getVectorString("solver_list");
     assert(solver_name != 1);

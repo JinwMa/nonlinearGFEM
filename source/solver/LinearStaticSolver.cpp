@@ -1,12 +1,4 @@
-#include <omp.h>
-#include <chrono>
 #include "LinearStaticSolver.h"
-#include "ConstraintManager.h"
-#include "elementassembler.h"
-#include "LoadManger.h"
-#include "post.h"
-
-#include "dof_map.h"
 
 void LinearStaticSolver::takeDB()
 {

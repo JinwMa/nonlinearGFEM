@@ -14,7 +14,7 @@ class LinearTet4 : public BaseElement
     static const int num_node_dof = 3;
 
     public:
-        string element_type() { return "FEM"; };
+        string ReturnElementType() { return "FEM"; };
         void ComputeStiffness(double nodes_coordinates[20][3],
                               std::vector<double> &displacement,
                               std::vector<double> &du,

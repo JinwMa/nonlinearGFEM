@@ -26,14 +26,18 @@ class BaseElement
     BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);    
-    virtual void SetElement() = 0;
-    virtual std::string element_type() = 0;
+    virtual void SetElement(){
+        toolbox::error("should not use this function in BaseElement: SetElement");
+    };;
+    virtual std::string ReturnElementType() = 0;
 
     virtual void ComputeStiffness(double nodes_coordinates[20][3],
                                   std::vector<double> & displacement,
                                   std::vector<double> & du,
                                   std::vector<double> & ddu,
-                                  std::vector<double> & elementmat) = 0;
+                                  std::vector<double> & elementmat){
+        toolbox::error("should not use this function in BaseElement: Computestiffness");
+    };
 
 
     virtual void ComputeInternalForce(){};
@@ -42,10 +46,14 @@ class BaseElement
                                   vector<vector<double>> &ShapeFunction,
                                   vector<vector<vector<double>>> &ShapeFunction_dxy,
                                   vector<double> &value_jkb,
-                                  const int num_GP) = 0;
+                                  const int num_GP) {
+        toolbox::error("should not use this function in BaseElement: getShapeFunction");
+    };
 
     virtual void getShapeFunctionOnIntegrationPoint(std::vector<double> & p_coord,
-                                                    std::vector<double> & sf) = 0;
+                                                    std::vector<double> & sf) {
+        toolbox::error("should not use this function in BaseElement: getShapeFunctionOnIntegrationPoint");
+    };
     
 
     protected:

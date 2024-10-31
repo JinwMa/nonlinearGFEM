@@ -1,6 +1,7 @@
 #ifndef BASESOLVER_H
 #define BASESOLVER_H
 
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -11,13 +12,18 @@
 #include <fstream>
 #include <omp.h>
 #include <chrono>
-
 #include <sstream>
 #include <map>
 #include <unordered_set>
 #include "dof_map.h"
 #include "input.h"
 #include "mesh.h"
+#include "ConstraintManager.h"
+#include "elementassembler.h"
+#include "LoadManger.h"
+#include "post.h"
+
+
 class BaseSolver
 {
     private:
