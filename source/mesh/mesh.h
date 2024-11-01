@@ -13,8 +13,8 @@ using namespace std;
 class Mesh
 {    
 private:
-    static const int maxnum_element = 100000;
-    static const int maxnum_node = 100000;
+    static const int maxnum_element = 300000;
+    static const int maxnum_node = 300000;
     std::string meshfilename;
 
 public:
