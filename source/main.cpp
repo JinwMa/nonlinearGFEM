@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
-
 #include "mesh.h"
 #include "input.h"
 

@@ -326,6 +326,7 @@ void Mesh::readmeshfile()
         }
     }
     inputFile.close();
+    buildElementsOfNodes();
 }
 
 void Mesh::checkmesh()
@@ -367,4 +368,20 @@ void Mesh::getElementSetName(Input * pinput)
         }
     }
 
+}
+
+void Mesh::buildElementsOfNodes()
+{
+    //循环所有的单元
+    for (int i = 0; i < actual_element_count; i++)
+    {
+        int element_id = ElementIdList[i];
+        int element_order = ElementOrderInList[element_id] - 1;
+        // 循环单元上的节点
+        for (int j = 0; j < NodesOnElements[element_order].size(); j++)
+        {
+            int node_id = NodesOnElements[element_order][j];
+            ElementsOfNodes[node_id].push_back(element_id);
+        }
+    }
 }

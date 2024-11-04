@@ -37,6 +37,8 @@ public:
     int NodeOrderInList[maxnum_node] = {};
     int ElementOrderInList[maxnum_element] = {};
 
+    unordered_map<int, vector<int>>ElementsOfNodes;
+
 
     // std::vector<std::vector<int>> mesh_element;
     // std::vector<std::vector<double>> mesh_node;
@@ -57,6 +59,7 @@ public:
 private:
     void readmeshfile();
     void getElementSetName(Input * pinput);
+    void buildElementsOfNodes();
 };
 
 #endif // FILE1_H
