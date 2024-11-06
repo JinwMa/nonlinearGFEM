@@ -40,6 +40,7 @@ public:
 
     virtual void solve(Input * pinput, Mesh * pmesh) = 0;
     virtual void takeDB() {};
+    virtual void takeDB(Input * pinput) {};
 
 
     virtual void vector_assembler(Input * pinput, Mesh * pmesh, Eigen::VectorXd & Vector){};

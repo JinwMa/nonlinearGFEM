@@ -341,6 +341,7 @@ void Mesh::checkmesh()
 
 void Mesh::getElementSetName(Input * pinput)
 {
+    if (!pinput->ifExist("element_list")) return;
     std::vector<std::string>element_list = pinput->getVectorString("element_list");
     for (auto name : element_list)
     {

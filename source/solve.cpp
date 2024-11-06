@@ -17,6 +17,10 @@ void solve(Input * pinput, Mesh * pmesh)
         {
             structsolver = new LinearStaticSolver;
         }
+        else if (solver_type == "NonLinearStaticSolver")
+        {
+            structsolver = new NonLinearStaticSolver;            
+        }
         else
         {
             toolbox::error("not support type of solver: " + solver_type);

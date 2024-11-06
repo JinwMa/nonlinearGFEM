@@ -3,6 +3,7 @@
 
 #include "BaseMaterial.h"
 #include "LinearElasticity.h"
+#include "KirchhoffHyperelasticity.h"
 
 
 

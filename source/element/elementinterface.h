@@ -4,6 +4,6 @@
 #include "BaseElement.h"
 #include "LinearHex8.h"
 #include "LinearTet4.h"
-#include "NonlinearHex8.h"
+#include "NonLinearHex8.h"
 
 #endif
