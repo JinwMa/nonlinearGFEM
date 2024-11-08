@@ -42,6 +42,8 @@ public:
     virtual void takeDB() {};
     virtual void takeDB(Input * pinput) {};
 
+    virtual void initialize_solver(Input * pinput, Mesh * pmesh){};
+
 
     virtual void vector_assembler(Input * pinput, Mesh * pmesh, Eigen::VectorXd & Vector){};
     // virtual void matrix_assembler(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};

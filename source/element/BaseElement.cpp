@@ -27,7 +27,7 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
         integration_order = pinput->getInt(name + "_integration_order");
     }
     if (integration_order <= 0) toolbox::error("the integration_order of " + name + " is wrong");
-    num_intergration_point = integration_order * integration_order * integration_order;
+    d_num_intergration_point = integration_order * integration_order * integration_order;
 
     //read material
     std::string material_name = pinput->getString(name + "_material");
@@ -35,6 +35,10 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
     if (material_type == "LinearElasticity")
     {
         pmaterial = std::make_shared<LinearElasticity>();
+    }
+    else if (material_type == "Kirchhoff_hyperelasticity")
+    {
+        pmaterial = std::make_shared<KirchhoffHyperelasticity>();
     }
     else
     {

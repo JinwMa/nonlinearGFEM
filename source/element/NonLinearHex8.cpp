@@ -1,11 +1,26 @@
 #include "NonLinearHex8.h"
 
+using namespace std;
 void NonLinearHex8::ComputeStiffness(double nodes_coordinates[20][3],
                                      std::vector<double> &displacement,
                                      std::vector<double> &du,
                                      std::vector<double> &ddu,
+                                     ObjectElement & elementdata,
                                      std::vector<double> &elementmat)
 {
+    elementmat.resize(24 * 24);
+    // 如果单元没有被初始化
+    if (!elementdata.if_element_is_initialized)
+    {
+        //对齐输入
+        vector<vector<double>> a;
+        vector<vector<vector<double>>> b;
+        vector<double> c;
+        initialize_element(nodes_coordinates, d_GaussPoints, a, b, c, d_num_intergration_point, elementdata);
+    }
+
+    // for (int i = 0; i < 24 * 24; i++) elementmat[i] = 1.0;
+
 }
 
 void NonLinearHex8::getShapeFunction(double nodes_coordinate[20][3],
@@ -197,4 +212,54 @@ void NonLinearHex8::SetElement()
             }
         }
     }
+}
+
+void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
+                                       std::vector<std::vector<double>> &GaussPoints,
+                                       vector<vector<double>> &ShapeFunction,
+                                       vector<vector<vector<double>>> &ShapeFunction_dxy,
+                                       vector<double> &value_jkb,
+                                       const int num_GP,
+                                       ObjectElement & elementdata)
+{
+    getShapeFunction(nodes_coordinate, GaussPoints, ShapeFunction, ShapeFunction_dxy, value_jkb, num_GP);
+    // 初始化积分点数目
+    elementdata.num_Gauss_points = GaussPoints.size();
+    // 积分点上的形函数
+    elementdata.sf_on_Gauss_points = ShapeFunction;
+    // 积分点上的形函数导数
+    elementdata.sfdxyz_on_Gauss_points = ShapeFunction_dxy;
+    // 积分点上的雅可比：母单元映射物理单元
+    elementdata.jkb = value_jkb;
+    // 积分点权重
+    elementdata.weights.resize(num_GP); 
+    for (int i = 0; i < num_GP; i++)
+    {
+        elementdata.weights[i] = GaussPoints[i][4];
+    }
+
+    // 等效塑性应变
+    elementdata.effecitve_plastic_strain_on_Gauss_points.resize(num_GP);
+    for (int i = 0; i < num_GP; i++) elementdata.effecitve_plastic_strain_on_Gauss_points[i] = 0.0;
+    // 变形梯度 应力 变形梯度逆
+    elementdata.F_on_Gauss_points.resize(num_GP);
+    elementdata.Finv_on_Gauss_points.resize(num_GP);
+    elementdata.stress_tensor_on_Gauss_points.resize(num_GP);
+    for (int i = 0; i < num_GP; i++)
+    {
+        for (int j = 0; j < 3; j++)
+            for (int k = 0; k < 3; k++)
+            {
+                elementdata.stress_tensor_on_Gauss_points[i][j][k] = 0.0;
+                elementdata.F_on_Gauss_points[i][j][k] = 0.0;
+                elementdata.Finv_on_Gauss_points[i][j][k] = 0.0;
+
+                if (j == k)
+                {
+                    elementdata.F_on_Gauss_points[i][j][k] = 1.0;
+                    elementdata.Finv_on_Gauss_points[i][j][k] = 1.0;
+                }
+            }
+    }
+    elementdata.if_element_is_initialized = true;
 }

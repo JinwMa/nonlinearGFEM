@@ -22,7 +22,7 @@ class BaseElement
 
     public:
     int integration_order = 3;
-    int num_intergration_point;
+    int d_num_intergration_point;
     BaseElement(){};
     virtual ~BaseElement() {}; //定义纯虚析构函数
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);    
@@ -35,6 +35,15 @@ class BaseElement
                                   std::vector<double> & displacement,
                                   std::vector<double> & du,
                                   std::vector<double> & ddu,
+                                  std::vector<double> & elementmat){
+        toolbox::error("should not use this function in BaseElement: Computestiffness");
+    };
+
+    virtual void ComputeStiffness(double nodes_coordinates[20][3],
+                                  std::vector<double> & displacement,
+                                  std::vector<double> & du,
+                                  std::vector<double> & ddu,
+                                  ObjectElement & elementdata,
                                   std::vector<double> & elementmat){
         toolbox::error("should not use this function in BaseElement: Computestiffness");
     };
@@ -70,7 +79,6 @@ class BaseElement
     public:
     std::vector<int> element_ids;
     std::vector<std::vector<double>> d_GaussPoints;
-    ObjectElement * pelementdata = nullptr;
 
     protected:
     std::shared_ptr<BaseMaterial> pmaterial;

@@ -18,14 +18,25 @@ class NonLinearHex8 : public BaseElement
                                       std::vector<double> &displacement,
                                       std::vector<double> &du,
                                       std::vector<double> &ddu,
-                                      std::vector<double> &elementmat);
+                                      ObjectElement & elementdata,
+                                      std::vector<double> &elementmat) override;
 
         virtual void getShapeFunction(double nodes_coordinate[20][3],
-                                      std::vector<std::vector<double>> &,
+                                      std::vector<std::vector<double>> & GaussPoints,
                                       vector<vector<double>> &ShapeFunction,
                                       vector<vector<vector<double>>> &ShapeFunction_dxy,
                                       vector<double> &value_jkb,
                                       const int num_GP);
+
+    private:
+        void initialize_element(double nodes_coordinate[20][3],
+                                std::vector<std::vector<double>> &GaussPoints,
+                                vector<vector<double>> &ShapeFunction,
+                                vector<vector<vector<double>>> &ShapeFunction_dxy,
+                                vector<double> &value_jkb,
+                                const int num_GP,
+                                ObjectElement & elementdata);
+                                
 };
 
 

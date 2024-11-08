@@ -19,7 +19,7 @@
 class ElementAssembler
 {
     private:
-    int max_threads = 6;
+    int max_threads = 1;
     public:
     ElementAssembler(){};
     ~ElementAssembler(){};
@@ -31,6 +31,14 @@ class ElementAssembler
     void assembleElementStiffness(Input * pinput,
                                   Mesh * pmesh,
                                   Dof_Map * pdofmap, 
+                                  Eigen::SparseMatrix<double> & Matrix);
+
+
+
+    void assembleNonLinearElementStiffness(Input * pinput,
+                                  Mesh * pmesh,
+                                  Dof_Map * pdofmap, 
+                                  std::vector<ObjectElement> & ElementData,
                                   Eigen::SparseMatrix<double> & Matrix);
 
     
@@ -57,6 +65,15 @@ class ElementAssembler
                           std::vector<std::string> & dofs,
                           std::vector<double> & elementmat,
                           std::vector<Eigen::Triplet<double>> & local_tripletLists);
+
+
+    void NonLinearElementSetStiffnessAssemble(Input * pinput,   
+                                Mesh * pmesh,
+                                Dof_Map * pdofmap,
+                                std::vector<int> & element_ids,
+                                BaseElement * pelement,
+                                std::vector<ObjectElement> & ElementData,
+                                std::vector<std::vector<Eigen::Triplet<double>>> &);
 
 };
 

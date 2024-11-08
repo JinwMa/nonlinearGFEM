@@ -20,7 +20,7 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
     vector<vector<double>> SF;
     vector<vector<vector<double>>> SF_dxyz;
     vector<double> detJ;
-    this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, num_intergration_point);
+    this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, d_num_intergration_point);
 
     double D[6][6] = {};
     double F = (matE * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
@@ -40,7 +40,7 @@ void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
     double B[6][3] = {};
     double BT[3][6] = {};
     double BTDB[3][3] = {};
-    for (int i = 0; i < num_intergration_point; i++)
+    for (int i = 0; i < d_num_intergration_point; i++)
     {
         double w = d_GaussPoints[i][3];
         double J = detJ[i];

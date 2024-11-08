@@ -74,7 +74,7 @@ void RotateBodyForce::buildLoadVector(Input * pinput,
             std::vector<double> jkb;
             std::vector<std::vector<double>> sf;
             std::vector<std::vector<std::vector<double>>> sf_dxyz;
-            int num_GP = pelement->num_intergration_point;
+            int num_GP = pelement->d_num_intergration_point;
             pelement->getShapeFunction(nodes_coordinates, GaussPoint, sf, sf_dxyz, jkb, num_GP);            
             // 循环高斯点
             int p_size = GaussPoint[0].size();
