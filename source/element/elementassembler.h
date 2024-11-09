@@ -19,7 +19,7 @@
 class ElementAssembler
 {
     private:
-    int max_threads = 1;
+    int max_threads = 6;
     public:
     ElementAssembler(){};
     ~ElementAssembler(){};

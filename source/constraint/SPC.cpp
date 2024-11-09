@@ -41,6 +41,13 @@ void SPC::takeDB(Input *pinput, Mesh *pmesh)
     {
         toolbox::error("the value of SPC" + name + " is wrong");
     }
+
+    //test
+    // for (int i = 0; i < d_node_ids.size(); i++)
+    // {
+    //     std::cout << d_node_ids[i] << std::endl;
+    // }
+    // exit(0);
 }
 
 void SPC::getNodesFromGeometry(Mesh *pmesh)

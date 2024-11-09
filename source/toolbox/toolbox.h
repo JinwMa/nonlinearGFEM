@@ -93,6 +93,32 @@ public:
         return std::sqrt(normal * normal - ty * ty);
     }
 
+    static void Tensor4dotdotTensor2(const double C[3][3][3][3],
+                                     const double E[3][3],
+                                     double X[3][3]){
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                X[i][j] = 0.0;
+            }
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    for (int l = 0; l < 3; l++)
+                    {
+                        X[i][j] += C[i][j][k][l] * E[k][l];
+                    }
+                }
+            }
+        }
+    }
+
 };
 
 #endif

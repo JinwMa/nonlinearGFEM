@@ -178,6 +178,7 @@ void Post::check_error(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
 
 void Post::onlymesh(Input *pinput, Mesh *pmesh)
 {
+    std::cout << "pass here" << std::endl;
 
     string filename = outputFilename + "_mesh.dat";
     std::ofstream outputFile(filename, std::ios::app); // 打开文件
@@ -209,7 +210,7 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
         {
             toolbox::error("not support the type of " + element_set_type + " for element ids");
         }
-        if (pinput->getString(elementname + "_type") == "LinearHex8")
+        if (pinput->getString(elementname + "_type") == "LinearHex8" || pinput->getString(elementname + "_type") == "NonLinearHex8")
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
@@ -326,7 +327,7 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
         {
             toolbox::error("not support the type of " + element_set_type + " for element ids");
         }
-        if (pinput->getString(elementname + "_type") == "LinearHex8")
+        if (pinput->getString(elementname + "_type") == "LinearHex8" || pinput->getString(elementname + "_type") == "NonLinearHex8")
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;

@@ -5,26 +5,160 @@ void NonLinearHex8::ComputeStiffness(double nodes_coordinates[20][3],
                                      std::vector<double> &displacement,
                                      std::vector<double> &du,
                                      std::vector<double> &ddu,
-                                     ObjectElement & elementdata,
+                                     ObjectElement &elementdata,
                                      std::vector<double> &elementmat)
 {
-    elementmat.resize(24 * 24);
+    std::cout.precision(10);
+    elementmat.resize(d_num_edofs * d_num_edofs);
     // 如果单元没有被初始化
     if (!elementdata.if_element_is_initialized)
     {
-        //对齐输入
+        // 对齐输入
         vector<vector<double>> a;
         vector<vector<vector<double>>> b;
         vector<double> c;
         initialize_element(nodes_coordinates, d_GaussPoints, a, b, c, d_num_intergration_point, elementdata);
     }
+    // 根据位移更新变形梯度，和变形梯度的逆
+    updateF_Finv(displacement, du, ddu, elementdata);
+    // TODO: 
+    // updateStressAndC();
+    // 循环所有积分点
+    int num_GP = elementdata.num_Gauss_points;
+    for (int i = 0; i < num_GP; i++) // 积分点循环
+    {
+        double D[6][6] = {0.0};
+        
+        double BT[3][6] = {0.0};
+        double B[6][3] = {0.0};
+        double Bg[3][1] = {0.0};
+        double BgT[1][3] = {0.0};
+        double weight = elementdata.weights[i];
+        double stress[3][3] = {0.0};
+        double JKB = elementdata.JKB[i]; // 母单元映射雅可比
+        double jkb = elementdata.jkb[i]; // 构型变化之雅可比
+        pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                stress[ii][jj] = elementdata.stress_tensor_on_Gauss_points[i][ii][jj];
+            }
+        }
+        for (int j = 0; j < d_num_nodes; j++) // 节点循环
+        {
 
-    // for (int i = 0; i < 24 * 24; i++) elementmat[i] = 1.0;
+            double sfdx = elementdata.sfdxyz_on_Gauss_points[i][j][0];
+            double sfdy = elementdata.sfdxyz_on_Gauss_points[i][j][1];
+            double sfdz = elementdata.sfdxyz_on_Gauss_points[i][j][2];
+            double sf_dxnow = elementdata.Finv_on_Gauss_points[i][0][0] * sfdx +
+                              elementdata.Finv_on_Gauss_points[i][1][0] * sfdy +
+                              elementdata.Finv_on_Gauss_points[i][2][0] * sfdz;
 
+            double sf_dynow = elementdata.Finv_on_Gauss_points[i][0][1] * sfdx +
+                              elementdata.Finv_on_Gauss_points[i][1][1] * sfdy +
+                              elementdata.Finv_on_Gauss_points[i][2][1] * sfdz;
+
+            double sf_dznow = elementdata.Finv_on_Gauss_points[i][0][2] * sfdx +
+                              elementdata.Finv_on_Gauss_points[i][1][2] * sfdy +
+                              elementdata.Finv_on_Gauss_points[i][2][2] * sfdz;
+            BT[0][0] = sf_dxnow;
+            BT[0][3] = sf_dynow;
+            BT[0][5] = sf_dznow;
+
+            BT[1][1] = sf_dynow;
+            BT[1][3] = sf_dxnow;
+            BT[1][4] = sf_dznow;
+
+            BT[2][2] = sf_dznow;
+            BT[2][4] = sf_dynow;
+            BT[2][5] = sf_dxnow;
+
+            BgT[0][0] = sf_dxnow;
+            BgT[0][1] = sf_dynow;
+            BgT[0][2] = sf_dznow;
+
+            for (int k = 0; k < d_num_nodes; k++)
+            {
+                sfdx = elementdata.sfdxyz_on_Gauss_points[i][k][0];
+                sfdy = elementdata.sfdxyz_on_Gauss_points[i][k][1];
+                sfdz = elementdata.sfdxyz_on_Gauss_points[i][k][2];
+                sf_dxnow = elementdata.Finv_on_Gauss_points[i][0][0] * sfdx +
+                           elementdata.Finv_on_Gauss_points[i][1][0] * sfdy +
+                           elementdata.Finv_on_Gauss_points[i][2][0] * sfdz;
+
+                sf_dynow = elementdata.Finv_on_Gauss_points[i][0][1] * sfdx +
+                           elementdata.Finv_on_Gauss_points[i][1][1] * sfdy +
+                           elementdata.Finv_on_Gauss_points[i][2][1] * sfdz;
+
+                sf_dznow = elementdata.Finv_on_Gauss_points[i][0][2] * sfdx +
+                           elementdata.Finv_on_Gauss_points[i][1][2] * sfdy +
+                           elementdata.Finv_on_Gauss_points[i][2][2] * sfdz;
+
+                B[0][0] = sf_dxnow;
+                B[1][1] = sf_dynow;
+                B[2][2] = sf_dznow;
+
+                B[3][0] = sf_dynow;
+                B[3][1] = sf_dxnow;
+                B[4][1] = sf_dznow;
+
+                B[4][2] = sf_dynow;
+                B[5][0] = sf_dznow;
+                B[5][2] = sf_dxnow;
+
+                Bg[0][0] = sf_dxnow;
+                Bg[1][0] = sf_dynow;
+                Bg[2][0] = sf_dznow;
+
+                double BTD[3][6] = {0.0};
+                AmnXBpq(&BT[0][0], 3, 6, &D[0][0], 6, 6, &BTD[0][0]);
+               
+                double BTDB[3][3] = {0.0};
+                AmnXBpq(&BTD[0][0], 3, 6, &B[0][0], 6, 3, &BTDB[0][0]);
+                
+                double BgTS[1][3] = {0.0};
+                AmnXBpq(&BgT[0][0], 1, 3, &stress[0][0], 3, 3, &BgTS[0][0]);
+                double BgTSBg[1][1] = {0.0};
+                AmnXBpq(&BgTS[0][0], 1, 3, &Bg[0][0], 3, 1, &BgTSBg[0][0]);
+                double TC1 = BgTSBg[0][0];
+                
+
+                double EK_IJ[3][3] = {};
+                for (int iii = 0; iii < 3; iii++)
+                {
+                    for(int jjj = 0; jjj < 3; jjj++)
+                    {
+                        double delta = 0.0;
+                        if (iii == jjj) delta = 1.0;
+                        EK_IJ[iii][jjj] = (BTDB[iii][jjj] + TC1 * delta) * weight * JKB * jkb;
+                    }
+                }
+                // for (int iii = 0; iii < 3; iii++)
+                // {
+                //     for(int jjj = 0; jjj < 3; jjj++)
+                //     {
+                //         std::cout << EK_IJ[iii][jjj] << std::endl;
+                //     }
+                // }
+                // std::cout << "@@@@@@@@@@@@@@" << std::endl;
+                for (int iii = 0; iii < 3; iii++)
+                {
+                    for (int jjj = 0; jjj < 3; jjj++)
+                    {
+                        int col = j * 3 + iii;
+                        int row = k * 3 + jjj;
+                        elementmat[col * d_num_edofs + row] += EK_IJ[iii][jjj];
+                    }
+                }
+            }
+
+        }
+    }
 }
 
 void NonLinearHex8::getShapeFunction(double nodes_coordinate[20][3],
-                                     std::vector<std::vector<double>> & GaussPoints,
+                                     std::vector<std::vector<double>> &GaussPoints,
                                      vector<vector<double>> &ShapeFunction,
                                      vector<vector<vector<double>>> &ShapeFunction_dxy,
                                      vector<double> &value_jkb,
@@ -220,7 +354,7 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
                                        vector<vector<vector<double>>> &ShapeFunction_dxy,
                                        vector<double> &value_jkb,
                                        const int num_GP,
-                                       ObjectElement & elementdata)
+                                       ObjectElement &elementdata)
 {
     getShapeFunction(nodes_coordinate, GaussPoints, ShapeFunction, ShapeFunction_dxy, value_jkb, num_GP);
     // 初始化积分点数目
@@ -230,17 +364,22 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
     // 积分点上的形函数导数
     elementdata.sfdxyz_on_Gauss_points = ShapeFunction_dxy;
     // 积分点上的雅可比：母单元映射物理单元
-    elementdata.jkb = value_jkb;
+    elementdata.JKB = value_jkb;
+    // 积分点上的雅可比: 构型变化之间的映射
+    elementdata.jkb.resize(num_GP);
+    for (int i = 0; i < num_GP; i++)
+        elementdata.jkb[i] = 1.0;
     // 积分点权重
-    elementdata.weights.resize(num_GP); 
+    elementdata.weights.resize(num_GP);
     for (int i = 0; i < num_GP; i++)
     {
-        elementdata.weights[i] = GaussPoints[i][4];
+        elementdata.weights[i] = GaussPoints[i][3];
     }
 
     // 等效塑性应变
     elementdata.effecitve_plastic_strain_on_Gauss_points.resize(num_GP);
-    for (int i = 0; i < num_GP; i++) elementdata.effecitve_plastic_strain_on_Gauss_points[i] = 0.0;
+    for (int i = 0; i < num_GP; i++)
+        elementdata.effecitve_plastic_strain_on_Gauss_points[i] = 0.0;
     // 变形梯度 应力 变形梯度逆
     elementdata.F_on_Gauss_points.resize(num_GP);
     elementdata.Finv_on_Gauss_points.resize(num_GP);
@@ -262,4 +401,11 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
             }
     }
     elementdata.if_element_is_initialized = true;
+}
+
+void NonLinearHex8::updateF_Finv(std::vector<double> &displacement,
+                                 std::vector<double> &du,
+                                 std::vector<double> &ddu,
+                                 ObjectElement &elementdata)
+{
 }

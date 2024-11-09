@@ -6,6 +6,7 @@
 
 void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
 {
+    // 读单元集合
     std::string element_set_type = pinput->getString(name + "_set_type");    
     if (element_set_type == "range")
     {

@@ -10,6 +10,7 @@ void LoadManger::takeDB(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap)
 void LoadManger::buildLoadForce(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap, Eigen::VectorXd & forcevector)
 {
     forcevector.resize(pdofmap->dof_size);
+    forcevector.setZero();
     BaseLoad * load;
     for (auto name : d_load_list)
     {

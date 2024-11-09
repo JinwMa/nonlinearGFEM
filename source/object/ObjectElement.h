@@ -14,7 +14,8 @@ struct ObjectElement
         vector<std::array<std::array<double, 3>, 3>> stress_tensor_on_Gauss_points;    
         vector<std::array<std::array<double, 3>, 3>> F_on_Gauss_points;
         vector<std::array<std::array<double, 3>, 3>> Finv_on_Gauss_points;
-        vector<double> jkb;
+        vector<double> JKB; //母单元向实际单元映射
+        vector<double> jkb; //构型变化之间的映射
         vector<double> weights;
 
         bool if_element_is_initialized; 

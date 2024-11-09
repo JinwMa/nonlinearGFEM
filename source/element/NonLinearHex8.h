@@ -5,10 +5,10 @@
 
 class NonLinearHex8 : public BaseElement
 {
-    public:
-    static const int num_edofs = 24;
-    static const int num_nodes = 8;
-    static const int num_node_dof = 3; 
+    private:
+    const int d_num_edofs = 24;
+    const int d_num_nodes = 8;
+    const int d_num_node_dof = 3; 
     public:
         ~NonLinearHex8() {};
         void SetElement();
@@ -36,7 +36,12 @@ class NonLinearHex8 : public BaseElement
                                 vector<double> &value_jkb,
                                 const int num_GP,
                                 ObjectElement & elementdata);
-                                
+
+        // 更新变形梯度，变形梯度的逆，雅可比
+        void updateF_Finv(std::vector<double> &displacement,
+                          std::vector<double> &du,
+                          std::vector<double> &ddu,
+                          ObjectElement &elementdata);
 };
 
 
