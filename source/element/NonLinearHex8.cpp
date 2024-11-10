@@ -21,30 +21,55 @@ void NonLinearHex8::ComputeStiffness(double nodes_coordinates[20][3],
     }
     // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(displacement, du, ddu, elementdata);
+
+
+
+
+    // 为了openmp并行，在单元内部维护材料参数
+    double C_e_tensor[3][3][3][3] = {0.0}; //弹性模量
+    pmaterial->getC_e_tensor(C_e_tensor);
+    double Ct[3][3][3][3] = {0.0};         //切线模量
+
+
     // TODO: 
     // updateStressAndC();
     // 循环所有积分点
     int num_GP = elementdata.num_Gauss_points;
     for (int i = 0; i < num_GP; i++) // 积分点循环
     {
-        double D[6][6] = {0.0};
-        
-        double BT[3][6] = {0.0};
-        double B[6][3] = {0.0};
-        double Bg[3][1] = {0.0};
-        double BgT[1][3] = {0.0};
+        double D[6][6] = {0.0};      // 6X6的材料矩阵        
+        double BT[3][6] = {0.0};     // BT
+        double B[6][3] = {0.0};      // B
+        double Bg[3][1] = {0.0};     // 几何矩阵
+        double BgT[1][3] = {0.0};    // 
         double weight = elementdata.weights[i];
         double stress[3][3] = {0.0};
+        double stressn[3][3] = {0.0};
+        double stressn1[3][3] = {0.0};
         double JKB = elementdata.JKB[i]; // 母单元映射雅可比
         double jkb = elementdata.jkb[i]; // 构型变化之雅可比
-        pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);
+        // pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);
+
+        double F[3][3] = {0.0};
+        double Finv[3][3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                stress[ii][jj] = elementdata.stress_tensor_on_Gauss_points[i][ii][jj];
+                F[ii][jj] = elementdata.F_on_Gauss_points[i][ii][jj];
+                Finv[ii][jj] = elementdata.Finv_on_Gauss_points[i][ii][jj];                
             }
         }
+        pmaterial->getCt(C_e_tensor, F, jkb, Ct);
+        pmaterial->transeCtoD(Ct, D);
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                stressn[ii][jj] = elementdata.stress_tensor_on_Gauss_points[i][ii][jj];
+            }
+        }
+        pmaterial->getStress(C_e_tensor, F, jkb, stress);
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
 
@@ -408,4 +433,57 @@ void NonLinearHex8::updateF_Finv(std::vector<double> &displacement,
                                  std::vector<double> &ddu,
                                  ObjectElement &elementdata)
 {
+    double Fn1[3][3] = {0.0};
+    double Finv_n1[3][3] = {0.0};
+    for (int i = 0; i < 3; i++)
+    {
+        Fn1[i][i] = 1.0;
+    }  
+
+    double ux = 0.0;
+    double uy = 0.0;
+    double uz = 0.0;  
+    double sfdx = 0.0;
+    double sfdy = 0.0;
+    double sfdz = 0.0;
+
+    for (int i = 0; i < elementdata.num_Gauss_points; i++)
+    {
+        auto & shapefunction = elementdata.sfdxyz_on_Gauss_points[i];
+        auto & Fn = elementdata.F_on_Gauss_points[i];
+        auto & Finv_n = elementdata.Finv_on_Gauss_points[i];
+        auto & jkbn = elementdata.jkb[i];
+        for (int inode = 0; inode < d_num_nodes; inode++)
+        {
+            ux = displacement[inode * d_num_nodes * 3 + 0];
+            uy = displacement[inode * d_num_nodes * 3 + 1];
+            uz = displacement[inode * d_num_nodes * 3 + 2];
+            sfdx = shapefunction[inode][0];
+            sfdy = shapefunction[inode][1];
+            sfdz = shapefunction[inode][2];
+
+            Fn1[0][0] = Fn1[0][0] + ux * sfdx;
+            Fn1[0][1] = Fn1[0][1] + ux * sfdy;
+            Fn1[0][2] = Fn1[0][2] + ux * sfdz;
+
+            Fn1[1][0] = Fn1[1][0] + uy * sfdx;
+            Fn1[1][1] = Fn1[1][1] + uy * sfdy;
+            Fn1[1][2] = Fn1[1][2] + uy * sfdz;
+
+            Fn1[2][0] = Fn1[2][0] + uz * sfdx;
+            Fn1[2][1] = Fn1[2][1] + uz * sfdy;
+            Fn1[2][2] = Fn1[2][2] + uz * sfdz;
+        }
+        double jkb_n1 = invertMatrix(Fn1, Finv_n1);
+        jkbn = jkb_n1; // 更新雅可比
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                Fn[ii][jj] = Fn1[ii][jj];
+                Finv_n[ii][jj] = Finv_n1[ii][jj];
+            }
+        }
+
+    }
 }

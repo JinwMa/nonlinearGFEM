@@ -20,9 +20,11 @@ class BaseMaterial
     void getC_e_tensor(double C_e_tensor[3][3][3][3]);
     void transeCtoD(const double C[3][3][3][3], double D[6][6]);
 
-    //对外接口
-    virtual void getDt(const double F[3][3], const double jkb, double Dt[6][6]) {};
-    virtual void getDt(std::array<std::array<double, 3>, 3> &F, const double jkb, double Dt[6][6]) {};
+    virtual void getCt(const double Ce[3][3][3][3], const double F[3][3], const double jkb, double Ct[3][3][3][3]){};
+
+    virtual void getStress(const double C[3][3][3][3], const double F[3][3], const double jkb, double stress[3][3]){};
+
+    
 
 
 public:

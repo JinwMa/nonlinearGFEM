@@ -39,6 +39,9 @@ class ElementAssembler
                                   Mesh * pmesh,
                                   Dof_Map * pdofmap, 
                                   std::vector<ObjectElement> & ElementData,
+                                  std::vector<double> & U,
+                                  std::vector<double> & dU,
+                                  std::vector<double> & ddU,
                                   Eigen::SparseMatrix<double> & Matrix);
 
     
@@ -66,15 +69,16 @@ class ElementAssembler
                           std::vector<double> & elementmat,
                           std::vector<Eigen::Triplet<double>> & local_tripletLists);
 
-
-    void NonLinearElementSetStiffnessAssemble(Input * pinput,   
-                                Mesh * pmesh,
-                                Dof_Map * pdofmap,
-                                std::vector<int> & element_ids,
-                                BaseElement * pelement,
-                                std::vector<ObjectElement> & ElementData,
-                                std::vector<std::vector<Eigen::Triplet<double>>> &);
-
+    void NonLinearElementSetStiffnessAssemble(Input *pinput,
+                                              Mesh *pmesh,
+                                              Dof_Map *pdofmap,
+                                              std::vector<int> &element_ids,
+                                              BaseElement *pelement,
+                                              std::vector<ObjectElement> &ElementData,
+                                              std::vector<double> &U,
+                                              std::vector<double> &dU,
+                                              std::vector<double> &ddU,
+                                              std::vector<std::vector<Eigen::Triplet<double>>> &);
 };
 
 

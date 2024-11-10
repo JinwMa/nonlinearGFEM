@@ -119,6 +119,26 @@ public:
         }
     }
 
+    static void AmnXBpq(const double *A, const int m, const int n,
+                              const double *B, const int p, const int q,
+                              double *C)
+    {
+        if (p != n)
+        {
+            std::cout << "矩阵相乘输入错误" << std::endl;
+        }
+
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < q; j++)
+            {
+                for (int k = 0; k < n; k++)
+                {
+                    C[i * q + j] = C[i * q + j] + A[i * n + k] * B[k * q + j];
+                }
+            }
+        }
+    }
 };
 
 #endif

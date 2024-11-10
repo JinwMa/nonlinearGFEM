@@ -138,7 +138,12 @@ void ElementAssembler::assembleAElement(Dof_Map *pdofmap,
     }
 }
 
-void ElementAssembler::assembleNonLinearElementStiffness(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap, std::vector<ObjectElement> &ElementData, Eigen::SparseMatrix<double> &K)
+void ElementAssembler::assembleNonLinearElementStiffness(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap,
+                                                         std::vector<ObjectElement> &ElementData,
+                                                         std::vector<double> & U,
+                                                         std::vector<double> & dU,
+                                                         std::vector<double> & ddU,
+                                                         Eigen::SparseMatrix<double> &K)
 {
     // 开始计时:
     auto start = std::chrono::high_resolution_clock::now();
@@ -164,7 +169,11 @@ void ElementAssembler::assembleNonLinearElementStiffness(Input *pinput, Mesh *pm
         elem->takeDB(pinput, pmesh, name);
         std::vector<int> element_ids = elem->element_ids;
         std::vector<std::vector<Eigen::Triplet<double>>> tripletLists;
-        NonLinearElementSetStiffnessAssemble(pinput, pmesh, pdofmap, element_ids, elem, ElementData, tripletLists);
+        NonLinearElementSetStiffnessAssemble(pinput, pmesh, pdofmap,
+                                             element_ids, elem,
+                                             ElementData,
+                                             U, dU, ddU,
+                                             tripletLists);
         delete elem;
         for (const auto &localList : tripletLists)
         {
@@ -186,6 +195,9 @@ void ElementAssembler::NonLinearElementSetStiffnessAssemble(Input *pinput,
                                                             std::vector<int> &element_ids,
                                                             BaseElement *pelement,
                                                             std::vector<ObjectElement> &ElementData,
+                                                            std::vector<double> &U,
+                                                            std::vector<double> &dU,
+                                                            std::vector<double> &ddU,
                                                             std::vector<std::vector<Eigen::Triplet<double>>> &tripletLists)
 {
     // openmp 并行设置

@@ -178,8 +178,6 @@ void Post::check_error(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
 
 void Post::onlymesh(Input *pinput, Mesh *pmesh)
 {
-    std::cout << "pass here" << std::endl;
-
     string filename = outputFilename + "_mesh.dat";
     std::ofstream outputFile(filename, std::ios::app); // 打开文件
     if (!outputFile)

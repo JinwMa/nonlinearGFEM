@@ -45,13 +45,19 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     std::chrono::duration<double, std::milli> duration_constraint = end_constraint - start_constraint;
     std::cout << "build Constraint time: " << duration_constraint.count() << " ms" << std::endl;
 
+    
+    int dof_size = pdofmap->dof_size;
+    U.resize(dof_size);
+    dU.resize(dof_size);
+    ddU.resize(dof_size);
+
 
     initialize_solver(pinput, pmesh);
     auto * pelementassembler = new ElementAssembler;
     pelementassembler->takeDB(pinput, pmesh, pdofmap); //读单元列表
     // 构造刚度矩阵,构造右端项
     std::cout << "building stiffness" << std::endl;
-    pelementassembler->assembleNonLinearElementStiffness(pinput, pmesh, pdofmap, d_elements_data, K);
+    pelementassembler->assembleNonLinearElementStiffness(pinput, pmesh, pdofmap, d_elements_data, U, dU, ddU, K);
     std::cout << "complete the stiffness " << std::endl;   
     //释放组装器指针
     delete pelementassembler;
