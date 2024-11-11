@@ -16,12 +16,15 @@ int main(int argc, char *argv[])
     std::chrono::duration<double, std::milli> duration = end - start;    
     std::cout << "time of read input data: " << duration.count() << " ms" << std::endl;
 
+    // 读入mesh文件
     Mesh mesh(p_input, p_input->db["mesh_file_name"][0]);
     Mesh *p_mesh = &mesh;
     start = std::chrono::high_resolution_clock::now();  
     duration = start - end;
     std::cout << "time of read mesh data: " << duration.count() << " ms" << std::endl;
 
+
+    // 求解：求解器选择
     solve(p_input, p_mesh);
     end = std::chrono::high_resolution_clock::now();
     duration = end - start;    

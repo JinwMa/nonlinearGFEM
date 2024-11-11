@@ -1,7 +1,7 @@
 #include "NonLinearStaticSolver.h"
 
 
-void NonLinearStaticSolver::initialize_solver(Input * pinput, Mesh * pmesh)
+void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
 {
     int elements_num = pmesh->actual_element_count;
     d_elements_data.resize(elements_num);
@@ -52,7 +52,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     ddU.resize(dof_size);
 
 
-    initialize_solver(pinput, pmesh);
+    init(pinput, pmesh);
     auto * pelementassembler = new ElementAssembler;
     pelementassembler->takeDB(pinput, pmesh, pdofmap); //读单元列表
     // 构造刚度矩阵,构造右端项

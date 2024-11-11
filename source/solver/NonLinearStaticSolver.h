@@ -14,7 +14,7 @@ class NonLinearStaticSolver : public BaseSolver
     }
     void solve(Input * pinput, Mesh * pmesh);
     void takeDB(Input * pinput) {};
-    void initialize_solver(Input * pinput, Mesh * pmesh) override;
+    void init(Input * pinput, Mesh * pmesh) override;
     
     private:
     std::vector<ObjectElement> d_elements_data;

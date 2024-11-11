@@ -15,6 +15,11 @@
 #include <sstream>
 #include <map>
 #include <unordered_set>
+#include <thread>
+#include <Eigen/IterativeLinearSolvers>
+
+
+
 #include "dof_map.h"
 #include "input.h"
 #include "mesh.h"
@@ -22,6 +27,9 @@
 #include "elementassembler.h"
 #include "LoadManger.h"
 #include "post.h"
+#include "ObjectElementData.h"
+#include "toolbox.h"
+
 
 
 class BaseSolver
@@ -31,26 +39,21 @@ class BaseSolver
 public:
     BaseSolver()
     {
-        std::cout << "build BaseSolver" << std::endl;
+        std::cout << "****************   build BaseSolver     ******************" << std::endl;
     };
     virtual ~BaseSolver()
     {
-        std::cout << "delete BaseSolver" << std::endl;
+        std::cout << "****************   delete BaseSolver     ******************" << std::endl;
     };
 
     virtual void solve(Input * pinput, Mesh * pmesh) = 0;
     virtual void takeDB() {};
     virtual void takeDB(Input * pinput) {};
+    virtual void init(Input * pinput, Mesh * pmesh);
+    virtual void deallocate(){};
 
-    virtual void initialize_solver(Input * pinput, Mesh * pmesh){};
-
-
-    virtual void vector_assembler(Input * pinput, Mesh * pmesh, Eigen::VectorXd & Vector){};
-    // virtual void matrix_assembler(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
-    virtual void assembleElementStiffness(Input * pinput, Mesh * pmesh, Eigen::SparseMatrix<double> & Matrix){};
-
-    void sparseMatrixMultiply(const Eigen::SparseMatrix<double> & A, const Eigen::SparseMatrix<double> & B, Eigen::SparseMatrix<double> & C);
-
+protected:
+    std::vector<ObjectElementData> d_element_data;
 
 protected:
     void linear_solver(const Eigen::SparseMatrix<double> & K,
@@ -102,6 +105,8 @@ protected:
         Eigen::MatrixXd Q_rightCols = (Q * identity).rightCols(nullity);
         return Q_rightCols; //.transpose();
     }
+    void sparseMatrixMultiply(const Eigen::SparseMatrix<double> & A, const Eigen::SparseMatrix<double> & B, Eigen::SparseMatrix<double> & C);
+
 };
 
 #endif

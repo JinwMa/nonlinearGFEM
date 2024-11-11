@@ -1,6 +1,35 @@
 #include "LinearStaticSolver.h"
 
-void LinearStaticSolver::takeDB()
+
+
+
+
+
+
+void LinearStaticSolver::init(Input * pinput, Mesh * pmesh)
+{
+    BaseSolver::init(pinput, pmesh);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void LinearStaticSolver::takeDB(Input * pinput)
 {
 }
 void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)

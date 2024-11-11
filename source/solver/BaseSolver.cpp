@@ -1,25 +1,89 @@
-#include <Eigen/Sparse>
-#include <Eigen/PardisoSupport>
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/Dense>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <omp.h>
-#include <chrono>
-#include <thread>
-
 #include "BaseSolver.h"
-#include "mesh.h"
-#include "input.h"
-#include "dof_map.h"
-#include "post.h"
-#include "SolverInterface.h"
-#include "ConstraintManager.h"
-#include "elementassembler.h"
-#include "toolbox.h"
-#include "SolverInterface.h"
+
+
+
+void BaseSolver::init(Input * pinput, Mesh * pmesh)
+{
+    //功能一：初始化elementdata
+    int num_element = pmesh->actual_element_count;
+    d_element_data.resize(num_element);
+    for (int i = 0; i < num_element; i++)
+    {
+        int element_id = pmesh->ElementIdList[i];
+        int element_order = pmesh->ElementOrderInList[element_id];
+        int element_index = element_order - 1;
+        auto & element_data = d_element_data[element_index];
+        // 单元层面的初始化
+        element_data.is_initialized = false;
+        element_data.is_alive = true;
+        element_data.element_id = element_id;
+        element_data.element_layer = 0;
+        element_data.element_order = element_order;
+
+        // 节点层面的初始化
+        auto node_ids = pmesh->NodesOnElements[element_index];
+        int num_nodes = node_ids.size();
+        element_data.num_nodes = num_nodes;
+        element_data.node_ids = node_ids;
+        element_data.coordinates.resize(num_nodes);
+        for (int inode = 0; inode < num_nodes; inode++)
+        {
+            int node_id = node_ids[inode];
+            int node_order = pmesh->NodeOrderInList[node_id];
+            int node_index = node_order - 1;
+            element_data.coordinates[inode] = pmesh->NodesCoordinate[node_index];
+        }
+
+        //单元内部负责积分点上的初始化
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
                                           Eigen::VectorXd &P,
