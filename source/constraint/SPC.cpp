@@ -97,7 +97,7 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh *pmesh)
         ConstraintEquation equation;
         int node_id = d_node_ids[i];
         if(if_dof_in_mset(node_id, d_dof)) 
-        std::cout << "warning: " << name << " " << node_id << " " << d_dof << " has been constrianted" << std::endl;
+        if(std::getenv("SHOW_WARNING_CONSTRAINT"))std::cout << "warning: " << name << " " << node_id << " " << d_dof << " has been constrianted" << std::endl;
         if(if_dof_in_mset(node_id, d_dof)) continue;
         else
             addToMset(node_id, d_dof);

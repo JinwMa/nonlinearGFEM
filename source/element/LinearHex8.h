@@ -28,6 +28,9 @@ class LinearHex8 : public BaseElement
                               vector<vector<vector<double>>> &ShapeFunction_dxy,
                               vector<double> &value_jkb,
                               const int num_GP);
+
+        void ComputeStiffness(ObjectElementData & element_data,
+                              std::vector<double> & elementmat);
         ~LinearHex8() {};
 
 

@@ -21,6 +21,9 @@ class NonLinearHex8 : public BaseElement
                                       ObjectElement & elementdata,
                                       std::vector<double> &elementmat) override;
 
+        void ComputeStiffness(ObjectElementData &elementdata,
+                              std::vector<double> &elementmat) override;
+
         virtual void getShapeFunction(double nodes_coordinate[20][3],
                                       std::vector<std::vector<double>> & GaussPoints,
                                       vector<vector<double>> &ShapeFunction,

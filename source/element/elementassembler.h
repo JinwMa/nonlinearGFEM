@@ -18,56 +18,43 @@
 #include "toolbox.h"
 class ElementAssembler
 {
-    private:
+private:
     int max_threads = 6;
-    public:
-    ElementAssembler(){};
-    ~ElementAssembler(){};
-    void takeDB(Input * pinput, Mesh * pmesh, Dof_Map * pdofmap);
 
-    std::vector<std::string> elementList;
-    std::vector<std::string> elementType;
+public:
+    ElementAssembler() {};
+    ~ElementAssembler() {};
+    void takeDB(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap);
 
-    void assembleElementStiffness(Input * pinput,
-                                  Mesh * pmesh,
-                                  Dof_Map * pdofmap, 
-                                  Eigen::SparseMatrix<double> & Matrix);
+    void assembleElementStiffness(Input *pinput,
+                                  Mesh *pmesh,
+                                  Dof_Map *pdofmap,
+                                  std::vector<ObjectElementData> &Element_Data,
+                                  Eigen::SparseMatrix<double> &Matrix);
 
-
-
-    void assembleNonLinearElementStiffness(Input * pinput,
-                                  Mesh * pmesh,
-                                  Dof_Map * pdofmap, 
-                                  std::vector<ObjectElement> & ElementData,
-                                  std::vector<double> & U,
-                                  std::vector<double> & dU,
-                                  std::vector<double> & ddU,
-                                  Eigen::SparseMatrix<double> & Matrix);
-
+    void assembleNonLinearElementStiffness(Input *pinput,
+                                           Mesh *pmesh,
+                                           Dof_Map *pdofmap,
+                                           std::vector<ObjectElement> &ElementData,
+                                           std::vector<double> &U,
+                                           std::vector<double> &dU,
+                                           std::vector<double> &ddU,
+                                           Eigen::SparseMatrix<double> &Matrix);
     
-    
-    
-    void assembleElementForce(Input * pinput,
-                              Mesh * pmesh,
-                              Dof_Map * pdofmap, 
-                              Eigen::VectorXd & P);
 
+    void assembleGroupElements(Input *pinput,
+                               Mesh *pmesh,
+                               Dof_Map *pdofmap,
+                               std::vector<int> &element_ids,
+                               BaseElement *pelement,
+                               std::vector<ObjectElementData> & ElementData,
+                               std::vector<std::vector<Eigen::Triplet<double>>> &);
 
-     
-    void elementSetStiffnessAssemble(Input * pinput,   
-                                Mesh * pmesh,
-                                Dof_Map * pdofmap,
-                                std::vector<int> & element_ids,
-                                BaseElement * pelement,
-                                std::vector<std::vector<Eigen::Triplet<double>>> &);
-
-
-
-    void assembleAElement(Dof_Map * pdofmap,
-                          std::vector<int> & nodes_ids,
-                          std::vector<std::string> & dofs,
-                          std::vector<double> & elementmat,
-                          std::vector<Eigen::Triplet<double>> & local_tripletLists);
+    void assembleAElement(Dof_Map *pdofmap,
+                          std::vector<int> &nodes_ids,
+                          std::vector<std::string> &dofs,
+                          std::vector<double> &elementmat,
+                          std::vector<Eigen::Triplet<double>> &local_tripletLists);
 
     void NonLinearElementSetStiffnessAssemble(Input *pinput,
                                               Mesh *pmesh,
@@ -79,8 +66,9 @@ class ElementAssembler
                                               std::vector<double> &dU,
                                               std::vector<double> &ddU,
                                               std::vector<std::vector<Eigen::Triplet<double>>> &);
+
+private:
+    std::vector<std::string> d_element_list;
 };
-
-
 
 #endif

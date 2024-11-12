@@ -10,6 +10,7 @@
 #include "toolbox.h"
 #include "materialinterface.h"
 #include "ObjectElement.h"
+#include "ObjectElementData.h"
 class BaseElement
 {
     private:
@@ -47,6 +48,9 @@ class BaseElement
                                   std::vector<double> & elementmat){
         toolbox::error("should not use this function in BaseElement: Computestiffness");
     };
+
+    virtual void ComputeStiffness(ObjectElementData & element_data,
+                                  std::vector<double> & elementmat){};
 
 
     virtual void ComputeInternalForce(){};

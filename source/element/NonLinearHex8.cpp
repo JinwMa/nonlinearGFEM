@@ -487,3 +487,8 @@ void NonLinearHex8::updateF_Finv(std::vector<double> &displacement,
 
     }
 }
+
+void NonLinearHex8::ComputeStiffness(ObjectElementData &elementdata,
+                                     std::vector<double> &elementmat)
+{
+}
