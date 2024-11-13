@@ -18,9 +18,9 @@ class NonLinearStaticSolver : public BaseSolver
     
     private:
     std::vector<ObjectElement> d_elements_data;
-    std::vector<double> U;
-    std::vector<double> dU;
-    std::vector<double> ddU;
+    std::vector<double> d_u;
+    std::vector<double> d_du;
+    std::vector<double> d_ddu;
 };
 
 

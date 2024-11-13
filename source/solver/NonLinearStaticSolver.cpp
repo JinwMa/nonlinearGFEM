@@ -47,9 +47,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
     
     int dof_size = pdofmap->dof_size;
-    U.resize(dof_size);
-    dU.resize(dof_size);
-    ddU.resize(dof_size);
+    d_u.resize(dof_size);
+    d_du.resize(dof_size);
+    d_ddu.resize(dof_size);
 
 
     init(pinput, pmesh);
@@ -57,7 +57,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     pelementassembler->takeDB(pinput, pmesh, pdofmap); //读单元列表
     // 构造刚度矩阵,构造右端项
     std::cout << "building stiffness" << std::endl;
-    pelementassembler->assembleNonLinearElementStiffness(pinput, pmesh, pdofmap, d_elements_data, U, dU, ddU, K);
+    pelementassembler->assembleNonLinearElementStiffness(pinput, pmesh, pdofmap, d_elements_data, d_u, d_du, d_ddu, K);
     std::cout << "complete the stiffness " << std::endl;   
     //释放组装器指针
     delete pelementassembler;
