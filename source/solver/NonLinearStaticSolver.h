@@ -21,6 +21,17 @@ class NonLinearStaticSolver : public BaseSolver
     std::vector<double> d_u;
     std::vector<double> d_du;
     std::vector<double> d_ddu;
+
+    
+    std::shared_ptr<ConstraintManager> d_constraint_manager;
+    std::shared_ptr<LoadManger> d_load_manager;
+    std::shared_ptr<ElementAssembler> d_element_assembler;
+    std::shared_ptr<Dof_Map> d_dof_map;
+
+    Eigen::SparseMatrix<double> d_C;
+    Eigen::SparseMatrix<double> d_K;
+    Eigen::VectorXd d_G;
+    Eigen::VectorXd d_P;
 };
 
 

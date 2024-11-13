@@ -433,6 +433,7 @@ void NonLinearHex8::updateF_Finv(std::vector<double> &displacement,
                                  std::vector<double> &ddu,
                                  ObjectElement &elementdata)
 {
+    std::cout << "pass 1" << std::endl;
     double Fn1[3][3] = {0.0};
     double Finv_n1[3][3] = {0.0};
     for (int i = 0; i < 3; i++)
@@ -449,16 +450,24 @@ void NonLinearHex8::updateF_Finv(std::vector<double> &displacement,
 
     for (int i = 0; i < elementdata.num_Gauss_points; i++)
     {
+        std::cout << i << std::endl;
         auto & shapefunction = elementdata.sfdxyz_on_Gauss_points[i];
+        std::cout << "2" << std::endl;
         auto & Fn = elementdata.F_on_Gauss_points[i];
+        std::cout << "3" << std::endl;
         auto & Finv_n = elementdata.Finv_on_Gauss_points[i];
+        std::cout << "4" << std::endl;
         auto & jkbn = elementdata.jkb[i];
+        std::cout << "5" << std::endl;
         for (int inode = 0; inode < d_num_nodes; inode++)
         {
+            std::cout << inode << std::endl;
             ux = displacement[inode * d_num_nodes * 3 + 0];
             uy = displacement[inode * d_num_nodes * 3 + 1];
             uz = displacement[inode * d_num_nodes * 3 + 2];
+            std::cout << "11" << std::endl;
             sfdx = shapefunction[inode][0];
+            std::cout << "22" << std::endl;
             sfdy = shapefunction[inode][1];
             sfdz = shapefunction[inode][2];
 
