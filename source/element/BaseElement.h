@@ -32,26 +32,10 @@ class BaseElement
     };;
     virtual std::string ReturnElementType() = 0;
 
-    virtual void ComputeStiffness(double nodes_coordinates[20][3],
-                                  std::vector<double> & displacement,
-                                  std::vector<double> & du,
-                                  std::vector<double> & ddu,
-                                  std::vector<double> & elementmat){
-        toolbox::error("should not use this function in BaseElement: Computestiffness");
-    };
-
-    virtual void ComputeStiffness(double nodes_coordinates[20][3],
-                                  std::vector<double> & displacement,
-                                  std::vector<double> & du,
-                                  std::vector<double> & ddu,
-                                  ObjectElement & elementdata,
-                                  std::vector<double> & elementmat){
-        toolbox::error("should not use this function in BaseElement: Computestiffness");
-    };
+    // virtual void init(ObjectElementData & element_data) = 0;
 
     virtual void ComputeStiffness(ObjectElementData & element_data,
-                                  std::vector<double> & elementmat){};
-
+                                  std::vector<double> & elementmat) = 0;
 
     virtual void ComputeInternalForce(){};
     virtual void getShapeFunction(double nodes_coordinate[20][3],
@@ -83,6 +67,8 @@ class BaseElement
 
     public:
     std::vector<int> element_ids;
+
+    //高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
     std::vector<std::vector<double>> d_GaussPoints;
 
     protected:

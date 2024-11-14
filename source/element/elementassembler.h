@@ -19,7 +19,7 @@
 class ElementAssembler
 {
 private:
-    int max_threads = 1;
+    int max_threads = 6;
 
 public:
     ElementAssembler() {};
@@ -31,15 +31,6 @@ public:
                                   Dof_Map *pdofmap,
                                   std::vector<ObjectElementData> &Element_Data,
                                   Eigen::SparseMatrix<double> &Matrix);
-
-    void assembleNonLinearElementStiffness(Input *pinput,
-                                           Mesh *pmesh,
-                                           Dof_Map *pdofmap,
-                                           std::vector<ObjectElementData> &ElementData,
-                                           std::vector<double> &U,
-                                           std::vector<double> &dU,
-                                           std::vector<double> &ddU,
-                                           Eigen::SparseMatrix<double> &Matrix);
     
 
     void assembleGroupElements(Input *pinput,
@@ -55,18 +46,6 @@ public:
                           std::vector<std::string> &dofs,
                           std::vector<double> &elementmat,
                           std::vector<Eigen::Triplet<double>> &local_tripletLists);
-
-    void NonLinearElementSetStiffnessAssemble(Input *pinput,
-                                              Mesh *pmesh,
-                                              Dof_Map *pdofmap,
-                                              std::vector<int> &element_ids,
-                                              BaseElement *pelement,
-                                              std::vector<ObjectElementData> &ElementData,
-                                              std::vector<double> &U,
-                                              std::vector<double> &dU,
-                                              std::vector<double> &ddU,
-                                              std::vector<std::vector<Eigen::Triplet<double>>> &);
-
 private:
     std::vector<std::string> d_element_list;
 };

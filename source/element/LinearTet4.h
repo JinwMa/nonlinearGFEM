@@ -15,11 +15,6 @@ class LinearTet4 : public BaseElement
 
     public:
         string ReturnElementType() { return "FEM"; };
-        void ComputeStiffness(double nodes_coordinates[20][3],
-                              std::vector<double> &displacement,
-                              std::vector<double> &du,
-                              std::vector<double> &ddu,
-                              vector<double> &elementmat);
 
         void ComputeStiffness(ObjectElementData &element_data,
                               std::vector<double> &elementmat);

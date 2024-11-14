@@ -14,31 +14,18 @@ class NonLinearHex8 : public BaseElement
         void SetElement();
 
         string ReturnElementType() { return "NonLinearFEM"; };
-        virtual void ComputeStiffness(double nodes_coordinates[20][3],
-                                      std::vector<double> &displacement,
-                                      std::vector<double> &du,
-                                      std::vector<double> &ddu,
-                                      ObjectElement & elementdata,
-                                      std::vector<double> &elementmat) override;
 
         void ComputeStiffness(ObjectElementData &elementdata,
                               std::vector<double> &elementmat) override;
 
-        virtual void getShapeFunction(double nodes_coordinate[20][3],
+        void getShapeFunction(double nodes_coordinate[20][3],
                                       std::vector<std::vector<double>> & GaussPoints,
                                       vector<vector<double>> &ShapeFunction,
                                       vector<vector<vector<double>>> &ShapeFunction_dxy,
                                       vector<double> &value_jkb,
                                       const int num_GP);
 
-    private:
-        void initialize_element(double nodes_coordinate[20][3],
-                                std::vector<std::vector<double>> &GaussPoints,
-                                vector<vector<double>> &ShapeFunction,
-                                vector<vector<vector<double>>> &ShapeFunction_dxy,
-                                vector<double> &value_jkb,
-                                const int num_GP,
-                                ObjectElement & elementdata);
+    private:        
 
         void initialize_element(double nodes_coordinate[20][3],
                                 std::vector<std::vector<double>> &GaussPoints,
@@ -48,12 +35,7 @@ class NonLinearHex8 : public BaseElement
                                 const int num_GP,
                                 ObjectElementData &elementdata);
 
-        // 更新变形梯度，变形梯度的逆，雅可比
-        void updateF_Finv(std::vector<double> &displacement,
-                          std::vector<double> &du,
-                          std::vector<double> &ddu,
-                          ObjectElement &elementdata);
-
+       
         void updateF_Finv(ObjectElementData & elementdata);
 };
 

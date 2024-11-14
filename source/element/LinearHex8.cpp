@@ -11,6 +11,7 @@ using namespace std;
 void LinearHex8::ComputeStiffness(ObjectElementData & element_data,
                                   vector<double> & elementmat)
 {
+    element_data.element_patch = element_data.node_ids;
     // 先给elementmat清零
     elementmat.resize(num_edofs * num_edofs);
     // 材料参数先给一个默认值
@@ -112,100 +113,6 @@ void LinearHex8::ComputeStiffness(ObjectElementData & element_data,
 }
 
 
-
-void LinearHex8::ComputeStiffness(double nodes_coordinate[20][3],
-                                  std::vector<double> & displacement,
-                                  std::vector<double> & du,
-                                  std::vector<double> & ddu,
-                                  vector<double> & elementmat)
-{
-    // 先给elementmat清零
-    elementmat.resize(num_edofs * num_edofs);
-    // 材料参数先给一个默认值
-    double matE = pmaterial->E;    
-    double v = pmaterial->u;
-    // 形函数和形函数导数
-    vector<vector<double>> SF;
-    vector<vector<vector<double>>> SF_dxyz;
-    vector<double> detJ;
-    this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, d_num_intergration_point);
-
-    double D[6][6] = {};
-    double F = (matE * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
-    D[0][0] = F;
-    D[1][1] = F;
-    D[2][2] = F;
-    D[3][3] = F * (1.0 - 2.0 * v) / (2.0 * (1.0 - v));
-    D[4][4] = D[3][3];
-    D[5][5] = D[3][3];
-    D[0][1] = F * v / (1.0 - v);
-    D[0][2] = D[0][1];
-    D[1][0] = D[0][1];
-    D[1][2] = D[0][1];
-    D[2][0] = D[0][1];
-    D[2][1] = D[0][1];
-    // 循环积分点
-    double B[6][3] = {};
-    double BT[3][6] = {};
-    double BTDB[3][3] = {};
-    for (int i = 0; i < d_num_intergration_point; i++)
-    {
-        double w = d_GaussPoints[i][3];
-        double J = detJ[i];
-        for (int ii = 0; ii < 8; ii++)
-        {
-            double sf_dxnow = SF_dxyz[i][ii][0];
-            double sf_dynow = SF_dxyz[i][ii][1];
-            double sf_dznow = SF_dxyz[i][ii][2];
-
-            BT[0][0] = sf_dxnow;
-            BT[0][3] = sf_dynow;
-            BT[0][5] = sf_dznow;
-            BT[1][1] = sf_dynow;
-            BT[1][3] = sf_dxnow;
-            BT[1][4] = sf_dznow;
-            BT[2][2] = sf_dznow;
-            BT[2][4] = sf_dynow;
-            BT[2][5] = sf_dxnow;
-
-            for (int jj = 0; jj < 8; jj++)
-            {                
-                double sf_dxnow = SF_dxyz[i][jj][0];
-                double sf_dynow = SF_dxyz[i][jj][1];
-                double sf_dznow = SF_dxyz[i][jj][2];
-
-                B[0][0] = sf_dxnow;
-                B[1][1] = sf_dynow;
-                B[2][2] = sf_dznow;
-                B[3][0] = sf_dynow;
-                B[3][1] = sf_dxnow;
-                B[4][1] = sf_dznow;
-                B[4][2] = sf_dynow;
-                B[5][0] = sf_dznow;
-                B[5][2] = sf_dxnow;
-                double BTD[3][6] = {};
-                double BTDB[3][3] = {};
-                AmnXBpq(&BT[0][0], 3, 6, &D[0][0], 6, 6, &BTD[0][0]);
-                AmnXBpq(&BTD[0][0], 3, 6, &B[0][0], 6, 3, &BTDB[0][0]);
-                double EK_IJ[3][3] = {};
-                for (int iii = 0; iii < 3; iii++)
-                {
-                    for(int jjj = 0; jjj < 3; jjj++)
-                    {
-                        EK_IJ[iii][jjj] = BTDB[iii][jjj] * w * J;
-                    }
-                }
-                for (int iii = 0; iii < 3; iii++)
-                    for (int jjj = 0; jjj < 3; jjj++)
-                    {
-                        int col = ii * 3 + iii;
-                        int row = jj * 3 + jjj;
-                        elementmat[col * num_edofs + row] += EK_IJ[iii][jjj];
-                    }
-            }
-        }
-    }
-}
 
 void LinearHex8::getShapeFunction(double nodes_coordinate[20][3],
                                   std::vector<std::vector<double>> &GaussPoints,

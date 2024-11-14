@@ -15,11 +15,6 @@ class LinearHex8 : public BaseElement
     static const int num_node_dof = 3;
     public:
         string ReturnElementType() { return "FEM"; };
-        void ComputeStiffness(double nodes_coordinates[20][3],
-                              std::vector<double> &displacement,
-                              std::vector<double> &du,
-                              std::vector<double> &ddu,
-                              vector<double> &elementmat);
         void ComputeInternalForce() {};
         void SetElement();
         void getShapeFunction(double nodes_coordinate[20][3],
