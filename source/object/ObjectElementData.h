@@ -24,13 +24,15 @@ struct ObjectElementData
     vector<vector<double>> coordinates;
 
     // integration_points
-    int unm_integration_points;
+    int num_integration_points;
     vector<vector<double>>sf;
     vector<vector<vector<double>>> sfdxyz;
     vector<vector<vector<double>>> F;
     vector<vector<vector<double>>> F_n;
     vector<vector<vector<double>>> F_n1;
 
+    vector<double> weights;
+    vector<double> JKB;
     vector<double> jkb;
     vector<double> jkb_n;
     vector<double> jkb_n1;

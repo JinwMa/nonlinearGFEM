@@ -51,7 +51,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     d_element_assembler->takeDB(pinput, pmesh, d_dof_map.get()); //读单元列表
     // 构造刚度矩阵,构造右端项
     std::cout << "building stiffness" << std::endl;
-    d_element_assembler->assembleNonLinearElementStiffness(pinput, pmesh, d_dof_map.get(), d_elements_data, d_u, d_du, d_ddu, d_K);
+    // d_element_assembler->assembleNonLinearElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_u, d_du, d_ddu, d_K);
+    d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K);
+
     std::cout << "complete the stiffness " << std::endl; 
 
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());

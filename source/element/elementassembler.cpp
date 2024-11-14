@@ -29,6 +29,10 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         {
             pelem = new LinearTet4;
         }
+        if (element_type == "NonLinearHex8")
+        {
+            pelem = new NonLinearHex8;
+        }
         else
         {
             toolbox::error("not supprot this type of element: " + element_type);
@@ -124,7 +128,7 @@ void ElementAssembler::assembleAElement(Dof_Map *pdofmap,
 }
 
 void ElementAssembler::assembleNonLinearElementStiffness(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap,
-                                                         std::vector<ObjectElement> &ElementData,
+                                                         std::vector<ObjectElementData> &ElementData,
                                                          std::vector<double> & U,
                                                          std::vector<double> & dU,
                                                          std::vector<double> & ddU,
@@ -179,7 +183,7 @@ void ElementAssembler::NonLinearElementSetStiffnessAssemble(Input *pinput,
                                                             Dof_Map *pdofmap,
                                                             std::vector<int> &element_ids,
                                                             BaseElement *pelement,
-                                                            std::vector<ObjectElement> &ElementData,
+                                                            std::vector<ObjectElementData> &ElementData,
                                                             std::vector<double> &U,
                                                             std::vector<double> &dU,
                                                             std::vector<double> &ddU,
@@ -215,15 +219,18 @@ void ElementAssembler::NonLinearElementSetStiffnessAssemble(Input *pinput,
         // 计算单元矩阵
         std::vector<double> elementmat;
         std::vector<double> u;
+        u.resize(24);
         std::vector<double> du;
+        du.resize(24);
         std::vector<double> ddu;
-        ObjectElement &elementdata = ElementData[element_location - 1];
+        ddu.resize(24);
+        auto &elementdata = ElementData[element_location - 1];
         #pragma omp critical
         {
             // std::cout << "Thread " << thread_id << " is printing safely.\n";
             // pelement->ComputeStiffness(nodes_coordinates, u, du, ddu, elementdata, elementmat);
         }
-        pelement->ComputeStiffness(nodes_coordinates, u, du, ddu, elementdata, elementmat);
+        pelement->ComputeStiffness(elementdata, elementmat);
         #pragma omp critical
         {
             // std::cout << element_id << std::endl;
