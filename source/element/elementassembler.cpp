@@ -2,8 +2,32 @@
 #include <omp.h>
 
 void ElementAssembler::takeDB(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
-{
-    d_element_list = pinput->getVectorString("element_list");
+{    
+    d_element_list = pinput->getVectorString("element_list");    
+    for (auto name : d_element_list)
+    {
+        std::string element_set_type = pinput->getString(name + "_set_type");
+        if (element_set_type == "range")
+        {
+            std::vector<int> element_ids;
+            std::vector<int> range = pinput->getVectorInt(name + "_range");
+            if (range.size() != 2)
+                toolbox::error("the range of " + name + "_range" + "is given wrong");
+            int start = range[0];
+            int end = range[1];
+            int size = end - start + 1;
+            element_ids.resize(size);
+            for (int i = 0; i < size; i++)
+                element_ids[i] = start + i;
+
+            d_element_sets.push_back(element_ids);
+        }
+        else
+        {
+            toolbox::error("not support the type of " + element_set_type + " for element ids");
+        }
+    }
+    
 }
 
 void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap,
@@ -16,6 +40,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
     K.resize(pdofmap->dof_size, pdofmap->dof_size);
     K.setZero();
     std::vector<Eigen::Triplet<double>> finalTripletList;
+
+    int iloop = 0;
 
     for (auto name : d_element_list)
     {
@@ -41,7 +67,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
 
         // 读单元参数和设置
         pelem->takeDB(pinput, pmesh, name);
-        std::vector<int> element_ids = pelem->element_ids;
+        // std::vector<int> element_ids = pelem->element_ids;
+        auto & element_ids = d_element_sets[iloop]; 
         std::vector<std::vector<Eigen::Triplet<double>>> tripletLists;
         assembleGroupElements(pinput, pmesh, pdofmap, element_ids, pelem, ElementData, tripletLists, contral_param);
         delete pelem;
@@ -49,6 +76,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         {
             finalTripletList.insert(finalTripletList.end(), localList.begin(), localList.end());
         }
+
+        iloop++;
     }
 
     // 设置稀疏矩阵
@@ -140,7 +169,7 @@ void ElementAssembler::assembleElementVector(Input *pinput,
 {
     int num_all_dofs = pdofmap->dof_size;
     Element_Force.resize(num_all_dofs);
-
+    int iloop = 0;
     for (auto name : d_element_list)
     {
         BaseElement *pelem;
@@ -156,11 +185,12 @@ void ElementAssembler::assembleElementVector(Input *pinput,
         }
 
         // 读单元参数和设置
-        pelem->takeDB(pinput, pmesh, name);
-        std::vector<int> element_ids = pelem->element_ids;
+        // pelem->takeDB(pinput, pmesh, name);
+        // std::vector<int> element_ids = pelem->element_ids;
+        auto & element_ids = d_element_sets[iloop];
         this->assembleGroupElementVector(pinput, pmesh, pdofmap, element_ids, pelem, Element_Data, Element_Force, contral_param);
         delete pelem;
-        
+        iloop++;        
     }    
 }
 

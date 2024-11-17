@@ -69,8 +69,6 @@ class BaseElement
 
 
     public:
-    std::vector<int> element_ids;
-
     //高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
     std::vector<std::vector<double>> d_GaussPoints;
 

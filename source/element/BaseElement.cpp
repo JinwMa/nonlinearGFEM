@@ -6,23 +6,7 @@
 
 void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
 {
-    // 读单元集合
-    std::string element_set_type = pinput->getString(name + "_set_type");    
-    if (element_set_type == "range")
-    {
-        std::vector<int> range = pinput->getVectorInt(name + "_range");
-        if (range.size() != 2) toolbox::error("the range of " + name + "_range" + "is given wrong");
-        int start = range[0];
-        int end = range[1];
-        int size = end - start + 1;
-        element_ids.resize(size);
-        for (int i = 0; i < size; i++)
-        element_ids[i] = start + i;
-    }
-    else
-    {
-        toolbox::error("not support the type of " + element_set_type + " for element ids");
-    }
+    
     if (pinput->ifExist(name + "_integration_order"))
     {
         integration_order = pinput->getInt(name + "_integration_order");

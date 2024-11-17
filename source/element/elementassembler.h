@@ -44,6 +44,7 @@ private:
 
 private:
     std::vector<std::string> d_element_list;
+    std::vector<std::vector<int>> d_element_sets;
 
     void assembleGroupElements(Input *pinput,
                                Mesh *pmesh,
