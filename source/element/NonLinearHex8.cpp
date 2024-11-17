@@ -3,22 +3,24 @@
 using namespace std;
 
 void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
-                                     std::vector<double> &elementmat)
+                                     std::vector<double> &elementmat,
+                                     ObjectContralParam * contral_param)
 {
-    std::cout.precision(10);
+    if(contral_param == nullptr) toolbox::error("contral_param is null");
+    std::cout.precision(20);
     elementmat.resize(d_num_edofs * d_num_edofs);
-
-    double nodes_coordinate[20][3] = {0.0};
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            nodes_coordinate[i][j] = element_data.coordinates.at(i).at(j);
-        }
-    }
-    // 如果单元没有被初始化
+  
+    // 如果单元没有被初始化，则执行初始化
     if (!element_data.is_initialized)
     {
+        double nodes_coordinate[20][3] = {0.0};
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                nodes_coordinate[i][j] = element_data.coordinates.at(i).at(j);
+            }
+        }
         // 对齐输入
         vector<vector<double>> a;
         vector<vector<vector<double>>> b;
@@ -71,10 +73,21 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                stressn[ii][jj] = element_data.stress[i][ii][jj];
+                stress[ii][jj] = element_data.stress[i][ii][jj];
             }
         }
         pmaterial->getStress(C_e_tensor, F, jkb, stress);
+
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                element_data.stress[i][ii][jj] = stress[ii][jj];
+            }
+        }
+
+       
+
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
 
@@ -164,14 +177,6 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
                         EK_IJ[iii][jjj] = (BTDB[iii][jjj] + TC1 * delta) * weight * JKB * jkb;
                     }
                 }
-                // for (int iii = 0; iii < 3; iii++)
-                // {
-                //     for(int jjj = 0; jjj < 3; jjj++)
-                //     {
-                //         std::cout << EK_IJ[iii][jjj] << std::endl;
-                //     }
-                // }
-                // std::cout << "@@@@@@@@@@@@@@" << std::endl;
                 for (int iii = 0; iii < 3; iii++)
                 {
                     for (int jjj = 0; jjj < 3; jjj++)
@@ -443,29 +448,10 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
                 }
             }
     }
-    elementdata.is_initialized = true;
-}
 
-void NonLinearHex8::updateF_Finv(ObjectElementData &elementdata)
-{
-    double Fn1[3][3] = {0.0};
-    double Finv_n1[3][3] = {0.0};
-    for (int i = 0; i < 3; i++)
-    {
-        Fn1[i][i] = 1.0;
-        Finv_n1[i][i] = 1.0;
-    }  
+    //初始化位移场可能已经在单元外部执行了初始化
 
-    double ux = 0.0;
-    double uy = 0.0;
-    double uz = 0.0;  
-    double sfdx = 0.0;
-    double sfdy = 0.0;
-    double sfdz = 0.0;
-
-    for (int i = 0; i < elementdata.num_integration_points; i++)
-    {
-        if (elementdata.u.size() == 0) elementdata.u.resize(d_num_nodes);
+    if (elementdata.u.size() == 0) elementdata.u.resize(d_num_nodes);
         if (elementdata.du.size() == 0) elementdata.du.resize(d_num_nodes);
         if (elementdata.ddu.size() == 0) elementdata.ddu.resize(d_num_nodes);
         for (int i = 0; i < d_num_nodes; i++)
@@ -475,7 +461,30 @@ void NonLinearHex8::updateF_Finv(ObjectElementData &elementdata)
             if (elementdata.ddu[i].size() == 0)elementdata.ddu[i].resize(d_num_node_dof);
         }
 
-        auto & shapefunction = elementdata.sfdxyz[i];
+    elementdata.is_initialized = true;    
+}
+
+
+
+void NonLinearHex8::updateF_Finv(ObjectElementData &elementdata)
+{
+    double ux = 0.0;
+    double uy = 0.0;
+    double uz = 0.0;  
+    double sfdx = 0.0;
+    double sfdy = 0.0;
+    double sfdz = 0.0;
+
+    for (int i = 0; i < elementdata.num_integration_points; i++)
+    {
+        double Fn1[3][3] = {{0.0}};
+        double Finv_n1[3][3] = {{0.0}};
+        for (int i = 0; i < 3; i++)
+        {
+            Fn1[i][i] = 1.0;
+            Finv_n1[i][i] = 1.0;
+        }
+        auto &shapefunction = elementdata.sfdxyz[i];
         auto & Fn = elementdata.F[i];
         auto & Finv_n = elementdata.Finv[i];
         auto & jkbn = elementdata.jkb[i];
@@ -512,4 +521,88 @@ void NonLinearHex8::updateF_Finv(ObjectElementData &elementdata)
         }
 
     }
+}
+
+
+
+
+void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
+                                  std::vector<double> &elementvector,
+                                  ObjectContralParam *contral_param)
+{
+    if (contral_param == nullptr)
+        toolbox::error("contral_param is null");
+    if (!element_data.is_initialized)
+        toolbox::error("element is not initialized");
+
+    std::cout.precision(20);
+    elementvector.resize(d_num_edofs);   
+
+    int num_GP = element_data.num_integration_points;    
+    
+    for (int i = 0; i < num_GP; i++)
+    {
+        auto & stress = element_data.stress[i];
+        double BT[3][6] = {0.0};     // BT
+        double F[3][3] = {0.0};
+        double Finv[3][3] = {0.0};
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                F[ii][jj] = element_data.F[i][ii][jj];
+                Finv[ii][jj] = element_data.Finv[i][ii][jj];                
+            }
+        }
+        for (int j = 0; j < d_num_nodes; j++) // 节点循环
+        {
+            double sfdx = element_data.sfdxyz[i][j][0];
+            double sfdy = element_data.sfdxyz[i][j][1];
+            double sfdz = element_data.sfdxyz[i][j][2];
+            double sf_dxnow = element_data.Finv[i][0][0] * sfdx +
+                              element_data.Finv[i][1][0] * sfdy +
+                              element_data.Finv[i][2][0] * sfdz;
+
+            double sf_dynow = element_data.Finv[i][0][1] * sfdx +
+                              element_data.Finv[i][1][1] * sfdy +
+                              element_data.Finv[i][2][1] * sfdz;
+
+            double sf_dznow = element_data.Finv[i][0][2] * sfdx +
+                              element_data.Finv[i][1][2] * sfdy +
+                              element_data.Finv[i][2][2] * sfdz;
+            BT[0][0] = sf_dxnow;
+            BT[0][3] = sf_dynow;
+            BT[0][5] = sf_dznow;
+
+            BT[1][1] = sf_dynow;
+            BT[1][3] = sf_dxnow;
+            BT[1][4] = sf_dznow;
+
+            BT[2][2] = sf_dznow;
+            BT[2][4] = sf_dynow;
+            BT[2][5] = sf_dxnow;
+
+            elementvector[3 * j + 0] += (sf_dxnow * stress[0][0] + sf_dynow * stress[1][0] + sf_dznow * stress[2][0]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
+            elementvector[3 * j + 1] += (sf_dxnow * stress[0][1] + sf_dynow * stress[1][1] + sf_dznow * stress[2][1]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
+            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
+
+            // std::cout << sf_dxnow << " " << sf_dynow << " " << sf_dznow << " " << std::endl;
+            // std::cout << "internal force" << std::endl;
+            // std::cout << elementvector[3 * j + 0] << " " << elementvector[3 * j + 1] << " " << elementvector[3 * j + 2] << std::endl;
+            // std::cout << "stress" << std::endl;
+            // for (int ix = 0; ix < 3; ix++)
+            // {
+            //     for (int iy = 0; iy < 3; iy++)
+            //     {
+            //         std::cout << stress[ix][iy] << std::endl;
+            //     }
+            // }
+            // std::cout << "weights" << std::endl;
+            // std::cout << element_data.weights[i] * element_data.JKB[i] << std::endl;
+            // std::cout << "jkb" << std::endl;
+            // std::cout << element_data.jkb[i] << std::endl;
+
+        }        
+    }
+
 }

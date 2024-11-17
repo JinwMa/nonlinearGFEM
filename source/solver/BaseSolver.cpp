@@ -31,9 +31,13 @@ void BaseSolver::init(Input *pinput, Mesh *pmesh)
             int node_index = node_order - 1;
             element_data.coordinates[inode] = pmesh->NodesCoordinate[node_index];
         }
-
         // 单元内部负责积分点上的初始化
     }
+
+    // 功能二： 初始化控制参数
+    d_contral_param = std::make_shared<ObjectContralParam>();
+    d_contral_param->load_step = 0;
+    d_contral_param->iteration_step = 0;
 }
 
 void BaseSolver::setVectorToElementData(std::vector<double> &vector,
@@ -135,6 +139,7 @@ void BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
                                Eigen::VectorXd &x,
                                const std::string type)
 {
+    x.setZero();
     auto start = std::chrono::high_resolution_clock::now();
     int K_row = K.rows();
     int K_col = K.cols();

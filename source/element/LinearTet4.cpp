@@ -305,7 +305,8 @@ void LinearTet4::getShapeFunction(double nodes_coordinate[20][3],
 
 
 void LinearTet4::ComputeStiffness(ObjectElementData & element_data,
-                                  vector<double> & elementmat)
+                                  vector<double> & elementmat,
+                                  ObjectContralParam * contral_param)
 {
     element_data.element_patch = element_data.node_ids;
     // 先给elementmat清零

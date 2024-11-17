@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -137,6 +138,31 @@ public:
                     C[i * q + j] = C[i * q + j] + A[i * n + k] * B[k * q + j];
                 }
             }
+        }
+    }
+
+
+
+
+    static void PrintVector(std::vector<double> & vector)
+    {
+        std::cout.precision(20);
+        for (size_t i = 0; i < vector.size(); i++)
+        {
+            std::cout << std::setw(30) << vector[i];
+        }
+    }
+
+    static void PrintVector(std::vector<std::vector<double>> & vector)
+    {
+        std::cout.precision(20);
+        for (size_t i = 0; i < vector.size(); i++)
+        {
+            for (size_t j = 0; j < vector[i].size(); j++)
+            {
+                std::cout << std::setw(30) << vector[i][j];
+            }
+            std::cout << std::endl;
         }
     }
 };

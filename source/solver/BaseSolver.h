@@ -54,6 +54,8 @@ public:
 
 protected:
     std::vector<ObjectElementData> d_element_data;
+    std::shared_ptr<ObjectContralParam> d_contral_param;
+
 
 protected:
 

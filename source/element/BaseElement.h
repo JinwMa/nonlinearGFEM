@@ -9,8 +9,8 @@
 #include "mesh.h"
 #include "toolbox.h"
 #include "materialinterface.h"
-#include "ObjectElement.h"
 #include "ObjectElementData.h"
+#include "ObjectContralParam.h"
 class BaseElement
 {
     private:
@@ -35,9 +35,12 @@ class BaseElement
     // virtual void init(ObjectElementData & element_data) = 0;
 
     virtual void ComputeStiffness(ObjectElementData & element_data,
-                                  std::vector<double> & elementmat) = 0;
+                                  std::vector<double> & elementmat,
+                                  ObjectContralParam * contral_param = nullptr) = 0;
 
-    virtual void ComputeInternalForce(){};
+    virtual void ComputeInternalForce(ObjectElementData &element_data,
+                                      std::vector<double> &elementvector,
+                                      ObjectContralParam *contral_param = nullptr) {};
     virtual void getShapeFunction(double nodes_coordinate[20][3],
                                   std::vector<std::vector<double>> &,
                                   vector<vector<double>> &ShapeFunction,

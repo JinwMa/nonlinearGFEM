@@ -8,7 +8,8 @@ void ElementAssembler::takeDB(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
 
 void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap,
                                                 std::vector<ObjectElementData> & ElementData,
-                                                Eigen::SparseMatrix<double> &K)
+                                                Eigen::SparseMatrix<double> &K,
+                                                ObjectContralParam * contral_param)
 {
     // 开始计时:
     auto start = std::chrono::high_resolution_clock::now();
@@ -42,7 +43,7 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         pelem->takeDB(pinput, pmesh, name);
         std::vector<int> element_ids = pelem->element_ids;
         std::vector<std::vector<Eigen::Triplet<double>>> tripletLists;
-        assembleGroupElements(pinput, pmesh, pdofmap, element_ids, pelem, ElementData, tripletLists);
+        assembleGroupElements(pinput, pmesh, pdofmap, element_ids, pelem, ElementData, tripletLists, contral_param);
         delete pelem;
         for (const auto &localList : tripletLists)
         {
@@ -66,7 +67,8 @@ void ElementAssembler::assembleGroupElements(Input *pinput,
                                              std::vector<int> &element_ids,
                                              BaseElement *pelement,
                                              std::vector<ObjectElementData> & ElementData,
-                                             std::vector<std::vector<Eigen::Triplet<double>>> &tripletLists)
+                                             std::vector<std::vector<Eigen::Triplet<double>>> &tripletLists,
+                                             ObjectContralParam * contral_param)
 {
     // openmp 并行设置
     omp_set_num_threads(max_threads);
@@ -84,7 +86,7 @@ void ElementAssembler::assembleGroupElements(Input *pinput,
         int element_index = element_location - 1;
         auto & element_data = ElementData[element_index];
         std::vector<double> elementmat;
-        pelement->ComputeStiffness(element_data, elementmat);
+        pelement->ComputeStiffness(element_data, elementmat, contral_param);
 
         auto node_ids_in_a_element = element_data.element_patch;
 
@@ -123,6 +125,105 @@ void ElementAssembler::assembleAElement(Dof_Map *pdofmap,
                     index++;
                 }
             }
+        }
+    }
+}
+
+
+
+void ElementAssembler::assembleElementVector(Input *pinput,
+                               Mesh *pmesh,
+                               Dof_Map *pdofmap,
+                               std::vector<ObjectElementData> &Element_Data,
+                               std::vector<double> & Element_Force,
+                               ObjectContralParam * contral_param)
+{
+    int num_all_dofs = pdofmap->dof_size;
+    Element_Force.resize(num_all_dofs);
+
+    for (auto name : d_element_list)
+    {
+        BaseElement *pelem;
+        vector<vector<double>> GaussPoint;
+        std::string element_type = pinput->getString(name + "_type");
+        if (element_type == "NonLinearHex8")
+        {
+            pelem = new NonLinearHex8;
+        }
+        else
+        {
+            toolbox::error("not supprot this type of element: " + element_type + "for integration element vector");
+        }
+
+        // 读单元参数和设置
+        pelem->takeDB(pinput, pmesh, name);
+        std::vector<int> element_ids = pelem->element_ids;
+        this->assembleGroupElementVector(pinput, pmesh, pdofmap, element_ids, pelem, Element_Data, Element_Force, contral_param);
+        delete pelem;
+        
+    }    
+}
+
+void ElementAssembler::assembleGroupElementVector(Input *pinput,
+                                                  Mesh *pmesh,
+                                                  Dof_Map *pdofmap,
+                                                  std::vector<int> &element_ids,
+                                                  BaseElement *pelement,
+                                                  std::vector<ObjectElementData> &ElementData,
+                                                  std::vector<double> &Element_Force,
+                                                  ObjectContralParam *contral_param)
+{    
+    int num_threads = omp_get_max_threads();
+    int num_alldof_size = Element_Force.size();
+    std::vector<std::vector<double>> Element_Force_Vectors;
+    Element_Force_Vectors.resize(num_threads);
+    for (int i = 0; i < num_threads; i++)
+    {
+        Element_Force_Vectors[i].resize(num_alldof_size);  
+    }
+    pelement->SetElement();
+    #pragma omp parallel for
+    for (int element_now = 0; element_now < element_ids.size(); element_now++)
+    {
+        int thread_id = omp_get_thread_num();
+        int element_id = element_ids[element_now];
+        int element_location = pmesh->ElementOrderInList[element_id];
+        int element_index = element_location - 1;
+        auto & element_data = ElementData[element_index];
+        std::vector<double> elementvector;
+        pelement->ComputeInternalForce(element_data, elementvector, contral_param);
+        auto node_ids_in_a_element = element_data.element_patch;  
+        setLocalVectorToGlobalVector(pdofmap, node_ids_in_a_element, pelement->dofs, elementvector, Element_Force_Vectors[thread_id]);
+    }    
+    for (int i = 0; i < num_threads; i++)
+    {
+        for (int j = 0; j < num_alldof_size; j++)
+        {
+            Element_Force[j] += Element_Force_Vectors[i][j];    
+        }          
+    }
+}
+
+void ElementAssembler::setLocalVectorToGlobalVector(Dof_Map *pdofmap,
+                                 std::vector<int> &nodes_ids,
+                                 std::vector<std::string> &dofs,
+                                 std::vector<double> &elementvector,
+                                 std::vector<double> &ElementVector)
+{
+    // toolbox::printvector(elementvector);
+    int num_node = nodes_ids.size();
+    int num_dof = dofs.size();   
+    // std::cout << num_dof << std::endl; 
+    for (int i = 0; i < num_node; i++)
+    {
+        int node_id = nodes_ids[i];
+        for (int j = 0; j < num_dof; j++)
+        {
+            int dof_index_local = i * num_dof + j;
+            std::string dof = dofs[j];
+            int dof_index_global = pdofmap->getDofIndex(node_id, dof);
+            // std::cout << dof_index_global << " " << dof_index_local << std::endl;
+            ElementVector[dof_index_global] += elementvector[dof_index_local];
         }
     }
 }

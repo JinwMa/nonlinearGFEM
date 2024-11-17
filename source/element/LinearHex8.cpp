@@ -9,7 +9,8 @@ using namespace std;
 
 
 void LinearHex8::ComputeStiffness(ObjectElementData & element_data,
-                                  vector<double> & elementmat)
+                                  vector<double> & elementmat,
+                                  ObjectContralParam * contral_param)
 {
     element_data.element_patch = element_data.node_ids;
     // 先给elementmat清零

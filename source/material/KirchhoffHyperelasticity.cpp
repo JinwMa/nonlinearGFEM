@@ -32,22 +32,8 @@ void KirchhoffHyperelasticity::transe_C_SE_to_Ct(const double C_e_tensor[3][3][3
                             for (int k = 0; k < 3; k++)
                                 for (int l = 0; l < 3; l++)
                                 {
-                                    Ct[ii][jj][kk][ll] += (C_e_tensor[ii][jj][kk][ll] * F[ii][i] * F[jj][j] * F[kk][k] * F[ll][l] / jkb);
+                                    Ct[ii][jj][kk][ll] += (C_e_tensor[i][j][k][l] * F[ii][i] * F[jj][j] * F[kk][k] * F[ll][l] / jkb);
                                 }
-
-//    for (int i = 0; i < 3; i++)
-//     {
-//         for (int j = 0; j < 3; j++)
-//         {
-//             for (int k = 0; k < 3; k++)
-//             {
-//                 for (int l = 0; l < 3; l++)
-//                 {
-//                     std::cout << Ct[i][j][k][l] << std::endl;
-//                 }
-//             }
-//         }
-//     }
 }
 
 
@@ -68,6 +54,13 @@ void KirchhoffHyperelasticity::getStress(const double C[3][3][3][3], const doubl
         }
     }
     toolbox::AmnXBpq(&tc[0][0], 3, 3, &Ft[0][0], 3, 3, &stress[0][0]);   
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            stress[i][j] = stress[i][j] / jkb;
+        }
+    }
 
 }
 

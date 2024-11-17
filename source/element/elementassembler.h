@@ -30,24 +30,50 @@ public:
                                   Mesh *pmesh,
                                   Dof_Map *pdofmap,
                                   std::vector<ObjectElementData> &Element_Data,
-                                  Eigen::SparseMatrix<double> &Matrix);
-    
+                                  Eigen::SparseMatrix<double> &Matrix,
+                                  ObjectContralParam * contral_param = nullptr);   
+
+    void assembleElementVector(Input *pinput,
+                               Mesh *pmesh,
+                               Dof_Map *pdofmap,
+                               std::vector<ObjectElementData> &Element_Data,
+                               std::vector<double> & Element_Force,
+                               ObjectContralParam * contral_param = nullptr);
+
+private:
+
+private:
+    std::vector<std::string> d_element_list;
 
     void assembleGroupElements(Input *pinput,
                                Mesh *pmesh,
                                Dof_Map *pdofmap,
                                std::vector<int> &element_ids,
                                BaseElement *pelement,
-                               std::vector<ObjectElementData> & ElementData,
-                               std::vector<std::vector<Eigen::Triplet<double>>> &);
+                               std::vector<ObjectElementData> &ElementData,
+                               std::vector<std::vector<Eigen::Triplet<double>>> &,
+                               ObjectContralParam *contral_param = nullptr);
 
     void assembleAElement(Dof_Map *pdofmap,
                           std::vector<int> &nodes_ids,
                           std::vector<std::string> &dofs,
                           std::vector<double> &elementmat,
                           std::vector<Eigen::Triplet<double>> &local_tripletLists);
-private:
-    std::vector<std::string> d_element_list;
+
+    void assembleGroupElementVector(Input *pinput,
+                                    Mesh *pmesh,
+                                    Dof_Map *pdofmap,
+                                    std::vector<int> &element_ids,
+                                    BaseElement *pelement,
+                                    std::vector<ObjectElementData> &ElementData,
+                                    std::vector<double> &Element_Force,
+                                    ObjectContralParam *contral_param = nullptr);
+
+    void setLocalVectorToGlobalVector(Dof_Map *pdofmap,
+                                     std::vector<int> &nodes_ids,
+                                     std::vector<std::string> &dofs,
+                                     std::vector<double> & elementvector,
+                                     std::vector<double> & ElementVector);
 };
 
 #endif

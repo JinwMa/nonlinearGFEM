@@ -17,10 +17,12 @@ class NonLinearStaticSolver : public BaseSolver
     void init(Input * pinput, Mesh * pmesh) override;
     
     private:
-    std::vector<ObjectElement> d_elements_data;
+    // std::vector<ObjectElement> d_elements_data;
     std::vector<double> d_u;
     std::vector<double> d_du;
     std::vector<double> d_ddu;
+
+    std::vector<double> d_internal_force;
 
     
     std::shared_ptr<ConstraintManager> d_constraint_manager;
@@ -32,6 +34,7 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::SparseMatrix<double> d_K;
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
+
 };
 
 

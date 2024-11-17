@@ -16,7 +16,12 @@ class NonLinearHex8 : public BaseElement
         string ReturnElementType() { return "NonLinearFEM"; };
 
         void ComputeStiffness(ObjectElementData &elementdata,
-                              std::vector<double> &elementmat) override;
+                              std::vector<double> &elementmat,
+                              ObjectContralParam * contral_param = nullptr) override;
+
+        void ComputeInternalForce(ObjectElementData &element_data,
+                                  std::vector<double> &elementmat,
+                                  ObjectContralParam *contral_param = nullptr) override;
 
         void getShapeFunction(double nodes_coordinate[20][3],
                                       std::vector<std::vector<double>> & GaussPoints,

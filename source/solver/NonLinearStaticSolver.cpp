@@ -9,12 +9,6 @@ void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
     d_load_manager = std::make_shared<LoadManger>();
     d_dof_map = std::make_shared<Dof_Map>(pmesh);
 
-    int elements_num = pmesh->actual_element_count;
-    d_elements_data.resize(elements_num);
-    for (int i = 0; i < elements_num; i++)
-    {
-        d_elements_data[i].if_element_is_initialized = false;
-    }
 }
 
 
@@ -52,7 +46,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     // 构造刚度矩阵,构造右端项
     std::cout << "building stiffness" << std::endl;
     // d_element_assembler->assembleNonLinearElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_u, d_du, d_ddu, d_K);
-    d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K);
+    d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
 
     std::cout << "complete the stiffness " << std::endl; 
 
@@ -84,6 +78,30 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, d_dof_map.get());
 
 
+    d_contral_param->iteration_step++;    
+    setVectorToElementData(displacement, d_dof_map.get(), d_element_data, "u");
+
+    d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
+
+    d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
+
+    Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
+    
+    rhs = d_P - rhs;
+
+    
+
+    linear_solver(d_K, rhs, d_C, d_G, solution);
+
+    std::vector<double> displacement2(solution.data(), solution.data() + rhs.size());
+
+    // 进行后处理
+    Post post2("tecplot2");
+    // 输出网格:
+    post2.onlymesh(pinput, pmesh);
+    // 输出位移场:
+    post2.ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement2);
+    if (std::getenv("CHECKSOLUTION") != nullptr)post2.check_error(pinput, pmesh, d_dof_map.get());
 
 
 }
