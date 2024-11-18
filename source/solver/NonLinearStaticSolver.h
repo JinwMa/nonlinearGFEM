@@ -29,6 +29,7 @@ class NonLinearStaticSolver : public BaseSolver
     std::shared_ptr<LoadManger> d_load_manager;
     std::shared_ptr<ElementAssembler> d_element_assembler;
     std::shared_ptr<Dof_Map> d_dof_map;
+    std::shared_ptr<Post> d_post;
 
     Eigen::SparseMatrix<double> d_C;
     Eigen::SparseMatrix<double> d_K;

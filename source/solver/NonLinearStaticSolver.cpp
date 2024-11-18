@@ -8,6 +8,7 @@ void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
     d_element_assembler = std::make_shared<ElementAssembler>();
     d_load_manager = std::make_shared<LoadManger>();
     d_dof_map = std::make_shared<Dof_Map>(pmesh);
+    d_post = std::make_shared<Post>("tecplot");
 
 }
 
@@ -70,11 +71,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
     
     // 进行后处理
-    Post post("tecplot");
-    // 输出网格:
-    post.onlymesh(pinput, pmesh);
+    d_post->onlymesh(pinput, pmesh);
     // 输出位移场:
-    post.ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement);
+    d_post->ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement);
     if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, d_dof_map.get());
 
 
