@@ -2,6 +2,26 @@
 
 using namespace std;
 
+
+void NonLinearHex8::initializeElement(ObjectElementData & element_data)
+{
+    if (element_data.is_initialized) return;
+
+    double nodes_coordinate[20][3] = {0.0};
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            nodes_coordinate[i][j] = element_data.coordinates.at(i).at(j);
+        }
+    }
+    // 对齐输入
+    vector<vector<double>> a;
+    vector<vector<vector<double>>> b;
+    vector<double> c;
+    initialize_element(nodes_coordinate, d_GaussPoints, a, b, c, d_num_intergration_point, element_data);
+}
+
 void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
                                      std::vector<double> &elementmat,
                                      ObjectContralParam * contral_param)
@@ -9,27 +29,8 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
     if(contral_param == nullptr) toolbox::error("contral_param is null");
     std::cout.precision(20);
     elementmat.resize(d_num_edofs * d_num_edofs);
-  
-    // 如果单元没有被初始化，则执行初始化
-    if (!element_data.is_initialized)
-    {
-        double nodes_coordinate[20][3] = {0.0};
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                nodes_coordinate[i][j] = element_data.coordinates.at(i).at(j);
-            }
-        }
-        // 对齐输入
-        vector<vector<double>> a;
-        vector<vector<vector<double>>> b;
-        vector<double> c;
-        initialize_element(nodes_coordinate, d_GaussPoints, a, b, c, d_num_intergration_point, element_data);
-    }
-    // 根据位移更新变形梯度，和变形梯度的逆
 
-    // updateF_Finv(displacement, du, ddu, element_data);
+    // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(element_data);
 
     // 为了openmp并行，在单元内部维护材料参数
@@ -37,9 +38,6 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
     pmaterial->getC_e_tensor(C_e_tensor);
     double Ct[3][3][3][3] = {0.0};         //切线模量
 
-
-    // TODO: 
-    // updateStressAndC();
     // 循环所有积分点
     int num_GP = element_data.num_integration_points;
     for (int i = 0; i < num_GP; i++) // 积分点循环
@@ -54,7 +52,7 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         double stressn[3][3] = {0.0};
         double stressn1[3][3] = {0.0};
         double JKB = element_data.JKB[i]; // 母单元映射雅可比
-        double jkb = element_data.jkb[i]; // 构型变化之雅可比
+        double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
         // pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);
 
         double F[3][3] = {0.0};
@@ -63,8 +61,8 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                F[ii][jj] = element_data.F[i][ii][jj];
-                Finv[ii][jj] = element_data.Finv[i][ii][jj];                
+                F[ii][jj] = element_data.F_n1[i][ii][jj];
+                Finv[ii][jj] = element_data.Finv_n1[i][ii][jj];                
             }
         }
         pmaterial->getCt(C_e_tensor, F, jkb, Ct);
@@ -73,7 +71,7 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                stress[ii][jj] = element_data.stress[i][ii][jj];
+                stress[ii][jj] = element_data.stress_n[i][ii][jj];
             }
         }
         pmaterial->getStress(C_e_tensor, F, jkb, stress);
@@ -82,7 +80,7 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                element_data.stress[i][ii][jj] = stress[ii][jj];
+                element_data.stress_n1[i][ii][jj] = stress[ii][jj];
             }
         }
 
@@ -94,17 +92,17 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
             double sfdx = element_data.sfdxyz[i][j][0];
             double sfdy = element_data.sfdxyz[i][j][1];
             double sfdz = element_data.sfdxyz[i][j][2];
-            double sf_dxnow = element_data.Finv[i][0][0] * sfdx +
-                              element_data.Finv[i][1][0] * sfdy +
-                              element_data.Finv[i][2][0] * sfdz;
+            double sf_dxnow = element_data.Finv_n1[i][0][0] * sfdx +
+                              element_data.Finv_n1[i][1][0] * sfdy +
+                              element_data.Finv_n1[i][2][0] * sfdz;
 
-            double sf_dynow = element_data.Finv[i][0][1] * sfdx +
-                              element_data.Finv[i][1][1] * sfdy +
-                              element_data.Finv[i][2][1] * sfdz;
+            double sf_dynow = element_data.Finv_n1[i][0][1] * sfdx +
+                              element_data.Finv_n1[i][1][1] * sfdy +
+                              element_data.Finv_n1[i][2][1] * sfdz;
 
-            double sf_dznow = element_data.Finv[i][0][2] * sfdx +
-                              element_data.Finv[i][1][2] * sfdy +
-                              element_data.Finv[i][2][2] * sfdz;
+            double sf_dznow = element_data.Finv_n1[i][0][2] * sfdx +
+                              element_data.Finv_n1[i][1][2] * sfdy +
+                              element_data.Finv_n1[i][2][2] * sfdz;
             BT[0][0] = sf_dxnow;
             BT[0][3] = sf_dynow;
             BT[0][5] = sf_dznow;
@@ -126,17 +124,17 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
                 sfdx = element_data.sfdxyz[i][k][0];
                 sfdy = element_data.sfdxyz[i][k][1];
                 sfdz = element_data.sfdxyz[i][k][2];
-                sf_dxnow = element_data.Finv[i][0][0] * sfdx +
-                           element_data.Finv[i][1][0] * sfdy +
-                           element_data.Finv[i][2][0] * sfdz;
+                sf_dxnow = element_data.Finv_n1[i][0][0] * sfdx +
+                           element_data.Finv_n1[i][1][0] * sfdy +
+                           element_data.Finv_n1[i][2][0] * sfdz;
 
-                sf_dynow = element_data.Finv[i][0][1] * sfdx +
-                           element_data.Finv[i][1][1] * sfdy +
-                           element_data.Finv[i][2][1] * sfdz;
+                sf_dynow = element_data.Finv_n1[i][0][1] * sfdx +
+                           element_data.Finv_n1[i][1][1] * sfdy +
+                           element_data.Finv_n1[i][2][1] * sfdz;
 
-                sf_dznow = element_data.Finv[i][0][2] * sfdx +
-                           element_data.Finv[i][1][2] * sfdy +
-                           element_data.Finv[i][2][2] * sfdz;
+                sf_dznow = element_data.Finv_n1[i][0][2] * sfdx +
+                           element_data.Finv_n1[i][1][2] * sfdy +
+                           element_data.Finv_n1[i][2][2] * sfdz;
 
                 B[0][0] = sf_dxnow;
                 B[1][1] = sf_dynow;
@@ -402,34 +400,40 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
     elementdata.sfdxyz = ShapeFunction_dxy;
     // 积分点上的雅可比：母单元映射物理单元
     elementdata.JKB = value_jkb;
-    // 积分点上的雅可比: 构型变化之间的映射
-    elementdata.jkb.resize(num_GP);
-    for (int i = 0; i < num_GP; i++)
-        elementdata.jkb[i] = 1.0;
     // 积分点权重
     elementdata.weights.resize(num_GP);
     for (int i = 0; i < num_GP; i++)
     {
         elementdata.weights[i] = GaussPoints[i][3];
     }
-    // 等效塑性应变
-    elementdata.eff_p_strain.resize(num_GP);
+
+
+
+
+    // 积分点上的雅可比: 构型变化之间的映射
+    elementdata.jkb_n.resize(num_GP);
     for (int i = 0; i < num_GP; i++)
-        elementdata.eff_p_strain[i] = 0.0;
+        elementdata.jkb_n[i] = 1.0;
+    
+    // 等效塑性应变
+    elementdata.eff_p_strain_n.resize(num_GP);
+    for (int i = 0; i < num_GP; i++)
+        elementdata.eff_p_strain_n[i] = 0.0;
+
     // 变形梯度 应力 变形梯度逆
-    elementdata.F.resize(num_GP);
-    elementdata.Finv.resize(num_GP);
-    elementdata.stress.resize(num_GP);
+    elementdata.F_n.resize(num_GP);
+    elementdata.Finv_n.resize(num_GP);
+    elementdata.stress_n.resize(num_GP);
     for (int i = 0; i < num_GP; i++)
     {
-        elementdata.F[i].resize(d_num_node_dof);
-        elementdata.Finv[i].resize(d_num_node_dof);
-        elementdata.stress[i].resize(d_num_node_dof);
+        elementdata.F_n[i].resize(d_num_node_dof);
+        elementdata.Finv_n[i].resize(d_num_node_dof);
+        elementdata.stress_n[i].resize(d_num_node_dof);
         for (int j = 0; j < d_num_node_dof; j++)
         {
-            elementdata.F[i][j].resize(d_num_node_dof);
-            elementdata.Finv[i][j].resize(d_num_node_dof);
-            elementdata.stress[i][j].resize(d_num_node_dof);
+            elementdata.F_n[i][j].resize(d_num_node_dof);
+            elementdata.Finv_n[i][j].resize(d_num_node_dof);
+            elementdata.stress_n[i][j].resize(d_num_node_dof);
         }
     }
     for (int i = 0; i < num_GP; i++)
@@ -437,29 +441,35 @@ void NonLinearHex8::initialize_element(double nodes_coordinate[20][3],
         for (int j = 0; j < 3; j++)
             for (int k = 0; k < 3; k++)
             {
-                elementdata.stress[i][j][k] = 0.0;
-                elementdata.F[i][j][k] = 0.0;
-                elementdata.Finv[i][j][k] = 0.0;
+                elementdata.stress_n[i][j][k] = 0.0;
+                elementdata.F_n[i][j][k] = 0.0;
+                elementdata.Finv_n[i][j][k] = 0.0;
 
                 if (j == k)
                 {
-                    elementdata.F[i][j][k] = 1.0;
-                    elementdata.Finv[i][j][k] = 1.0;
+                    elementdata.F_n[i][j][k] = 1.0;
+                    elementdata.Finv_n[i][j][k] = 1.0;
                 }
             }
     }
 
-    //初始化位移场可能已经在单元外部执行了初始化
+    elementdata.jkb_n1 = elementdata.jkb_n;
+    elementdata.eff_p_strain_n1 = elementdata.eff_p_strain_n;
 
+    elementdata.F_n1 = elementdata.F_n;
+    elementdata.Finv_n1 = elementdata.Finv_n;
+    elementdata.stress_n1 = elementdata.stress_n;
+
+    //初始化位移场可能已经在单元外部执行了初始化
     if (elementdata.u.size() == 0) elementdata.u.resize(d_num_nodes);
-        if (elementdata.du.size() == 0) elementdata.du.resize(d_num_nodes);
-        if (elementdata.ddu.size() == 0) elementdata.ddu.resize(d_num_nodes);
-        for (int i = 0; i < d_num_nodes; i++)
-        {
-            if (elementdata.u[i].size() == 0)elementdata.u[i].resize(d_num_node_dof);
-            if (elementdata.du[i].size() == 0)elementdata.du[i].resize(d_num_node_dof);
-            if (elementdata.ddu[i].size() == 0)elementdata.ddu[i].resize(d_num_node_dof);
-        }
+    if (elementdata.du.size() == 0) elementdata.du.resize(d_num_nodes);
+    for (int i = 0; i < d_num_nodes; i++)
+    {
+        if (elementdata.u[i].size() == 0)
+            elementdata.u[i].resize(d_num_node_dof);
+        if (elementdata.du[i].size() == 0)
+            elementdata.du[i].resize(d_num_node_dof);
+    }
 
     elementdata.is_initialized = true;    
 }
@@ -477,49 +487,43 @@ void NonLinearHex8::updateF_Finv(ObjectElementData &elementdata)
 
     for (int i = 0; i < elementdata.num_integration_points; i++)
     {
-        double Fn1[3][3] = {{0.0}};
-        double Finv_n1[3][3] = {{0.0}};
-        for (int i = 0; i < 3; i++)
-        {
-            Fn1[i][i] = 1.0;
-            Finv_n1[i][i] = 1.0;
-        }
-        auto &shapefunction = elementdata.sfdxyz[i];
-        auto & Fn = elementdata.F[i];
-        auto & Finv_n = elementdata.Finv[i];
-        auto & jkbn = elementdata.jkb[i];
-        for (int inode = 0; inode < d_num_nodes; inode++)
-        {
-            ux = elementdata.u[inode][0];
-            uy = elementdata.u[inode][1];
-            uz = elementdata.u[inode][2];
-            sfdx = shapefunction[inode][0];
-            sfdy = shapefunction[inode][1];
-            sfdz = shapefunction[inode][2];
-
-            Fn1[0][0] = Fn1[0][0] + ux * sfdx;
-            Fn1[0][1] = Fn1[0][1] + ux * sfdy;
-            Fn1[0][2] = Fn1[0][2] + ux * sfdz;
-
-            Fn1[1][0] = Fn1[1][0] + uy * sfdx;
-            Fn1[1][1] = Fn1[1][1] + uy * sfdy;
-            Fn1[1][2] = Fn1[1][2] + uy * sfdz;
-
-            Fn1[2][0] = Fn1[2][0] + uz * sfdx;
-            Fn1[2][1] = Fn1[2][1] + uz * sfdy;
-            Fn1[2][2] = Fn1[2][2] + uz * sfdz;
-        }
-        double jkb_n1 = invertMatrix(Fn1, Finv_n1);
-        jkbn = jkb_n1; // 更新雅可比
+        //更新变形梯度
+        auto & F_n1 = elementdata.F_n1[i];
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                Fn[ii][jj] = Fn1[ii][jj];
-                Finv_n[ii][jj] = Finv_n1[ii][jj];
+                F_n1[ii][jj] = 0.0;
+                if (ii == jj) F_n1[ii][jj] = 1.0;
             }
         }
+        auto & shapefunction = elementdata.sfdxyz[i];
+        for (int inode = 0; inode < d_num_nodes; inode++)
+        {
 
+            ux = elementdata.u[inode][0] + elementdata.du[inode][0];
+            uy = elementdata.u[inode][1] + elementdata.du[inode][1];
+            uz = elementdata.u[inode][2] + elementdata.du[inode][2];
+            sfdx = shapefunction[inode][0];
+            sfdy = shapefunction[inode][1];
+            sfdz = shapefunction[inode][2];
+
+            F_n1[0][0] += ux * sfdx;
+            F_n1[0][1] += ux * sfdy;
+            F_n1[0][2] += ux * sfdz;
+
+            F_n1[1][0] += uy * sfdx;
+            F_n1[1][1] += uy * sfdy;
+            F_n1[1][2] += uy * sfdz;
+
+            F_n1[2][0] += uz * sfdx;
+            F_n1[2][1] += uz * sfdy;
+            F_n1[2][2] += uz * sfdz;
+        }
+        // 更新变形梯度的逆和雅可比
+        auto & Finv_n1 = elementdata.Finv_n1[i];
+        auto & jkb_n1 = elementdata.jkb_n1[i];
+        jkb_n1 = invertMatrix(F_n1, Finv_n1);
     }
 }
 
@@ -542,7 +546,7 @@ void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
     
     for (int i = 0; i < num_GP; i++)
     {
-        auto & stress = element_data.stress[i];
+        auto & stress = element_data.stress_n1[i];
         double BT[3][6] = {0.0};     // BT
         double F[3][3] = {0.0};
         double Finv[3][3] = {0.0};
@@ -550,26 +554,28 @@ void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                F[ii][jj] = element_data.F[i][ii][jj];
-                Finv[ii][jj] = element_data.Finv[i][ii][jj];                
+                F[ii][jj] = element_data.F_n1[i][ii][jj];
+                Finv[ii][jj] = element_data.Finv_n1[i][ii][jj];                
             }
         }
+
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
             double sfdx = element_data.sfdxyz[i][j][0];
             double sfdy = element_data.sfdxyz[i][j][1];
             double sfdz = element_data.sfdxyz[i][j][2];
-            double sf_dxnow = element_data.Finv[i][0][0] * sfdx +
-                              element_data.Finv[i][1][0] * sfdy +
-                              element_data.Finv[i][2][0] * sfdz;
 
-            double sf_dynow = element_data.Finv[i][0][1] * sfdx +
-                              element_data.Finv[i][1][1] * sfdy +
-                              element_data.Finv[i][2][1] * sfdz;
+            double sf_dxnow = element_data.Finv_n1[i][0][0] * sfdx +
+                              element_data.Finv_n1[i][1][0] * sfdy +
+                              element_data.Finv_n1[i][2][0] * sfdz;
 
-            double sf_dznow = element_data.Finv[i][0][2] * sfdx +
-                              element_data.Finv[i][1][2] * sfdy +
-                              element_data.Finv[i][2][2] * sfdz;
+            double sf_dynow = element_data.Finv_n1[i][0][1] * sfdx +
+                              element_data.Finv_n1[i][1][1] * sfdy +
+                              element_data.Finv_n1[i][2][1] * sfdz;
+
+            double sf_dznow = element_data.Finv_n1[i][0][2] * sfdx +
+                              element_data.Finv_n1[i][1][2] * sfdy +
+                              element_data.Finv_n1[i][2][2] * sfdz;
             BT[0][0] = sf_dxnow;
             BT[0][3] = sf_dynow;
             BT[0][5] = sf_dznow;
@@ -582,25 +588,11 @@ void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
             BT[2][4] = sf_dynow;
             BT[2][5] = sf_dxnow;
 
-            elementvector[3 * j + 0] += (sf_dxnow * stress[0][0] + sf_dynow * stress[1][0] + sf_dznow * stress[2][0]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
-            elementvector[3 * j + 1] += (sf_dxnow * stress[0][1] + sf_dynow * stress[1][1] + sf_dznow * stress[2][1]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
-            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb[i] * element_data.JKB[i];
+            elementvector[3 * j + 0] += (sf_dxnow * stress[0][0] + sf_dynow * stress[1][0] + sf_dznow * stress[2][0]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
+            elementvector[3 * j + 1] += (sf_dxnow * stress[0][1] + sf_dynow * stress[1][1] + sf_dznow * stress[2][1]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
+            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
 
-            // std::cout << sf_dxnow << " " << sf_dynow << " " << sf_dznow << " " << std::endl;
-            // std::cout << "internal force" << std::endl;
-            // std::cout << elementvector[3 * j + 0] << " " << elementvector[3 * j + 1] << " " << elementvector[3 * j + 2] << std::endl;
-            // std::cout << "stress" << std::endl;
-            // for (int ix = 0; ix < 3; ix++)
-            // {
-            //     for (int iy = 0; iy < 3; iy++)
-            //     {
-            //         std::cout << stress[ix][iy] << std::endl;
-            //     }
-            // }
-            // std::cout << "weights" << std::endl;
-            // std::cout << element_data.weights[i] * element_data.JKB[i] << std::endl;
-            // std::cout << "jkb" << std::endl;
-            // std::cout << element_data.jkb[i] << std::endl;
+          
 
         }        
     }

@@ -74,7 +74,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     d_post->onlymesh(pinput, pmesh);
     // 输出位移场:
     d_post->ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement);
-    if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, d_dof_map.get());
+    if (std::getenv("CHECKSOLUTION") != nullptr)d_post->check_error(pinput, pmesh, d_dof_map.get());
 
 
     d_contral_param->iteration_step++;    
@@ -83,6 +83,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
 
     d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
+
 
     Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
     

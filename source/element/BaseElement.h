@@ -29,8 +29,9 @@ class BaseElement
     void takeDB(Input * pinput, Mesh * pmesh, std::string & name);    
     virtual void SetElement(){
         toolbox::error("should not use this function in BaseElement: SetElement");
-    };;
+    };
     virtual std::string ReturnElementType() = 0;
+    virtual void initializeElement(ObjectElementData & element_data) = 0;
 
     // virtual void init(ObjectElementData & element_data) = 0;
 
@@ -41,6 +42,11 @@ class BaseElement
     virtual void ComputeInternalForce(ObjectElementData &element_data,
                                       std::vector<double> &elementvector,
                                       ObjectContralParam *contral_param = nullptr) {};
+
+
+
+
+
     virtual void getShapeFunction(double nodes_coordinate[20][3],
                                   std::vector<std::vector<double>> &,
                                   vector<vector<double>> &ShapeFunction,
@@ -65,6 +71,8 @@ class BaseElement
     void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
     void AXB3883(const double A[3][8], const double B[8][3], double C[3][3]);
     double invertMatrix(const double input[3][3], double inverse[3][3]);
+    double invertMatrix(const std::vector<std::vector<double>> & input,
+                                 std::vector<std::vector<double>> & inverse);
     void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
 
 

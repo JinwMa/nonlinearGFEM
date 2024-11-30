@@ -114,6 +114,7 @@ void ElementAssembler::assembleGroupElements(Input *pinput,
         int element_location = pmesh->ElementOrderInList[element_id];
         int element_index = element_location - 1;
         auto & element_data = ElementData[element_index];
+        pelement->initializeElement(element_data);
         std::vector<double> elementmat;
         pelement->ComputeStiffness(element_data, elementmat, contral_param);
 

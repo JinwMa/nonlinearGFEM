@@ -149,7 +149,7 @@ public:
         std::cout.precision(20);
         for (size_t i = 0; i < vector.size(); i++)
         {
-            std::cout << std::setw(30) << vector[i];
+            std::cout << std::setw(30) << vector[i] << std::endl;
         }
     }
 

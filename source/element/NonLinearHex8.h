@@ -15,6 +15,8 @@ class NonLinearHex8 : public BaseElement
 
         string ReturnElementType() { return "NonLinearFEM"; };
 
+        void initializeElement(ObjectElementData & element_data);
+
         void ComputeStiffness(ObjectElementData &elementdata,
                               std::vector<double> &elementmat,
                               ObjectContralParam * contral_param = nullptr) override;

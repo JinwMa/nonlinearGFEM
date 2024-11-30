@@ -15,6 +15,9 @@ class LinearTet4 : public BaseElement
 
     public:
         string ReturnElementType() { return "FEM"; };
+        ~LinearTet4() {};
+        void initializeElement(ObjectElementData & element_data);
+
 
         void ComputeStiffness(ObjectElementData &element_data,
                               std::vector<double> &elementmat,
@@ -27,7 +30,6 @@ class LinearTet4 : public BaseElement
                               vector<vector<vector<double>>> &ShapeFunction_dxy,
                               vector<double> &value_jkb,
                               const int num_GP);
-        ~LinearTet4() {};
 
     public:
         void getShapeFunctionOnIntegrationPoint(std::vector<double> &p_coord,

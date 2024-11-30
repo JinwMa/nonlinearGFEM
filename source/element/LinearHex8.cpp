@@ -7,12 +7,19 @@ using namespace std;
 
 
 
+void LinearHex8::initializeElement(ObjectElementData & element_data)
+{
+    if (element_data.is_initialized) return;
+    element_data.element_patch = element_data.node_ids;
+    element_data.is_initialized = true;
+    
+}
 
 void LinearHex8::ComputeStiffness(ObjectElementData & element_data,
                                   vector<double> & elementmat,
                                   ObjectContralParam * contral_param)
 {
-    element_data.element_patch = element_data.node_ids;
+    // element_data.element_patch = element_data.node_ids;
     // 先给elementmat清零
     elementmat.resize(num_edofs * num_edofs);
     // 材料参数先给一个默认值
