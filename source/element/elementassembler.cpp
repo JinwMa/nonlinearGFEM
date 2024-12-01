@@ -170,6 +170,7 @@ void ElementAssembler::assembleElementVector(Input *pinput,
 {
     int num_all_dofs = pdofmap->dof_size;
     Element_Force.resize(num_all_dofs);
+    for (int index = 0; index < num_all_dofs; index++) Element_Force[index] = 0.0;
     int iloop = 0;
     for (auto name : d_element_list)
     {

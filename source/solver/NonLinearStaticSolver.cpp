@@ -48,8 +48,13 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_dlambda.resize(num_constrain_equations);
     d_ddlambda.resize(num_constrain_equations);
 
-    d_element_assembler->takeDB(pinput, pmesh, d_dof_map.get()); //读单元列表
+    d_internal_force.resize(dof_size);
+    d_rhs.resize(dof_size);
+
+
+
     // 构造刚度矩阵,构造右端项
+    d_element_assembler->takeDB(pinput, pmesh, d_dof_map.get()); //读单元列表
     std::cout << "building stiffness" << std::endl;
     // d_element_assembler->assembleNonLinearElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_u, d_du, d_ddu, d_K);
     d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
@@ -63,93 +68,42 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 {
+    for (int index = 0; index < d_dof_map->dof_size; index++)
+    {
+        d_u[index] = 0.0;
+        d_du[index] = 0.0;
+        d_ddu[index] = 0.0;
+    }
 
-    d_u.clear();
-    d_du.clear();
-    d_ddu.clear();
-    d_lambda.clear();
-    d_dlambda.clear();
-    d_ddlambda.clear();
+
     while(true)
     {
         d_contral_param->load_step++;    
-        d_contral_param->iteration_step = 0;      
-        d_du.clear();
-        d_ddlambda.clear();
+        d_contral_param->iteration_step = 0;
+        for (int index = 0; index < d_dof_map->dof_size; index++)
+        {
+            d_du[index] = 0.0;
+        }
         while(true)
         {
             d_contral_param->iteration_step++;
-            d_ddu.clear();
-            d_ddlambda.clear();
-
-            
-
+            for (int index = 0; index < d_dof_map->dof_size; index++)
+            {
+                d_ddu[index] = 0.0;
+            }
+            Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
+            rhs = d_P - rhs;
             Eigen::VectorXd solution;
-            linear_solver(d_K, d_P, d_C, d_G, solution);
-            std::copy(solution.data(), solution.data() + solution.size(); d_ddu.begin());
+            linear_solver(d_K, rhs, d_C, d_G, solution);
+
+            for (int index = 0; index < d_dof_map->dof_size; index++) d_ddu[index] = solution[index];
 
             for (int index = 0; index < d_dof_map->dof_size; index++) d_du[index] += d_ddu[index];
-            setVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");
-
+            setVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");           
             d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
+
             d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
-            Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
-            Eigen::SparseMatrix<double> CT = d_C.transpose();
-            Eigen::VectorXd dlambda = solution.segment(displacement.size(), d_C.rows());
-            Eigen::VectorXd rhs_lambda = CT * dlambda;
-            rhs = d_P - rhs - rhs_lambda;
-            linear_solver(d_K, rhs, d_C, d_G, solution);
         }        
     }
-
-    /// 求解线性方程组
-    std::cout << "solving the linear equations" << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
-    Eigen::VectorXd solution;
-    linear_solver(d_K, d_P, d_C, d_G, solution);
-    // linear_solver2(K, P, C, G, solution);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "complete the solve" << std::endl;
-    // 计算持续时间并转换为毫秒
-    std::chrono::duration<double, std::milli> duration = end - start;
-    std::cout << "solve Ax=b time: " << duration.count() << " ms" << std::endl;
-
-    std::vector<double> displacement(solution.data(), solution.data() + d_P.size());
-    
-    // 进行后处理
-    d_post->onlymesh(pinput, pmesh);
-    // 输出位移场:
-    d_post->ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement);
-    if (std::getenv("CHECKSOLUTION") != nullptr)d_post->check_error(pinput, pmesh, d_dof_map.get());
-
-
-    d_contral_param->iteration_step++;    
-    setVectorToElementData(displacement, d_dof_map.get(), d_element_data, "u");
-
-    d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
-
-    d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
-
-
-    Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
-    Eigen::SparseMatrix<double> CT = d_C.transpose();
-    Eigen::VectorXd dlambda = solution.segment(displacement.size(), d_C.rows());
-    Eigen::VectorXd rhs_lambda = CT * dlambda;    
-    rhs = d_P - rhs - rhs_lambda;
-    linear_solver(d_K, rhs, d_C, d_G, solution);
-
-    std::vector<double> displacement2(solution.data(), solution.data() + rhs.size());
-    // 进行后处理
-    Post post2("tecplot2");
-    // 输出网格:
-    post2.onlymesh(pinput, pmesh);
-    // 输出位移场:
-    post2.ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement2);
-    if (std::getenv("CHECKSOLUTION") != nullptr)post2.check_error(pinput, pmesh, d_dof_map.get());
-
-
-
-   
-
 
 }
