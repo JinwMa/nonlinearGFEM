@@ -10,12 +10,13 @@ void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
     d_dof_map = std::make_shared<Dof_Map>(pmesh);
     d_post = std::make_shared<Post>("tecplot");
 
+
+    initData(pinput, pmesh);
 }
 
 
-void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
+void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 {
-    
     // 构造约束
     auto start_constraint = std::chrono::high_resolution_clock::now();
     std::cout << "building constraint" << std::endl;
@@ -42,6 +43,10 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     d_u.resize(dof_size);
     d_du.resize(dof_size);
     d_ddu.resize(dof_size);
+    int num_constrain_equations = d_C.rows();
+    d_lambda.resize(num_constrain_equations);
+    d_dlambda.resize(num_constrain_equations);
+    d_ddlambda.resize(num_constrain_equations);
 
     d_element_assembler->takeDB(pinput, pmesh, d_dof_map.get()); //读单元列表
     // 构造刚度矩阵,构造右端项
@@ -53,6 +58,49 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
+
+}
+
+void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
+{
+
+    d_u.clear();
+    d_du.clear();
+    d_ddu.clear();
+    d_lambda.clear();
+    d_dlambda.clear();
+    d_ddlambda.clear();
+    while(true)
+    {
+        d_contral_param->load_step++;    
+        d_contral_param->iteration_step = 0;      
+        d_du.clear();
+        d_ddlambda.clear();
+        while(true)
+        {
+            d_contral_param->iteration_step++;
+            d_ddu.clear();
+            d_ddlambda.clear();
+
+            
+
+            Eigen::VectorXd solution;
+            linear_solver(d_K, d_P, d_C, d_G, solution);
+            std::copy(solution.data(), solution.data() + solution.size(); d_ddu.begin());
+
+            for (int index = 0; index < d_dof_map->dof_size; index++) d_du[index] += d_ddu[index];
+            setVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");
+
+            d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
+            d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
+            Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
+            Eigen::SparseMatrix<double> CT = d_C.transpose();
+            Eigen::VectorXd dlambda = solution.segment(displacement.size(), d_C.rows());
+            Eigen::VectorXd rhs_lambda = CT * dlambda;
+            rhs = d_P - rhs - rhs_lambda;
+            linear_solver(d_K, rhs, d_C, d_G, solution);
+        }        
+    }
 
     /// 求解线性方程组
     std::cout << "solving the linear equations" << std::endl;
@@ -67,8 +115,6 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     std::cout << "solve Ax=b time: " << duration.count() << " ms" << std::endl;
 
     std::vector<double> displacement(solution.data(), solution.data() + d_P.size());
-
-
     
     // 进行后处理
     d_post->onlymesh(pinput, pmesh);
@@ -86,26 +132,13 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
 
     Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
-
     Eigen::SparseMatrix<double> CT = d_C.transpose();
     Eigen::VectorXd dlambda = solution.segment(displacement.size(), d_C.rows());
-
-    Eigen::VectorXd rhs_lambda = CT * dlambda;
-
-    // std::cout << rhs << std::endl;
-    std::cout << rhs_lambda << std::endl;
-
-    
+    Eigen::VectorXd rhs_lambda = CT * dlambda;    
     rhs = d_P - rhs - rhs_lambda;
-
-    
-
     linear_solver(d_K, rhs, d_C, d_G, solution);
 
     std::vector<double> displacement2(solution.data(), solution.data() + rhs.size());
-
-    toolbox::PrintVector(displacement2);
-
     // 进行后处理
     Post post2("tecplot2");
     // 输出网格:
@@ -113,6 +146,10 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     // 输出位移场:
     post2.ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement2);
     if (std::getenv("CHECKSOLUTION") != nullptr)post2.check_error(pinput, pmesh, d_dof_map.get());
+
+
+
+   
 
 
 }

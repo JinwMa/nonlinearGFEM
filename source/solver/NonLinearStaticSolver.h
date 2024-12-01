@@ -15,6 +15,8 @@ class NonLinearStaticSolver : public BaseSolver
     void solve(Input * pinput, Mesh * pmesh);
     void takeDB(Input * pinput) {};
     void init(Input * pinput, Mesh * pmesh) override;
+
+    void initData(Input * pinput, Mesh * pmesh);
     
     private:
     // std::vector<ObjectElement> d_elements_data;
@@ -22,7 +24,13 @@ class NonLinearStaticSolver : public BaseSolver
     std::vector<double> d_du;
     std::vector<double> d_ddu;
 
+    std::vector<double> d_lambda;
+    std::vector<double> d_dlambda;
+    std::vector<double> d_ddlambda;
+
+    
     std::vector<double> d_internal_force;
+    std::vector<double> d_rhs;
 
     
     std::shared_ptr<ConstraintManager> d_constraint_manager;
