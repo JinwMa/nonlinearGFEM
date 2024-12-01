@@ -49,8 +49,6 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         double BgT[1][3] = {0.0};    // 
         double weight = element_data.weights[i];
         double stress[3][3] = {0.0};
-        double stressn[3][3] = {0.0};
-        double stressn1[3][3] = {0.0};
         double JKB = element_data.JKB[i]; // 母单元映射雅可比
         double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
         // pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);

@@ -86,14 +86,25 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
 
     Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
+
+    Eigen::SparseMatrix<double> CT = d_C.transpose();
+    Eigen::VectorXd dlambda = solution.segment(displacement.size(), d_C.rows());
+
+    Eigen::VectorXd rhs_lambda = CT * dlambda;
+
+    // std::cout << rhs << std::endl;
+    std::cout << rhs_lambda << std::endl;
+
     
-    rhs = d_P - rhs;
+    rhs = d_P - rhs - rhs_lambda;
 
     
 
     linear_solver(d_K, rhs, d_C, d_G, solution);
 
     std::vector<double> displacement2(solution.data(), solution.data() + rhs.size());
+
+    toolbox::PrintVector(displacement2);
 
     // 进行后处理
     Post post2("tecplot2");
