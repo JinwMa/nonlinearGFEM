@@ -19,8 +19,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     message(STATUS "The operating system is Linux")
-    set(MKLROOT "/home/majinwei/intel/oneapi/mkl/2024.2")
-    set(EIGEN3_INCLUDE_DIR "/home/majinwei/wal-nonlinearfem/eigen-3.4.0")
+    set(MKLROOT "/home/ma/intel/oneapi/mkl/2023.2.0")
+    set(EIGEN3_INCLUDE_DIR "/home/ma/work/wal-nonlinearfem/eigen-3.4.0")
 endif()
 # 添加包含目录
 include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
