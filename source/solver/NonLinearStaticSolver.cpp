@@ -63,47 +63,76 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
+    d_dP = d_P;
 
 }
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 {
-    for (int index = 0; index < d_dof_map->dof_size; index++)
-    {
-        d_u[index] = 0.0;
-        d_du[index] = 0.0;
-        d_ddu[index] = 0.0;
-    }
+    d_u.setZero();
+    d_du.setZero();
+    d_ddu.setZero();
+    d_lambda.setZero();
 
-
-    while(true)
+    int ii = 0;
+    d_dlambda.setZero();
+    d_internal_force.setZero();
+    while(ii < 100)
     {
+        std::cout << "++++++++++++++++++ load step" << ii + 1 << "++++++++"<< std::endl;   
         d_contral_param->load_step++;    
         d_contral_param->iteration_step = 0;
-        for (int index = 0; index < d_dof_map->dof_size; index++)
-        {
-            d_du[index] = 0.0;
-        }
+        d_du.setZero();
+        d_P = d_dP * (ii + 1);
         while(true)
         {
             d_contral_param->iteration_step++;
-            for (int index = 0; index < d_dof_map->dof_size; index++)
-            {
-                d_ddu[index] = 0.0;
-            }
-            Eigen::VectorXd rhs = Eigen::Map<Eigen::VectorXd>(d_internal_force.data(), d_internal_force.size());
-            rhs = d_P - rhs;
+            d_ddu.setZero();
+            d_ddlambda.setZero();
+            Eigen::SparseMatrix<double> Ct = d_C.transpose();             
+            d_rhs = d_P - d_internal_force - Ct * d_dlambda;            
+            if(checkConvergence()) break;
             Eigen::VectorXd solution;
-            linear_solver(d_K, rhs, d_C, d_G, solution);
+            linear_solver(d_K, d_rhs, d_C, d_G, solution);
+            d_ddu = solution.head(d_ddu.size());
+            d_ddlambda = solution.tail(d_ddlambda.size());
+            d_du = d_du + d_ddu;
+            d_dlambda = d_dlambda + d_ddlambda;
+            std::vector<double> temp(d_du.data(), d_du.data() + d_du.size());
+            setVectorToElementData(temp, d_dof_map.get(), d_element_data, "du");           
+            d_element_assembler->assembleElementStiffness(pinput, pmesh,
+                                                          d_dof_map.get(),
+                                                          d_element_data, 
+                                                          d_K,
+                                                          d_contral_param.get());
 
-            for (int index = 0; index < d_dof_map->dof_size; index++) d_ddu[index] = solution[index];
+            d_element_assembler->assembleElementVector(pinput, 
+                                                       pmesh, 
+                                                       d_dof_map.get(), 
+                                                       d_element_data, 
+                                                       temp, 
+                                                       d_contral_param.get());
 
-            for (int index = 0; index < d_dof_map->dof_size; index++) d_du[index] += d_ddu[index];
-            setVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");           
-            d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
-
-            d_element_assembler->assembleElementVector(pinput, pmesh, d_dof_map.get(), d_element_data, d_internal_force, d_contral_param.get());
-        }        
+            Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
+            d_internal_force = temp_eigen;
+        }   
+        d_u = d_u + d_du;     
+        std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
+        setVectorToElementData(temp, d_dof_map.get(), d_element_data, "u");
+        d_post->ShowDisplacement(pinput, pmesh, d_dof_map.get(), temp);
+        ii++;
     }
 
+}
+
+
+bool NonLinearStaticSolver::checkConvergence()
+{
+    double eps = 1.E-8;
+    double normal_rhs = toolbox::getEigenVectorNormal(d_rhs);
+    double normal_P = toolbox:: getEigenVectorNormal(d_P);
+    // std::cout << "rhs: " << normal_rhs << "  P: " << normal_P << std::endl;
+    std::cout << "the error is " << normal_rhs / normal_P << std::endl;
+    if (normal_rhs / normal_P < eps) return true;
+    else return false;    
 }

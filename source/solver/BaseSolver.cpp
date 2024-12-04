@@ -187,7 +187,7 @@ void BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration = end - start;
-    std::cout << "assembleK_AL: " << duration.count() << " ms" << std::endl;
+    if(std::getenv("CHECKSOLVER") != nullptr)std::cout << "assembleK_AL: " << duration.count() << " ms" << std::endl;
 
     // 设置PG向量
     Eigen::VectorXd PG(P.size() + G.size());

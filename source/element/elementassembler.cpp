@@ -85,7 +85,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
     auto end = std::chrono::high_resolution_clock::now();
     // 计算持续时间并转换为毫秒
     std::chrono::duration<double, std::milli> duration = end - start;
-    std::cout << "assemble stiffness time: " << duration.count() << " ms" << std::endl;
+    if(std::getenv("CHECKSOLVER") != nullptr)
+        std::cout << "assemble stiffness time: " << duration.count() << " ms" << std::endl;
 }
 
 

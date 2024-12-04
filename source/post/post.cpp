@@ -120,14 +120,19 @@ void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displace
     {
         int nodeid = pmesh->NodeIdList[i];
         int nodeorder = pmesh->NodeOrderInList[nodeid];
-        PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0];
-        PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1];
-        PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2];
+        // PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0];
+        // PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1];
+        // PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2];
 
         // int index = pdofmap->NodesIndex[nodeorder - 1];
         PostNodes[i].ux = displacement[pdofmap->getDofIndex(nodeid, "ux")];
         PostNodes[i].uy = displacement[pdofmap->getDofIndex(nodeid, "uy")];
         PostNodes[i].uz = displacement[pdofmap->getDofIndex(nodeid, "uz")];
+
+        
+        PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0] + PostNodes[i].ux;
+        PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1] + PostNodes[i].uy;
+        PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2] + PostNodes[i].uz;
     }
 }
 

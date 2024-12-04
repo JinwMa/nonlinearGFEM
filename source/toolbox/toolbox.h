@@ -6,6 +6,8 @@
 #include <vector>
 #include <cmath>
 #include <iomanip>
+#include <Eigen/Dense>
+
 
 using namespace std;
 
@@ -165,6 +167,20 @@ public:
             std::cout << std::endl;
         }
     }
+
+
+    static double getEigenVectorNormal(Eigen::VectorXd & a)
+    {
+        double normal = 0.0;
+        int size = a.size();
+        for (int i = 0; i < size; i++)
+        {
+            normal += a[i] * a[i];
+        }
+        return std::sqrt(normal);
+    }
+
+
 };
 
 #endif

@@ -17,20 +17,24 @@ class NonLinearStaticSolver : public BaseSolver
     void init(Input * pinput, Mesh * pmesh) override;
 
     void initData(Input * pinput, Mesh * pmesh);
+
+    private:
+
+    bool checkConvergence();
     
     private:
     // std::vector<ObjectElement> d_elements_data;
-    std::vector<double> d_u;
-    std::vector<double> d_du;
-    std::vector<double> d_ddu;
+    Eigen::VectorXd d_u;
+    Eigen::VectorXd d_du;
+    Eigen::VectorXd d_ddu;
 
-    std::vector<double> d_lambda;
-    std::vector<double> d_dlambda;
-    std::vector<double> d_ddlambda;
+    Eigen::VectorXd d_lambda;
+    Eigen::VectorXd d_dlambda;
+    Eigen::VectorXd d_ddlambda;
 
     
-    std::vector<double> d_internal_force;
-    std::vector<double> d_rhs;
+    Eigen::VectorXd d_internal_force;
+    Eigen::VectorXd d_rhs;
 
     
     std::shared_ptr<ConstraintManager> d_constraint_manager;
@@ -43,6 +47,8 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::SparseMatrix<double> d_K;
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
+    Eigen::VectorXd d_dP;
+
 
 };
 
