@@ -13,7 +13,7 @@ class NonLinearStaticSolver : public BaseSolver
         std::cout << "delete NonLinearStaticSolver" << std::endl;
     }
     void solve(Input * pinput, Mesh * pmesh);
-    void takeDB(Input * pinput) {};
+    void takeDB(Input * pinput, const std::string & name);
     void init(Input * pinput, Mesh * pmesh) override;
 
     void initData(Input * pinput, Mesh * pmesh);
@@ -27,16 +27,9 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::VectorXd d_u;
     Eigen::VectorXd d_du;
     Eigen::VectorXd d_ddu;
-
-    Eigen::VectorXd d_lambda;
-    Eigen::VectorXd d_dlambda;
-    Eigen::VectorXd d_ddlambda;
-
-    
+    Eigen::VectorXd d_lambda;    
     Eigen::VectorXd d_internal_force;
-    Eigen::VectorXd d_rhs;
-
-    
+    Eigen::VectorXd d_rhs;    
     std::shared_ptr<ConstraintManager> d_constraint_manager;
     std::shared_ptr<LoadManger> d_load_manager;
     std::shared_ptr<ElementAssembler> d_element_assembler;
@@ -48,6 +41,8 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
     Eigen::VectorXd d_dP;
+
+    int d_num_load_step = 10;
 
 
 };

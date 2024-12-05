@@ -15,7 +15,7 @@ class LinearStaticSolver : public BaseSolver
         std::cout << "delete LinearStaticSolver" << std::endl;
     }
     void solve(Input * pinput, Mesh * pmesh);
-    void takeDB(Input * pinput);
+    void takeDB(Input * pinput, std::string & name);
     void init(Input * pinput, Mesh * pmesh);
     
     private:

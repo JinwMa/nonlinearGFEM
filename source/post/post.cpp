@@ -59,7 +59,7 @@ void Post::onlymesh(Mesh *pmesh)
     outputFile.close();
 }
 
-void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displacement)
+void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
 {
     string filename = outputFilename + "_displacement.dat";
     std::ofstream outputFile(filename); // 打开文件
@@ -113,7 +113,7 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displa
     outputFile.close();
 }
 
-void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> displacement)
+void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
 {
     PostNodes.resize(pmesh->actual_node_count);
     for (int i = 0; i < pmesh->actual_node_count; i++)
@@ -297,7 +297,7 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
 
 
 
-void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vector<double> displacement)
+void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
 {
     string filename = outputFilename + "_displacement.dat";
     std::ofstream outputFile(filename, std::ios::app); // 打开文件

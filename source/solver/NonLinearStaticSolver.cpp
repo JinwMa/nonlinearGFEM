@@ -1,6 +1,12 @@
 #include "NonLinearStaticSolver.h"
 
 
+void NonLinearStaticSolver::takeDB(Input * pinput, const std::string & name)
+{
+    if (pinput->ifExist(name + "_load_steps")) d_num_load_step = pinput->getInt(name + "_load_steps");
+    std::cout << "number of load steps is " << d_num_load_step << std::endl;
+}
+
 void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
 {
     BaseSolver::init(pinput, pmesh);
@@ -45,11 +51,16 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_ddu.resize(dof_size);
     int num_constrain_equations = d_C.rows();
     d_lambda.resize(num_constrain_equations);
-    d_dlambda.resize(num_constrain_equations);
-    d_ddlambda.resize(num_constrain_equations);
-
     d_internal_force.resize(dof_size);
     d_rhs.resize(dof_size);
+
+    d_u.setZero();
+    d_du.setZero();
+    d_ddu.setZero();
+    d_lambda.setZero();
+
+    d_internal_force.setZero();
+    d_rhs.setZero();
 
 
 
@@ -63,21 +74,15 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
-    d_dP = d_P;
+    d_dP = d_P / d_num_load_step;
 
 }
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 {
-    d_u.setZero();
-    d_du.setZero();
-    d_ddu.setZero();
-    d_lambda.setZero();
-
+    
     int ii = 0;
-    d_dlambda.setZero();
-    d_internal_force.setZero();
-    while(ii < 100)
+    while(ii < d_num_load_step)
     {
         std::cout << "++++++++++++++++++ load step" << ii + 1 << "++++++++"<< std::endl;   
         d_contral_param->load_step++;    
@@ -87,17 +92,15 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         while(true)
         {
             d_contral_param->iteration_step++;
-            d_ddu.setZero();
-            d_ddlambda.setZero();
-            Eigen::SparseMatrix<double> Ct = d_C.transpose();             
-            d_rhs = d_P - d_internal_force - Ct * d_dlambda;            
+            d_ddu.setZero();                        
+            d_rhs = d_P - d_internal_force; 
+            std::cout << "    ------- iteration " << d_contral_param->iteration_step << "  ";           
             if(checkConvergence()) break;
             Eigen::VectorXd solution;
             linear_solver(d_K, d_rhs, d_C, d_G, solution);
             d_ddu = solution.head(d_ddu.size());
-            d_ddlambda = solution.tail(d_ddlambda.size());
+            d_lambda = solution.tail(d_lambda.size());
             d_du = d_du + d_ddu;
-            d_dlambda = d_dlambda + d_ddlambda;
             std::vector<double> temp(d_du.data(), d_du.data() + d_du.size());
             setVectorToElementData(temp, d_dof_map.get(), d_element_data, "du");           
             d_element_assembler->assembleElementStiffness(pinput, pmesh,
@@ -129,7 +132,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 bool NonLinearStaticSolver::checkConvergence()
 {
     double eps = 1.E-8;
-    double normal_rhs = toolbox::getEigenVectorNormal(d_rhs);
+    Eigen::SparseMatrix<double> Ct = d_C.transpose(); 
+    Eigen::VectorXd temp = d_rhs - Ct * d_lambda;
+    double normal_rhs = toolbox::getEigenVectorNormal(temp);
     double normal_P = toolbox:: getEigenVectorNormal(d_P);
     // std::cout << "rhs: " << normal_rhs << "  P: " << normal_P << std::endl;
     std::cout << "the error is " << normal_rhs / normal_P << std::endl;

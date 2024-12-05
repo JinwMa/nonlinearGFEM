@@ -37,7 +37,8 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
 {
     // 开始计时:
     auto start = std::chrono::high_resolution_clock::now();
-    K.resize(pdofmap->dof_size, pdofmap->dof_size);
+    if (contral_param->iteration_step == 0 && contral_param->load_step == 0)
+       K.resize(pdofmap->dof_size, pdofmap->dof_size);
     K.setZero();
     std::vector<Eigen::Triplet<double>> finalTripletList;
 

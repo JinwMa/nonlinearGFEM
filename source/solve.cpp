@@ -25,7 +25,7 @@ void solve(Input * pinput, Mesh * pmesh)
         {
             toolbox::error("not support type of solver: " + solver_type);
         }
-        structsolver->takeDB(pinput);
+        structsolver->takeDB(pinput, solver_name[i]);
         structsolver->init(pinput, pmesh);
         structsolver->solve(pinput, pmesh);
         delete structsolver;

@@ -15,7 +15,7 @@ void LinearStaticSolver::init(Input * pinput, Mesh * pmesh)
     d_dof_map = std::make_shared<Dof_Map>(pmesh);
 }
 
-void LinearStaticSolver::takeDB(Input * pinput)
+void LinearStaticSolver::takeDB(Input * pinput, std::string & name)
 {
 }
 

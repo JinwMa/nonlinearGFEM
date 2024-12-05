@@ -48,7 +48,7 @@ public:
 
     virtual void solve(Input * pinput, Mesh * pmesh) = 0;
     virtual void takeDB() {};
-    virtual void takeDB(Input * pinput) {};
+    virtual void takeDB(Input * pinput, const std::string & name) {};
     virtual void init(Input * pinput, Mesh * pmesh);
     virtual void deallocate(){};
 
