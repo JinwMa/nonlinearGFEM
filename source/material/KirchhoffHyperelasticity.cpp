@@ -4,6 +4,7 @@ void KirchhoffHyperelasticity::takeDB(Input *pinput, std::string &name)
 {
     E = pinput->getDouble(name + "_modulus");
     u = pinput->getDouble(name + "_radio");
+    getC_e_tensor(d_C_e_tensor);
 }
 
 void KirchhoffHyperelasticity::transe_C_SE_to_Ct(const double C_e_tensor[3][3][3][3],
@@ -92,4 +93,28 @@ void KirchhoffHyperelasticity::getPK2(const double C[3][3][3][3], const double F
 void KirchhoffHyperelasticity::getCt(const double Ce[3][3][3][3], const double F[3][3], const double jkb, double Ct[3][3][3][3])
 {
     transe_C_SE_to_Ct(Ce, F, jkb, Ct);
+}
+
+void KirchhoffHyperelasticity::updateStressOnIntegrationPoint(ObjectElementData & element_data,
+                                                              const int ip_order,
+                                                              double Ct[3][3][3][3])
+{
+    auto & stress_n1 = element_data.stress_n1[ip_order];
+    auto & F_n1 = element_data.F_n1[ip_order];
+    double F[3][3] = {0};
+    for (int i = 0; i < 3; i++)
+      for (int j = 0; j < 3; j++)
+        F[i][j] = F_n1[i][j];
+
+    double jkb = element_data.jkb_n1[ip_order];
+
+    double stress[3][3] = {0};
+
+    getStress(d_C_e_tensor, F, jkb, stress);
+
+    for (int i = 0; i < 3; i++)
+      for (int j = 0; j < 3; j++)
+        stress_n1[i][j] = stress[i][j];
+
+    getCt(d_C_e_tensor, F, jkb, Ct);
 }

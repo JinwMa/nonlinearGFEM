@@ -10,6 +10,7 @@
 #include"input.h"
 #include"mesh.h"
 #include"toolbox.h"
+#include "ObjectElementData.h"
 
 class BaseMaterial
 {
@@ -24,12 +25,15 @@ class BaseMaterial
 
     virtual void getStress(const double C[3][3][3][3], const double F[3][3], const double jkb, double stress[3][3]){};
 
-    
+    virtual void updateStressOnIntegrationPoint(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]){};
 
 
 public:
     double E = 0.0;
     double u = 0.0;
+
+    protected:
+    double d_C_e_tensor[3][3][3][3];
 };
 
 

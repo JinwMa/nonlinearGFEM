@@ -4,4 +4,5 @@ void LinearElasticity::takeDB(Input * pinput, std::string & name)
 {
     E = pinput->getDouble(name + "_modulus");
     u = pinput->getDouble(name + "_radio");
+    getC_e_tensor(d_C_e_tensor);
 }

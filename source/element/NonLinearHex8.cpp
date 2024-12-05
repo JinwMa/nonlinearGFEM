@@ -33,9 +33,6 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
     // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(element_data);
 
-    // 为了openmp并行，在单元内部维护材料参数
-    double C_e_tensor[3][3][3][3] = {0.0}; //弹性模量
-    pmaterial->getC_e_tensor(C_e_tensor);
     double Ct[3][3][3][3] = {0.0};         //切线模量
 
     // 循环所有积分点
@@ -51,7 +48,6 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
         double stress[3][3] = {0.0};
         double JKB = element_data.JKB[i]; // 母单元映射雅可比
         double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
-        // pmaterial->getDt(elementdata.F_on_Gauss_points[i], elementdata.jkb[i], D);
 
         double F[3][3] = {0.0};
         double Finv[3][3] = {0.0};
@@ -63,26 +59,16 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
                 Finv[ii][jj] = element_data.Finv_n1[i][ii][jj];                
             }
         }
-        pmaterial->getCt(C_e_tensor, F, jkb, Ct);
+
+        pmaterial->updateStressOnIntegrationPoint(element_data, i, Ct);
         pmaterial->transeCtoD(Ct, D);
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
             {
-                stress[ii][jj] = element_data.stress_n[i][ii][jj];
+               stress[ii][jj] = element_data.stress_n1[i][ii][jj];
             }
-        }
-        pmaterial->getStress(C_e_tensor, F, jkb, stress);
-
-        for (int ii = 0; ii < 3; ii++)
-        {
-            for (int jj = 0; jj < 3; jj++)
-            {
-                element_data.stress_n1[i][ii][jj] = stress[ii][jj];
-            }
-        }
-
-       
+        }       
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
