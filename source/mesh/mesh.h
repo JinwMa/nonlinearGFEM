@@ -7,6 +7,7 @@
 
 #include "input.h"
 #include "toolbox.h"
+#include "ObjectBody.h"
 
 
 using namespace std;
@@ -31,33 +32,31 @@ public:
     map<int, vector<int>> element_sets;
     map<int, vector<vector<int>>> segment_sets;
     unordered_map<int, string> element_setname;
-    // map<int, int> NodeOrderInList;
-    // map<int, int> ElementOrderInList;
 
-    int NodeOrderInList[maxnum_node] = {};
-    int ElementOrderInList[maxnum_element] = {};
+    map<int, ObjectBody> bodies;
 
-    // unordered_map<int, int> NodeOrderInList;
-    // unordered_map<int, int> ElementOrderInList;
+    unordered_map<int, int> NodeOrderInList;
+    unordered_map<int, int> ElementOrderInList;
 
     unordered_map<int, vector<int>>ElementsOfNodes;
-
-
-    // std::vector<std::vector<int>> mesh_element;
-    // std::vector<std::vector<double>> mesh_node;
-    // std::vector<int> node_ids;
-    // std::vector<int> element_ids;
-    Mesh(Input * pinput, const std::string &filename) : meshfilename(filename)//,
-                                        // mesh_element(maxnum_element),
-                                        // mesh_node(maxnum_node),
-                                        // node_ids(maxnum_node),
-                                        // element_ids(maxnum_element)
+    Mesh(Input * pinput, const std::string &filename) : meshfilename(filename)
     {
         readmeshfile();
         checkmesh();
         getElementSetName(pinput);
     }
     void checkmesh();
+
+    int getNodeLocalId(const int node_global_id)
+    {
+        return NodeOrderInList[node_global_id] - 1;
+    }
+    int getElementId(const int element_global_id)
+    {
+        return ElementOrderInList[element_global_id] - 1;
+    }
+
+
 
 private:
     void readmeshfile();
