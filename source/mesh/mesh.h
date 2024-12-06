@@ -23,6 +23,8 @@ public:
     int d_actual_node_count = 0;
     int d_max_nodeid = 0;
     int d_max_elementid = 0;
+
+    map<int, vector<vector<int>>> d_element_face_node_order;
     std::vector<int> d_element_type;
     std::vector<int> d_node_list;
     std::vector<int> d_element_list;
@@ -43,6 +45,7 @@ public:
     unordered_map<int, vector<int>>d_elements_of_nodes;
     Mesh(Input * pinput, const std::string &filename) : d_mesh_filename(filename)
     {
+        buildElementFaceNodeOrder();
         readmeshfile();
         checkmesh();
         getElementSetName(pinput);
@@ -66,6 +69,7 @@ private:
     void getElementSetName(Input * pinput);
     void buildElementsOfNodes();
     void buildBodies(Input * pinput);
+    void buildElementFaceNodeOrder();
 };
 
 #endif // FILE1_H

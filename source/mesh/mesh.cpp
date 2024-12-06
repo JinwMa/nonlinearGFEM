@@ -428,26 +428,67 @@ void Mesh::buildElementsOfNodes()
 
 void Mesh::buildBodies(Input * pinput)
 {
-//     if (!pinput->ifExist("body_list")) return;
-//     std::vector<std::string> body_list = pinput->getVectorString("body_list");
-//     int body_id = 0;
-//     for (auto body_name : body_list)
-//     {
-//         if (pinput->ifExist(body_name + "_element_ids"))
-//         {
-//             std::vector<int> element_ids = pinput->getVectorInt(body_name + "_element_ids");
-//             bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
-//         }
-//         if (pinput->ifExist(body_name + "_element_sets"))
-//         {
-//             std::vector<int> d_element_sets = pinput->getVectorInt(body_name + "_element_sets");
-//             for (int ii : d_element_sets)
-//             {
-//                 const auto & element_ids = el
-//             }
+    if (!pinput->ifExist("body_list")) return;
+    std::vector<std::string> body_list = pinput->getVectorString("body_list");
+    int body_id = 0;
+    for (auto body_name : body_list)
+    {
+        d_body_name_map_to_id[body_name] = body_id;
+        if (pinput->ifExist(body_name + "_element_ids"))
+        {
+            std::vector<int> element_ids = pinput->getVectorInt(body_name + "_element_ids");
+            d_bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
+        }
+        if (pinput->ifExist(body_name + "_element_sets"))
+        {
+            std::vector<int> element_sets = pinput->getVectorInt(body_name + "_element_sets");
+            for (int ii : element_sets)
+            {
+                const auto & element_ids = d_element_sets[ii];
+                d_bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
+            }
+        }
+        body_id++;
+    }
 
-//         }
-//     }
+    // for (auto it : d_body_name_map_to_id)
+    // {
+    //     std::cout << it.first << " " << it.second << std::endl;
+    // }
 
-//     exit(0);
+    // for (auto it : d_bodies)
+    // {
+    //     std::cout << "body id = " << it.first << std::endl;
+    //     for (auto it2 : it.second.Element_ids)
+    //     {
+    //         std::cout << "      element id = " << it2 << std::endl;
+    //     }
+    // }
+
+    // exit(0);
+}
+
+void Mesh::buildElementFaceNodeOrder()
+{
+    /*
+    1 -- Hex8
+    2 -- Tet4
+    */
+   std::vector<std::vector<int>> Hex8;
+   Hex8.resize(6);
+   Hex8[0] = {0, 3, 2, 1};
+   Hex8[1] = {4, 5, 6, 7};
+   Hex8[2] = {0, 1, 5, 4};
+   Hex8[3] = {1, 2, 6, 5};
+   Hex8[4] = {2, 3, 7, 6};
+   Hex8[6] = {0, 4, 7, 3};
+   std::vector<std::vector<int>> Tet4;
+   Tet4.resize(4);
+   Tet4[0] = {0, 2, 1};
+   Tet4[1] = {0, 1, 3};
+   Tet4[2] = {0, 3, 2};
+   Tet4[3] = {1, 2, 3};
+
+   d_element_face_node_order[1] = Hex8;
+   d_element_face_node_order[2] = Tet4;
 }
