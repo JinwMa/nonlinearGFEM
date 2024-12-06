@@ -120,9 +120,9 @@ void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displa
     {
         int nodeid = pmesh->NodeIdList[i];
         int nodeorder = pmesh->NodeOrderInList[nodeid];
-        // PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0];
-        // PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1];
-        // PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2];
+        PostNodes[i].X = pmesh->NodesCoordinate[nodeorder - 1][0];
+        PostNodes[i].Y = pmesh->NodesCoordinate[nodeorder - 1][1];
+        PostNodes[i].Z = pmesh->NodesCoordinate[nodeorder - 1][2];
 
         // int index = pdofmap->NodesIndex[nodeorder - 1];
         PostNodes[i].ux = displacement[pdofmap->getDofIndex(nodeid, "ux")];
@@ -164,9 +164,9 @@ void Post::check_error(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
 
     for (int i = 0; i < PostNodes.size(); i++)
     {
-        uxext[i] += tx[0] + tx[1] * PostNodes[i].x + tx[2] * PostNodes[i].y + tx[3] * PostNodes[i].z;
-        uyext[i] += ty[0] + ty[1] * PostNodes[i].x + ty[2] * PostNodes[i].y + ty[3] * PostNodes[i].z;
-        uzext[i] += tz[0] + tz[1] * PostNodes[i].x + tz[2] * PostNodes[i].y + tz[3] * PostNodes[i].z;
+        uxext[i] += tx[0] + tx[1] * PostNodes[i].X + tx[2] * PostNodes[i].Y + tx[3] * PostNodes[i].Z;
+        uyext[i] += ty[0] + ty[1] * PostNodes[i].X + ty[2] * PostNodes[i].Y + ty[3] * PostNodes[i].Z;
+        uzext[i] += tz[0] + tz[1] * PostNodes[i].X + tz[2] * PostNodes[i].Y + tz[3] * PostNodes[i].Z;
 
         uxnum[i] = PostNodes[i].ux;
         uynum[i] = PostNodes[i].uy;

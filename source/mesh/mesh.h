@@ -37,6 +37,9 @@ public:
     int NodeOrderInList[maxnum_node] = {};
     int ElementOrderInList[maxnum_element] = {};
 
+    // unordered_map<int, int> NodeOrderInList;
+    // unordered_map<int, int> ElementOrderInList;
+
     unordered_map<int, vector<int>>ElementsOfNodes;
 
 
