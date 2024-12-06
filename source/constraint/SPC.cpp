@@ -18,6 +18,10 @@ void SPC::takeDB(Input *pinput, Mesh *pmesh)
         else
             toolbox::error("the node_set of" + name + " does not exist");
     }
+    else if (nodes_type == "node_ids")
+    {
+        d_node_ids = pinput->getVectorInt(name + "_node_ids");
+    }
     else
     {
         toolbox::error("not found " + name + "nodes_type");

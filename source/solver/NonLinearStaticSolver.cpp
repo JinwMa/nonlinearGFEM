@@ -75,7 +75,9 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
     d_dP = d_P / d_num_load_step;
-
+    d_dG = d_G / d_num_load_step;
+    d_dP.setZero();
+    d_rhs_G.resize(d_G.size());
 }
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
@@ -89,15 +91,17 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         d_contral_param->iteration_step = 0;
         d_du.setZero();
         d_P = d_dP * (ii + 1);
+        d_G = d_dG * (ii + 1);
         while(true)
         {
             d_contral_param->iteration_step++;
             d_ddu.setZero();                        
             d_rhs = d_P - d_internal_force; 
-            std::cout << "    ------- iteration " << d_contral_param->iteration_step << "  ";           
-            if(checkConvergence()) break;
+            d_rhs_G = d_G - d_C * (d_u + d_du);
+            std::cout << "    ------- iteration " << d_contral_param->iteration_step << std::endl;;           
+            if(checkConvergence()) break;            
             Eigen::VectorXd solution;
-            linear_solver(d_K, d_rhs, d_C, d_G, solution);
+            linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
             d_ddu = solution.head(d_ddu.size());
             d_lambda = solution.tail(d_lambda.size());
             d_du = d_du + d_ddu;
@@ -131,13 +135,31 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
 bool NonLinearStaticSolver::checkConvergence()
 {
+    //判断收敛需要执行两条标准：力和约束
+    bool force_convergence = false;
+    bool constraint_convergence = false;
+
     double eps = 1.E-8;
     Eigen::SparseMatrix<double> Ct = d_C.transpose(); 
     Eigen::VectorXd temp = d_rhs - Ct * d_lambda;
     double normal_rhs = toolbox::getEigenVectorNormal(temp);
     double normal_P = toolbox:: getEigenVectorNormal(d_P);
-    // std::cout << "rhs: " << normal_rhs << "  P: " << normal_P << std::endl;
-    std::cout << "the error is " << normal_rhs / normal_P << std::endl;
-    if (normal_rhs / normal_P < eps) return true;
-    else return false;    
+    if (normal_P < eps)
+    {
+        std::cout << "\t" << " the iteration error of force is " << normal_rhs << std::endl;
+        if (normal_rhs < eps * 1.e2) force_convergence = true;
+    }
+    else 
+    {
+        std::cout << "\t" << " the iteration error of force is " << normal_rhs / normal_P << std::endl;
+        if (normal_rhs / normal_P < eps)
+            force_convergence = true;
+    }
+
+    double normal_rhs_G = toolbox::getEigenVectorNormal(d_rhs_G);
+    std::cout << "\t" << " the iteration error of constrain is " << normal_rhs_G << std::endl;
+    if (normal_rhs_G < eps) constraint_convergence = true;
+
+    return constraint_convergence && force_convergence;
+
 }

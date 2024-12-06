@@ -41,7 +41,9 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
     Eigen::VectorXd d_dP;
+    Eigen::VectorXd d_dG;
 
+    Eigen::VectorXd d_rhs_G;
     int d_num_load_step = 10;
 
 
