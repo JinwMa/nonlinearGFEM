@@ -127,11 +127,11 @@ void solve(Input * pinput, Mesh * pmesh)
 // //     vector<Equation> Equations;
 // //     vector<int> constrained_node_ids;
 
-// //     for (int i = 0; i < mesh.actual_node_count; i++) // 循环所有的节点
+// //     for (int i = 0; i < mesh.d_actual_node_count; i++) // 循环所有的节点
 // //     {
-// //         double x = mesh.NodesCoordinate[mesh.NodeOrderInList[mesh.NodeIdList[i]] - 1][0];
-// //         double y = mesh.NodesCoordinate[mesh.NodeOrderInList[mesh.NodeIdList[i]] - 1][1];
-// //         double z = mesh.NodesCoordinate[mesh.NodeOrderInList[mesh.NodeIdList[i]] - 1][2];
+// //         double x = mesh.d_nodes_coordinate[mesh.d_node_order_in_list[mesh.d_node_list[i]] - 1][0];
+// //         double y = mesh.d_nodes_coordinate[mesh.d_node_order_in_list[mesh.d_node_list[i]] - 1][1];
+// //         double z = mesh.d_nodes_coordinate[mesh.d_node_order_in_list[mesh.d_node_list[i]] - 1][2];
 // //         if (std::fabs(x) < eps)
 // //         {
 // //             constrained_node_ids.push_back(i + 1);
@@ -160,11 +160,11 @@ void solve(Input * pinput, Mesh * pmesh)
 // //     for (int i = 0; i < constrained_node_ids.size(); i++)
 // //     {
 // //         int n = constrained_node_ids[i];  // 节点编号
-// //         int nn = mesh.NodeOrderInList[n]; // 节点坐标的存储位置
+// //         int nn = mesh.d_node_order_in_list[n]; // 节点坐标的存储位置
 
-// //         double x = mesh.NodesCoordinate[nn - 1][0];
-// //         double y = mesh.NodesCoordinate[nn - 1][1];
-// //         double z = mesh.NodesCoordinate[nn - 1][2];
+// //         double x = mesh.d_nodes_coordinate[nn - 1][0];
+// //         double y = mesh.d_nodes_coordinate[nn - 1][1];
+// //         double z = mesh.d_nodes_coordinate[nn - 1][2];
 // //         for (int j = 0; j < 3; j++)
 // //         {
 // //             Equation equation;
@@ -190,7 +190,7 @@ void solve(Input * pinput, Mesh * pmesh)
 // //         }
 // //     }
 
-// //     int num_dofs = mesh.actual_node_count * 3;
+// //     int num_dofs = mesh.d_actual_node_count * 3;
 // //     int num_dof_constrain = Equations.size();
 // //     int num_all = num_dofs + num_dof_constrain;
 // //     Eigen::SparseMatrix<double> K(num_all, num_all);
@@ -209,19 +209,19 @@ void solve(Input * pinput, Mesh * pmesh)
 // //     auto elem = new LinearHex8;
 // //     elem->SetGaussIntegration(GaussPoint);
 // //     delete elem;
-// //     for (int element_now = 0; element_now < mesh.actual_element_count; element_now++)
+// //     for (int element_now = 0; element_now < mesh.d_actual_element_count; element_now++)
 // //     {
-// //         int element_id = mesh.ElementIdList[element_now];
-// //         int element_location = mesh.ElementOrderInList[element_id];
-// //         vector<int> node_ids_in_a_element = mesh.NodesOnElements[element_location - 1];
+// //         int element_id = mesh.d_element_list[element_now];
+// //         int element_location = mesh.d_element_order_in_list[element_id];
+// //         vector<int> node_ids_in_a_element = mesh.d_nodes_on_elements[element_location - 1];
 // //         auto elem = new LinearHex8;
 // //         double nodes_coordinates[8][3];
 // //         for (int i = 0; i < 8; i++)
 // //             for (int j = 0; j < 3; j++)
 // //             {
 // //                 int node_id = node_ids_in_a_element[i];
-// //                 int node_location = mesh.NodeOrderInList[node_id];
-// //                 nodes_coordinates[i][j] = mesh.NodesCoordinate[node_location - 1][j];
+// //                 int node_location = mesh.d_node_order_in_list[node_id];
+// //                 nodes_coordinates[i][j] = mesh.d_nodes_coordinate[node_location - 1][j];
 // //             }
 
 // //         double elementmat[24][24];

@@ -14,46 +14,49 @@ using namespace std;
 class Mesh
 {    
 private:
-    static const int maxnum_element = 300000;
-    static const int maxnum_node = 300000;
-    std::string meshfilename;
+    static const int d_maxnum_element = 300000;
+    static const int d_maxnum_node = 300000;
+    std::string d_mesh_filename;
 
 public:
-    int actual_element_count = 0;
-    int actual_node_count = 0;
-    int max_nodeid = 0;
-    int max_elementid = 0;
-    std::vector<int> NodeIdList;
-    std::vector<int> ElementIdList;
-    std::vector<std::vector<double>> NodesCoordinate;
-    std::vector<std::vector<int>> NodesOnElements;
+    int d_actual_element_count = 0;
+    int d_actual_node_count = 0;
+    int d_max_nodeid = 0;
+    int d_max_elementid = 0;
+    std::vector<int> d_element_type;
+    std::vector<int> d_node_list;
+    std::vector<int> d_element_list;
+    std::vector<std::vector<double>> d_nodes_coordinate;
+    std::vector<std::vector<int>> d_nodes_on_elements;
 
-    map<int, vector<int>> node_sets;
-    map<int, vector<int>> element_sets;
-    map<int, vector<vector<int>>> segment_sets;
-    unordered_map<int, string> element_setname;
+    map<int, vector<int>> d_node_sets;
+    map<int, vector<int>> d_element_sets;
+    map<int, vector<vector<int>>> d_segment_sets;
+    unordered_map<int, string> d_element_set_name;
 
-    map<int, ObjectBody> bodies;
+    map<int, ObjectBody> d_bodies;
+    map<std::string, int> d_body_name_map_to_id;
 
-    unordered_map<int, int> NodeOrderInList;
-    unordered_map<int, int> ElementOrderInList;
+    unordered_map<int, int> d_node_order_in_list;
+    unordered_map<int, int> d_element_order_in_list;
 
-    unordered_map<int, vector<int>>ElementsOfNodes;
-    Mesh(Input * pinput, const std::string &filename) : meshfilename(filename)
+    unordered_map<int, vector<int>>d_elements_of_nodes;
+    Mesh(Input * pinput, const std::string &filename) : d_mesh_filename(filename)
     {
         readmeshfile();
         checkmesh();
         getElementSetName(pinput);
+        buildBodies(pinput);
     }
     void checkmesh();
 
     int getNodeLocalId(const int node_global_id)
     {
-        return NodeOrderInList[node_global_id] - 1;
+        return d_node_order_in_list[node_global_id] - 1;
     }
-    int getElementId(const int element_global_id)
+    int getElementLocalId(const int element_global_id)
     {
-        return ElementOrderInList[element_global_id] - 1;
+        return d_element_order_in_list[element_global_id] - 1;
     }
 
 
@@ -62,6 +65,7 @@ private:
     void readmeshfile();
     void getElementSetName(Input * pinput);
     void buildElementsOfNodes();
+    void buildBodies(Input * pinput);
 };
 
 #endif // FILE1_H

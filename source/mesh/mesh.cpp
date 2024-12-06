@@ -10,10 +10,10 @@
 void Mesh::readmeshfile()
 {    
     std::streampos pos;
-    std::ifstream inputFile(meshfilename); // 打开文件
+    std::ifstream inputFile(d_mesh_filename); // 打开文件
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << meshfilename << std::endl;
+        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
     }
     std::string line;
     while (std::getline(inputFile, line))
@@ -25,8 +25,37 @@ void Mesh::readmeshfile()
         std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
 
 
-        if (line_lower.substr(0, 8) == "*element")
+        if (line_lower.substr(0, 8) == "*element" && line_lower.substr(8, 8) != "_")
         {
+            int element_type = -1;
+            std::string typeValue;
+            size_t typePos = line_lower.find("type=");
+            if (typePos != std::string::npos)
+            {
+                // 提取从 "type=" 开始的子字符串，并跳过 "type=" 的长度
+                size_t start = typePos + 5;         // 5是"type="的长度
+                size_t end = line.find(',', start); // 找到下一个逗号的位置
+                if (end != std::string::npos)
+                {
+                    // 如果找到逗号，截取到逗号前的内容
+                    typeValue = line.substr(start, end - start);
+                }
+                else
+                {
+                    // 如果没有逗号，直接截取到字符串末尾
+                    typeValue = line.substr(start);
+                }
+            }
+            else
+            {
+               toolbox::error("Type not found in the line! " +  line);
+            }
+            if (typeValue.substr(0, 4) == "C3D4") element_type = 2;
+            else if (typeValue.substr(0, 4) == "C3D8") element_type = 1;
+            else
+            {
+                toolbox::error("not support type of element " + typeValue);
+            }
             while (true)
             {
                 pos = inputFile.tellg();
@@ -49,7 +78,7 @@ void Mesh::readmeshfile()
                 int element_id;
                 iss >> element_id;
 
-                if (element_id >= maxnum_element || element_id < 1)
+                if (element_id >= d_maxnum_element || element_id < 1)
                 {
                     std::cerr << "错误:元素ID超出范围: (过大或出现0及负值)" << element_id << std::endl;
                     exit(0);
@@ -65,12 +94,13 @@ void Mesh::readmeshfile()
                 }                
                 if (!aelement.empty())
                 {         
-                    NodesOnElements.push_back(aelement);           
-                    ++actual_element_count;
-                    // element_ids[actual_element_count - 1] = element_id;
-                    ElementIdList.push_back(element_id);
-                    ElementOrderInList[element_id] = actual_element_count;
-                    if (element_id > max_elementid) max_elementid = element_id;
+                    d_nodes_on_elements.push_back(aelement);           
+                    ++d_actual_element_count;
+                    // element_ids[d_actual_element_count - 1] = element_id;
+                    d_element_list.push_back(element_id);
+                    d_element_type.push_back(element_type);
+                    d_element_order_in_list[element_id] = d_actual_element_count;
+                    if (element_id > d_max_elementid) d_max_elementid = element_id;
                 }
             }
         }
@@ -94,7 +124,7 @@ void Mesh::readmeshfile()
                 std::istringstream iss(line);
                 int node_id;
                 iss >> node_id;
-                if (node_id >= maxnum_node || node_id < 1)
+                if (node_id >= d_maxnum_node || node_id < 1)
                 {
                     std::cerr << "错误:节点ID超出范围:" << node_id << std::endl;
                     exit(0);
@@ -110,16 +140,16 @@ void Mesh::readmeshfile()
                 }                
                 if (!coordinates_of_one_node.empty())
                 {
-                    NodesCoordinate.push_back(coordinates_of_one_node);
-                    ++actual_node_count;
-                    // node_ids[actual_node_count - 1] = node_id;
-                    NodeIdList.push_back(node_id);
-                    NodeOrderInList[node_id] = actual_node_count;
-                    if (node_id > max_nodeid) max_nodeid = node_id;
+                    d_nodes_coordinate.push_back(coordinates_of_one_node);
+                    ++d_actual_node_count;
+                    // node_ids[d_actual_node_count - 1] = node_id;
+                    d_node_list.push_back(node_id);
+                    d_node_order_in_list[node_id] = d_actual_node_count;
+                    if (node_id > d_max_nodeid) d_max_nodeid = node_id;
                 }  
             }
         }
-        else if (line_lower.substr(0, 5) == "*nset" || line_lower.substr(0, 9) == "*node_set")
+        else if (line_lower.substr(0, 5) == "*nset")
         {
             int node_set_id;
             
@@ -149,7 +179,7 @@ void Mesh::readmeshfile()
                 throw std::runtime_error("Error: Integer value out of range.");
             }
 
-            if (node_sets.find(node_set_id) != node_sets.end())
+            if (d_node_sets.find(node_set_id) != d_node_sets.end())
             {
                 throw std::runtime_error("Error: Key already exists in the map.");
             }
@@ -181,11 +211,11 @@ void Mesh::readmeshfile()
                 int node_id;
                 while (iss >> node_id)
                 {
-                    node_sets[node_set_id].push_back(node_id);
+                    d_node_sets[node_set_id].push_back(node_id);
                 }
             }
         }
-        else if (line_lower.substr(0, 6) == "*elset" || line_lower.substr(0, 12) == "*element_set")
+        else if (line_lower.substr(0, 6) == "*elset" )
         {
             int element_set_id;
             
@@ -215,9 +245,9 @@ void Mesh::readmeshfile()
                 throw std::runtime_error("Error: Integer value out of range.");
             }
 
-            if (element_sets.find(element_set_id) != element_sets.end())
+            if (d_element_sets.find(element_set_id) != d_element_sets.end())
             {
-                throw std::runtime_error("Error: Key already exists in the map.");
+                throw std::runtime_error("Error: Key already exists in the ElementSet map.");
             }
 
             if (line.find_first_not_of("0123456789+-") != std::string::npos)
@@ -247,7 +277,7 @@ void Mesh::readmeshfile()
                 int element_id;
                 while (iss >> element_id)
                 {
-                    element_sets[element_set_id].push_back(element_id);
+                    d_element_sets[element_set_id].push_back(element_id);
                 }
             }
         }
@@ -282,7 +312,7 @@ void Mesh::readmeshfile()
                 throw std::runtime_error("Error: Integer value out of range.");
             }
 
-            if (segment_sets.find(segment_set_id) != segment_sets.end())
+            if (d_segment_sets.find(segment_set_id) != d_segment_sets.end())
             {
                 throw std::runtime_error("Error: Key already exists in the map.");
             }
@@ -320,7 +350,7 @@ void Mesh::readmeshfile()
                 }                
                 if (!asegment.empty())
                 {         
-                    segment_sets[segment_set_id].push_back(asegment);
+                    d_segment_sets[segment_set_id].push_back(asegment);
                 }
             }
         }
@@ -331,11 +361,19 @@ void Mesh::readmeshfile()
 
 void Mesh::checkmesh()
 {
-    if (!actual_node_count == NodeIdList.size())
+    if (!d_actual_node_count == d_node_list.size())
     throw std::runtime_error("单元中节点数目无法对齐");
 
-    if (!actual_element_count == ElementIdList.size())
+    if (!d_actual_element_count == d_element_list.size())
     throw std::runtime_error("单元中单元数目无法对齐");
+
+    if (!d_element_type.size() == d_actual_element_count)
+    throw std::runtime_error("单元类型数目没有对齐");
+
+    for (int i = 0; i < d_actual_element_count; i++)
+    {
+        if (d_element_type[i] == -1) toolbox::error("单元类型错误");
+    }
 }
 
 
@@ -365,7 +403,7 @@ void Mesh::getElementSetName(Input * pinput)
         for (int i = 0; i < element_ids.size(); i++)
         {
             int element_id = element_ids[i];
-            element_setname[element_id] = name;
+            d_element_set_name[element_id] = name;
         }
     }
 
@@ -374,15 +412,42 @@ void Mesh::getElementSetName(Input * pinput)
 void Mesh::buildElementsOfNodes()
 {
     //循环所有的单元
-    for (int i = 0; i < actual_element_count; i++)
+    for (int i = 0; i < d_actual_element_count; i++)
     {
-        int element_id = ElementIdList[i];
-        int element_order = ElementOrderInList[element_id] - 1;
+        int element_id = d_element_list[i];
+        int element_order = d_element_order_in_list[element_id] - 1;
         // 循环单元上的节点
-        for (int j = 0; j < NodesOnElements[element_order].size(); j++)
+        for (int j = 0; j < d_nodes_on_elements[element_order].size(); j++)
         {
-            int node_id = NodesOnElements[element_order][j];
-            ElementsOfNodes[node_id].push_back(element_id);
+            int node_id = d_nodes_on_elements[element_order][j];
+            d_elements_of_nodes[node_id].push_back(element_id);
         }
     }
+}
+
+
+void Mesh::buildBodies(Input * pinput)
+{
+//     if (!pinput->ifExist("body_list")) return;
+//     std::vector<std::string> body_list = pinput->getVectorString("body_list");
+//     int body_id = 0;
+//     for (auto body_name : body_list)
+//     {
+//         if (pinput->ifExist(body_name + "_element_ids"))
+//         {
+//             std::vector<int> element_ids = pinput->getVectorInt(body_name + "_element_ids");
+//             bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
+//         }
+//         if (pinput->ifExist(body_name + "_element_sets"))
+//         {
+//             std::vector<int> d_element_sets = pinput->getVectorInt(body_name + "_element_sets");
+//             for (int ii : d_element_sets)
+//             {
+//                 const auto & element_ids = el
+//             }
+
+//         }
+//     }
+
+//     exit(0);
 }

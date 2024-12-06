@@ -10,12 +10,12 @@ void RotateBodyForce::takeDB(Input * pinput, Mesh * pmesh, std::string name)
     d_angular_velocity = pinput->getDouble(name + "_rotation_angular_velocity");
     if (!pinput->ifExist(name + "_set_id"))
     {
-        d_element_ids = pmesh->ElementIdList;
+        d_element_ids = pmesh->d_element_list;
     }
     else
     {
         int set_id = pinput->getInt(name + "_set_id");
-        d_element_ids = pmesh->element_sets[set_id];
+        d_element_ids = pmesh->d_element_sets[set_id];
     }
 }
 
@@ -31,7 +31,7 @@ void RotateBodyForce::buildLoadVector(Input * pinput,
     for (int i = 0; i < d_element_ids.size(); i++)
     {
         int element_id = d_element_ids[i];
-        std::string element_set_name = pmesh->element_setname[element_id];
+        std::string element_set_name = pmesh->d_element_set_name[element_id];
         d_set_elements[element_set_name].push_back(element_id);
     }
     for (auto set_elements : d_set_elements)
@@ -58,16 +58,16 @@ void RotateBodyForce::buildLoadVector(Input * pinput,
         for (int i = 0; i < set_elements.second.size(); i++)
         {
             int element_id = set_elements.second[i];
-            int element_location = pmesh->ElementOrderInList[element_id];
-            std::vector<int> node_ids_in_a_element = pmesh->NodesOnElements[element_location - 1];
+            int element_location = pmesh->d_element_order_in_list[element_id];
+            std::vector<int> node_ids_in_a_element = pmesh->d_nodes_on_elements[element_location - 1];
             double nodes_coordinates[20][3] = {0.0, 0.0};
             // 拿到节点坐标
             for (int i = 0; i < pelement->numNodes; i++)
                 for (int j = 0; j < pelement->dim; j++)
                 {
                     int node_id = node_ids_in_a_element[i];
-                    int node_location = pmesh->NodeOrderInList[node_id];
-                    nodes_coordinates[i][j] = pmesh->NodesCoordinate[node_location - 1][j];
+                    int node_location = pmesh->d_node_order_in_list[node_id];
+                    nodes_coordinates[i][j] = pmesh->d_nodes_coordinate[node_location - 1][j];
                 }
 
             

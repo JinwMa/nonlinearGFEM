@@ -42,7 +42,7 @@ void ConstraintManager::takeDB(Input * pinput, Mesh * pmesh)
 Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh, Dof_Map * pdofmap)
 {
     //TODO:: 临时写死--第一个分支:实体单元
-    int numdofs = pmesh->actual_node_count * NDIM;
+    int numdofs = pmesh->d_actual_node_count * NDIM;
     Eigen::SparseMatrix<double> C(d_equations_num, numdofs);
     C.setZero();
     std::vector<Eigen::Triplet<double>> tripletList;
@@ -70,7 +70,7 @@ Eigen::SparseMatrix<double> ConstraintManager::buildConstrintMatrix(Mesh * pmesh
                 double factor = terms[k].factor;
                 int row, col;
                 // row = (sid - 1) * NDIM + dof_map[sdof] - 1;
-                // row = (pmesh->NodeOrderInList[sid] - 1) * NDIM + dof_map[sdof] - 1;
+                // row = (pmesh->d_node_order_in_list[sid] - 1) * NDIM + dof_map[sdof] - 1;
                 row = pdofmap->getDofIndex(sid, sdof);
                 tripletList.push_back(Eigen::Triplet<double>(equation_id, row, factor));
             }

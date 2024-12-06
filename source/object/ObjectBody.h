@@ -6,6 +6,7 @@
 
 struct ObjectBody
 {
+    std::set<int> Element_ids;
     std::set<std::vector<int>> outer_faces;
     std::set<int> outer_nodes;    
 };

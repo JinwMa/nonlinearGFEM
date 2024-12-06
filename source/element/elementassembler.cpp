@@ -122,7 +122,7 @@ void ElementAssembler::assembleGroupElements(Input *pinput,
         int thread_id = omp_get_thread_num();
         auto &tripletList = tripletLists[thread_id];
 
-        int element_location = pmesh->ElementOrderInList[element_id];
+        int element_location = pmesh->d_element_order_in_list[element_id];
         int element_index = element_location - 1;
         auto & element_data = ElementData[element_index];
         pelement->initializeElement(element_data);
@@ -230,7 +230,7 @@ void ElementAssembler::assembleGroupElementVector(Input *pinput,
     {
         int thread_id = omp_get_thread_num();
         int element_id = element_ids[element_now];
-        int element_location = pmesh->ElementOrderInList[element_id];
+        int element_location = pmesh->d_element_order_in_list[element_id];
         int element_index = element_location - 1;
         auto & element_data = ElementData[element_index];
         std::vector<double> elementvector;

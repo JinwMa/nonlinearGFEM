@@ -13,8 +13,8 @@ void SPC::takeDB(Input *pinput, Mesh *pmesh)
     else if (nodes_type == "node_set")
     {
         d_node_set_id = pinput->getInt(name + "_node_set_id");
-        if (pmesh->node_sets.find(d_node_set_id) != pmesh->node_sets.end())
-            d_node_ids = pmesh->node_sets[d_node_set_id];
+        if (pmesh->d_node_sets.find(d_node_set_id) != pmesh->d_node_sets.end())
+            d_node_ids = pmesh->d_node_sets[d_node_set_id];
         else
             toolbox::error("the node_set of" + name + " does not exist");
     }
@@ -69,16 +69,16 @@ void SPC::getNodesFromGeometry(Mesh *pmesh)
     for (int i = 0; i < count; i++)
         expression[i] = d_geometry_expression[i];
 
-    int node_num = pmesh->actual_node_count;
+    int node_num = pmesh->d_actual_node_count;
     for (int i = 0; i < node_num; i++)
     {
-        int node_id = pmesh->NodeIdList[i];
-        int node_order = pmesh->NodeOrderInList[node_id] - 1;
-        double x = pmesh->NodesCoordinate[node_order][0];
-        double y = pmesh->NodesCoordinate[node_order][1];
+        int node_id = pmesh->d_node_list[i];
+        int node_order = pmesh->d_node_order_in_list[node_id] - 1;
+        double x = pmesh->d_nodes_coordinate[node_order][0];
+        double y = pmesh->d_nodes_coordinate[node_order][1];
         double z = 0.0;
         if (NDIM == 3)
-            z = pmesh->NodesCoordinate[node_order][2];
+            z = pmesh->d_nodes_coordinate[node_order][2];
         double value = 1E10;
         if (NDIM != 3)
             toolbox::error("2D or 1D cases are not supported");
@@ -126,12 +126,12 @@ std::vector<ConstraintEquation> SPC::buildEquations(Mesh *pmesh)
             for (int ii = 0; ii < count; ii++)
                 expression[ii] = d_value_expression[ii];
 
-            int node_order = pmesh->NodeOrderInList[node_id] - 1;
-            double x = pmesh->NodesCoordinate[node_order][0];
-            double y = pmesh->NodesCoordinate[node_order][1];
+            int node_order = pmesh->d_node_order_in_list[node_id] - 1;
+            double x = pmesh->d_nodes_coordinate[node_order][0];
+            double y = pmesh->d_nodes_coordinate[node_order][1];
             double z = 0.0;
             if (NDIM == 3)
-                z = pmesh->NodesCoordinate[node_order][2];
+                z = pmesh->d_nodes_coordinate[node_order][2];
             double value = 1E10;
             if (NDIM != 3)
                 toolbox::error("2D or 1D cases are not supported");

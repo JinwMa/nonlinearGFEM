@@ -20,29 +20,29 @@ void Post::onlymesh(Mesh *pmesh)
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
-    // outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
-    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+    // outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
 
     // 输出节点
-    for (int i = 0; i < pmesh->actual_node_count; i++)
+    for (int i = 0; i < pmesh->d_actual_node_count; i++)
     {
-        int nodeid = pmesh->NodeIdList[i];
-        int nodeorder = pmesh->NodeOrderInList[nodeid];
-        outputFile << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][2] << std::endl;
+        int nodeid = pmesh->d_node_list[i];
+        int nodeorder = pmesh->d_node_order_in_list[nodeid];
+        outputFile << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][2] << std::endl;
     }
 
     // 输出单元
-    for (int i = 0; i < pmesh->actual_element_count; i++)
+    for (int i = 0; i < pmesh->d_actual_element_count; i++)
     {
-        int elementid = pmesh->ElementIdList[i];
-        int elementorder = pmesh->ElementOrderInList[elementid];
-        vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+        int elementid = pmesh->d_element_list[i];
+        int elementorder = pmesh->d_element_order_in_list[elementid];
+        vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
         if (element_connect.size() == 4) // 四面体单元
         {
             for (int ii = 0; ii < 4; ii++)
             {
-                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -50,7 +50,7 @@ void Post::onlymesh(Mesh *pmesh)
         {
             for (int ii = 0; ii < 8; ii++)
             {
-                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -75,8 +75,8 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & disp
 
     outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
     outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-    // outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
-    outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+    // outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=brick" << std::endl;
+    outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
 
     // 输出节点
     for (size_t i = 0; (int)i < PostNodes.size(); i++)
@@ -86,17 +86,17 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & disp
     }
 
     // 输出单元
-    for (int i = 0; i < pmesh->actual_element_count; i++)
+    for (int i = 0; i < pmesh->d_actual_element_count; i++)
     {
-        int elementid = pmesh->ElementIdList[i];
-        int elementorder = pmesh->ElementOrderInList[elementid];
-        vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+        int elementid = pmesh->d_element_list[i];
+        int elementorder = pmesh->d_element_order_in_list[elementid];
+        vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
         if (element_connect.size() == 4) // 四面体单元
         {
             for (int ii = 0; ii < 4; ii++)
             {
-                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -104,7 +104,7 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & disp
         {
             for (int ii = 0; ii < 8; ii++)
             {
-                outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
             }
             outputFile << std::endl;
         }
@@ -115,14 +115,14 @@ void Post::ShowDisplacement(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & disp
 
 void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
 {
-    PostNodes.resize(pmesh->actual_node_count);
-    for (int i = 0; i < pmesh->actual_node_count; i++)
+    PostNodes.resize(pmesh->d_actual_node_count);
+    for (int i = 0; i < pmesh->d_actual_node_count; i++)
     {
-        int nodeid = pmesh->NodeIdList[i];
-        int nodeorder = pmesh->NodeOrderInList[nodeid];
-        PostNodes[i].X = pmesh->NodesCoordinate[nodeorder - 1][0];
-        PostNodes[i].Y = pmesh->NodesCoordinate[nodeorder - 1][1];
-        PostNodes[i].Z = pmesh->NodesCoordinate[nodeorder - 1][2];
+        int nodeid = pmesh->d_node_list[i];
+        int nodeorder = pmesh->d_node_order_in_list[nodeid];
+        PostNodes[i].X = pmesh->d_nodes_coordinate[nodeorder - 1][0];
+        PostNodes[i].Y = pmesh->d_nodes_coordinate[nodeorder - 1][1];
+        PostNodes[i].Z = pmesh->d_nodes_coordinate[nodeorder - 1][2];
 
         // int index = pdofmap->NodesIndex[nodeorder - 1];
         PostNodes[i].ux = displacement[pdofmap->getDofIndex(nodeid, "ux")];
@@ -130,9 +130,9 @@ void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displa
         PostNodes[i].uz = displacement[pdofmap->getDofIndex(nodeid, "uz")];
 
         
-        PostNodes[i].x = pmesh->NodesCoordinate[nodeorder - 1][0] + PostNodes[i].ux;
-        PostNodes[i].y = pmesh->NodesCoordinate[nodeorder - 1][1] + PostNodes[i].uy;
-        PostNodes[i].z = pmesh->NodesCoordinate[nodeorder - 1][2] + PostNodes[i].uz;
+        PostNodes[i].x = pmesh->d_nodes_coordinate[nodeorder - 1][0] + PostNodes[i].ux;
+        PostNodes[i].y = pmesh->d_nodes_coordinate[nodeorder - 1][1] + PostNodes[i].uy;
+        PostNodes[i].z = pmesh->d_nodes_coordinate[nodeorder - 1][2] + PostNodes[i].uz;
     }
 }
 
@@ -217,25 +217,25 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
             // 输出节点
-            for (int i = 0; i < pmesh->actual_node_count; i++)
+            for (int i = 0; i < pmesh->d_actual_node_count; i++)
             {
-                int nodeid = pmesh->NodeIdList[i];
-                int nodeorder = pmesh->NodeOrderInList[nodeid];
-                outputFile << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][2] << std::endl;
+                int nodeid = pmesh->d_node_list[i];
+                int nodeorder = pmesh->d_node_order_in_list[nodeid];
+                outputFile << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][2] << std::endl;
             }
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -243,7 +243,7 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -253,26 +253,26 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
             //输出节点
-            for (int i = 0; i < pmesh->actual_node_count; i++)
+            for (int i = 0; i < pmesh->d_actual_node_count; i++)
             {
-                int nodeid = pmesh->NodeIdList[i];
-                int nodeorder = pmesh->NodeOrderInList[nodeid];
-                outputFile << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->NodesCoordinate[nodeorder - 1][2] << std::endl;
+                int nodeid = pmesh->d_node_list[i];
+                int nodeorder = pmesh->d_node_order_in_list[nodeid];
+                outputFile << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][0] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][1] << "   " << std::setw(20) << pmesh->d_nodes_coordinate[nodeorder - 1][2] << std::endl;
             }
             //输出单元
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -280,7 +280,7 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -334,7 +334,7 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
              // 输出节点
             for (size_t i = 0; (int)i < PostNodes.size(); i++)
             {
@@ -346,14 +346,14 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -361,7 +361,7 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -371,7 +371,7 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
             // 输出节点
             for (size_t i = 0; (int)i < PostNodes.size(); i++)
             {
@@ -382,14 +382,14 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -397,7 +397,7 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -446,7 +446,7 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
              // 输出节点
             for (size_t i = 0; (int)i < PostNodes.size(); i++)
             {
@@ -458,14 +458,14 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -473,7 +473,7 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -483,7 +483,7 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
-            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+            outputFile << "Zone N=  " << pmesh->d_actual_node_count << ", E=  " << pmesh->d_actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
             // 输出节点
             for (size_t i = 0; (int)i < PostNodes.size(); i++)
             {
@@ -494,14 +494,14 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
             for (int i = 0; i < element_ids.size(); i++)
             {
                 int elementid = element_ids[i];
-                int elementorder = pmesh->ElementOrderInList[elementid];
-                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+                int elementorder = pmesh->d_element_order_in_list[elementid];
+                vector<int> element_connect = pmesh->d_nodes_on_elements[elementorder - 1];
 
                 if (element_connect.size() == 4) // 四面体单元
                 {
                     for (int ii = 0; ii < 4; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }
@@ -509,7 +509,7 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
                 {
                     for (int ii = 0; ii < 8; ii++)
                     {
-                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                        outputFile << std::setw(20) << pmesh->d_node_order_in_list[element_connect[ii]];
                     }
                     outputFile << std::endl;
                 }

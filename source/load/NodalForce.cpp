@@ -22,8 +22,8 @@ void NodalForce::takeDB(Input * pinput, Mesh * pmesh, std::string name)
         for (int i = 0; i < node_set_ids.size(); i++)
         {
             node_ids.insert(node_ids.end(), 
-                            pmesh->node_sets[node_set_ids[i]].begin(),
-                            pmesh->node_sets[node_set_ids[i]].end());
+                            pmesh->d_node_sets[node_set_ids[i]].begin(),
+                            pmesh->d_node_sets[node_set_ids[i]].end());
         }
     }
 }

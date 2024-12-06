@@ -22,12 +22,12 @@
    尽管这两条信息在输入文件中的位置可以是随意的,但应尽量放在一块,以增加input文件的可读性
 2. mesh类
    mesh类的设计支持多part,支持节点编号从非0开始,为了实现这一目的,设计了如下的成员变量
-   NodeIdList: 存储所有节点的编号信息
-   ElementIdList: 存储所有单元的编号信息
-   NodesCoordinate: 按顺序存放节点的坐标
-   NodesOnElements: 按顺序存放单元中的节点
-   NodeOrderInList: 节点在list中的位置         对应的位置都没有-1,在取用的时候注意下标
-   ElementOrderInList: 单元在list中的位置
+   d_node_list: 存储所有节点的编号信息
+   d_element_list: 存储所有单元的编号信息
+   d_nodes_coordinate: 按顺序存放节点的坐标
+   d_nodes_on_elements: 按顺序存放单元中的节点
+   d_node_order_in_list: 节点在list中的位置         对应的位置都没有-1,在取用的时候注意下标
+   d_element_order_in_list: 单元在list中的位置
 
 3. 约束中的重复约束
    约束基类中定义了unordered_set m_set: 参考了NSC手册

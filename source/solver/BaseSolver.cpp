@@ -3,12 +3,12 @@
 void BaseSolver::init(Input *pinput, Mesh *pmesh)
 {
     // 功能一：初始化elementdata
-    int num_element = pmesh->actual_element_count;
+    int num_element = pmesh->d_actual_element_count;
     d_element_data.resize(num_element);
     for (int i = 0; i < num_element; i++)
     {
-        int element_id = pmesh->ElementIdList[i];
-        int element_order = pmesh->ElementOrderInList[element_id];
+        int element_id = pmesh->d_element_list[i];
+        int element_order = pmesh->d_element_order_in_list[element_id];
         int element_index = element_order - 1;
         auto &element_data = d_element_data[element_index];
         // 单元层面的初始化
@@ -19,7 +19,7 @@ void BaseSolver::init(Input *pinput, Mesh *pmesh)
         element_data.element_order = element_order;
 
         // 节点层面的初始化
-        auto node_ids = pmesh->NodesOnElements[element_index];
+        auto node_ids = pmesh->d_nodes_on_elements[element_index];
         int num_nodes = node_ids.size();
         element_data.num_nodes = num_nodes;
         element_data.node_ids = node_ids;
@@ -27,9 +27,9 @@ void BaseSolver::init(Input *pinput, Mesh *pmesh)
         for (int inode = 0; inode < num_nodes; inode++)
         {
             int node_id = node_ids[inode];
-            int node_order = pmesh->NodeOrderInList[node_id];
+            int node_order = pmesh->d_node_order_in_list[node_id];
             int node_index = node_order - 1;
-            element_data.coordinates[inode] = pmesh->NodesCoordinate[node_index];
+            element_data.coordinates[inode] = pmesh->d_nodes_coordinate[node_index];
         }
         // 单元内部负责积分点上的初始化
     }

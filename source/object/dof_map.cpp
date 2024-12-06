@@ -12,9 +12,9 @@ void Dof_Map::BuildNodesDofs(Mesh * pmesh)
 {
     // 暂时为每一个节点开三个自由度
     vector<string> alldofs = {"ux", "uy", "uz"};
-    for (int i = 0; i < pmesh->actual_node_count; i++)
+    for (int i = 0; i < pmesh->d_actual_node_count; i++)
     {
-        int nodeid = pmesh->NodeIdList[i];
+        int nodeid = pmesh->d_node_list[i];
         NodesDofs[nodeid] = alldofs;
     }
 }
@@ -22,23 +22,23 @@ void Dof_Map::BuildNodesDofs(Mesh * pmesh)
 void Dof_Map::BuildDofMap(Mesh * pmesh)
 {
     // 先为数组开辟空间
-    // NodesIndex.resize(pmesh->actual_node_count);
+    // NodesIndex.resize(pmesh->d_actual_node_count);
     // int index = 0;
-    // for (int i = 0; i < pmesh->actual_node_count; i++)
+    // for (int i = 0; i < pmesh->d_actual_node_count; i++)
     // {
-    //     int nodeid = pmesh->NodeIdList[i];
-    //     int nodeorder = pmesh->NodeOrderInList[nodeid];
+    //     int nodeid = pmesh->d_node_list[i];
+    //     int nodeorder = pmesh->d_node_order_in_list[nodeid];
     //     NodesIndex[nodeorder - 1] = index;
     //     int dofsize = NodesDofs[nodeid].size();
     //     index += dofsize;
     // }
 
-    NodesDofIndex.resize(pmesh->actual_node_count * 6 + reserve_size);
+    NodesDofIndex.resize(pmesh->d_actual_node_count * 6 + reserve_size);
     std::fill(NodesDofIndex.begin(), NodesDofIndex.end(), -1);
-    for (int i = 0; i < pmesh->actual_node_count; i++)
+    for (int i = 0; i < pmesh->d_actual_node_count; i++)
     {
-        int node_id = pmesh->NodeIdList[i];
-        int node_order = pmesh->NodeOrderInList[node_id];
+        int node_id = pmesh->d_node_list[i];
+        int node_order = pmesh->d_node_order_in_list[node_id];
         auto dofs = NodesDofs[node_id];
         for (auto dof : dofs)
         {
@@ -65,10 +65,10 @@ void Dof_Map::BuildDofMap(Mesh * pmesh)
             NodesDofIndex[i] = max_dof_index - 1;
         }
     }
-    for (int i = 0; i < pmesh->NodeIdList.size(); i++)
+    for (int i = 0; i < pmesh->d_node_list.size(); i++)
     {
-        int node_id = pmesh->NodeIdList[i];
-        int node_order = pmesh->NodeOrderInList[node_id];
+        int node_id = pmesh->d_node_list[i];
+        int node_order = pmesh->d_node_order_in_list[node_id];
         for (int j = 0; j < 6; j++)
         {
             dofmap[(node_id - 1) * 6 + j] = NodesDofIndex[(node_order - 1) * 6 + j];
