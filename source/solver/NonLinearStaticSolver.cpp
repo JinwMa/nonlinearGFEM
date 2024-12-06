@@ -76,7 +76,6 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
     d_dP = d_P / d_num_load_step;
     d_dG = d_G / d_num_load_step;
-    d_dP.setZero();
     d_rhs_G.resize(d_G.size());
 }
 
@@ -126,7 +125,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         d_u = d_u + d_du;     
         std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
         setVectorToElementData(temp, d_dof_map.get(), d_element_data, "u");
-        d_post->ShowDisplacement(pinput, pmesh, d_dof_map.get(), temp);
+        d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp);
         ii++;
     }
 

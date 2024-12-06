@@ -297,7 +297,7 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
 
 
 
-void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
+void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
 {
     string filename = outputFilename + "_displacement.dat";
     std::ofstream outputFile(filename, std::ios::app); // 打开文件
@@ -376,6 +376,118 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
             for (size_t i = 0; (int)i < PostNodes.size(); i++)
             {
                 outputFile << std::setw(20) << PostNodes[i].x << "   " << std::setw(20) << PostNodes[i].y << "   " << std::setw(20) << PostNodes[i].z
+                           << std::setw(20) << PostNodes[i].ux << "   " << std::setw(20) << PostNodes[i].uy << "   " << std::setw(20) << PostNodes[i].uz << std::endl;
+            }
+            //输出单元
+            for (int i = 0; i < element_ids.size(); i++)
+            {
+                int elementid = element_ids[i];
+                int elementorder = pmesh->ElementOrderInList[elementid];
+                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+
+                if (element_connect.size() == 4) // 四面体单元
+                {
+                    for (int ii = 0; ii < 4; ii++)
+                    {
+                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                    }
+                    outputFile << std::endl;
+                }
+                else if (element_connect.size() == 8) // 六面体单元
+                {
+                    for (int ii = 0; ii < 8; ii++)
+                    {
+                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                    }
+                    outputFile << std::endl;
+                }
+            }
+        }
+    }
+    outputFile.close();
+}
+
+
+
+void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displacement)
+{
+    string filename = outputFilename + "_displacement.dat";
+    std::ofstream outputFile(filename, std::ios::app); // 打开文件
+    if (!outputFile)
+    {
+        std::cerr << "无法打开文件:" << filename << std::endl;
+        exit(0);
+    }
+    outputFile << std::fixed << std::setprecision(7);
+    BuildPostNodes(pmesh, pdofmap, displacement);
+
+    std::vector<std::string> elementList = pinput->getVectorString("element_list");
+    for (auto elementname : elementList)
+    {
+        std::vector<int> element_ids;
+        std::string element_set_type = pinput->getString(elementname + "_set_type");
+        if (element_set_type == "range")
+        {
+            std::vector<int> range = pinput->getVectorInt(elementname + "_range");
+            if (range.size() != 2)
+                toolbox::error("the range of " + elementname + "_range" + "is given wrong");
+            int start = range[0];
+            int end = range[1];
+            int size = end - start + 1;
+            element_ids.resize(size);
+            for (int i = 0; i < size; i++)
+                element_ids[i] = start + i;
+        }
+        else
+        {
+            toolbox::error("not support the type of " + element_set_type + " for element ids");
+        }
+        if (pinput->getString(elementname + "_type") == "LinearHex8" || pinput->getString(elementname + "_type") == "NonLinearHex8")
+        {
+            outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
+            outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
+            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << element_ids.size() << ", F=FEPOINT, ET=brick" << std::endl;
+             // 输出节点
+            for (size_t i = 0; (int)i < PostNodes.size(); i++)
+            {
+                outputFile << std::setw(20) << PostNodes[i].X << "   " << std::setw(20) << PostNodes[i].Y << "   " << std::setw(20) << PostNodes[i].Z
+                           << std::setw(20) << PostNodes[i].ux << "   " << std::setw(20) << PostNodes[i].uy << "   " << std::setw(20) << PostNodes[i].uz << std::endl;
+            }
+            
+            //输出单元
+            for (int i = 0; i < element_ids.size(); i++)
+            {
+                int elementid = element_ids[i];
+                int elementorder = pmesh->ElementOrderInList[elementid];
+                vector<int> element_connect = pmesh->NodesOnElements[elementorder - 1];
+
+                if (element_connect.size() == 4) // 四面体单元
+                {
+                    for (int ii = 0; ii < 4; ii++)
+                    {
+                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                    }
+                    outputFile << std::endl;
+                }
+                else if (element_connect.size() == 8) // 六面体单元
+                {
+                    for (int ii = 0; ii < 8; ii++)
+                    {
+                        outputFile << std::setw(20) << pmesh->NodeOrderInList[element_connect[ii]];
+                    }
+                    outputFile << std::endl;
+                }
+            }
+        }
+        else if (pinput->getString(elementname + "_type") == "LinearTet4")
+        {
+            outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
+            outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
+            outputFile << "Zone N=  " << pmesh->actual_node_count << ", E=  " << pmesh->actual_element_count << ", F=FEPOINT, ET=TETRAHEDRON" << std::endl;
+            // 输出节点
+            for (size_t i = 0; (int)i < PostNodes.size(); i++)
+            {
+                outputFile << std::setw(20) << PostNodes[i].X << "   " << std::setw(20) << PostNodes[i].Y << "   " << std::setw(20) << PostNodes[i].Z
                            << std::setw(20) << PostNodes[i].ux << "   " << std::setw(20) << PostNodes[i].uy << "   " << std::setw(20) << PostNodes[i].uz << std::endl;
             }
             //输出单元
