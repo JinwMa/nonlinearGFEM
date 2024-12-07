@@ -20,7 +20,7 @@ class NonLinearStaticSolver : public BaseSolver
 
     private:
 
-    bool checkConvergence();
+    int checkConvergence();
     
     private:
     // std::vector<ObjectElement> d_elements_data;
@@ -38,15 +38,33 @@ class NonLinearStaticSolver : public BaseSolver
 
     Eigen::SparseMatrix<double> d_C;
     Eigen::SparseMatrix<double> d_K;
+
+
+    Eigen::SparseMatrix<double> d_K_n;
+    Eigen::VectorXd d_internal_force_n;
+
+
+
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
     Eigen::VectorXd d_dP;
     Eigen::VectorXd d_dG;
+    Eigen::VectorXd d_P_trial;
+    Eigen::VectorXd d_G_trial;
+
+    //adaptive load step
+    double d_real_time = 0.0;
+    double d_actural_dt = 0.0;
+    double d_trial_time = 0.0;
+    double d_predict_dt = 0.0;
+    int d_convergence_state = 0;
 
     Eigen::VectorXd d_rhs_G;
     int d_num_load_step = 10;
 
     void updateElementData();
+
+    void dealWithConvergenceStatus(Input * pinput, Mesh * pmesh);
 
 
 };

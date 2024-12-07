@@ -76,7 +76,14 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
     d_dP = d_P / d_num_load_step;
     d_dG = d_G / d_num_load_step;
-    d_rhs_G.resize(d_G.size());
+    d_rhs_G.resize(d_G.size());    
+
+
+    //adaptive load step
+    d_real_time = 0.0;
+    d_actural_dt = 0.0;
+    d_trial_time = 0.0;
+    d_predict_dt = 1.0 / d_num_load_step;
 }
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
@@ -86,23 +93,31 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         d_post->onlymesh(pinput, pmesh);
         toolbox::error("only show mesh is process");
     }
-    int ii = 0;
-    while(ii < d_num_load_step)
+    while(d_real_time < 1.0 - 1.e-10)
     {
-        std::cout << "++++++++++++++++++ load step" << ii + 1 << "++++++++"<< std::endl;   
+        std::cout << "++++++++++++++++++ load step  " << d_contral_param->load_step + 1 << "  ++++++++"<< std::endl;   
         d_contral_param->load_step++;    
         d_contral_param->iteration_step = 0;
         d_du.setZero();
-        d_P = d_dP * (ii + 1);
-        d_G = d_dG * (ii + 1);
+        if (d_real_time + d_predict_dt > 1.0) d_predict_dt = 1.0 - d_real_time;
+        d_trial_time = d_real_time + d_predict_dt;
+        std::cout << "++++++++++++++++++ trial time  " << d_trial_time << "  ++++++++"<< std::endl; 
+        // 仅适用于保守载荷
+        d_P_trial = d_P * d_trial_time; 
+        // 仅适用于保守约束
+        d_G_trial = d_G * d_trial_time;
+        d_convergence_state = 0;
+        d_K_n = d_K;
+        d_internal_force_n = d_internal_force;
         while(true)
         {
             d_contral_param->iteration_step++;
             d_ddu.setZero();                        
-            d_rhs = d_P - d_internal_force; 
-            d_rhs_G = d_G - d_C * (d_u + d_du);
-            std::cout << "    ------- iteration " << d_contral_param->iteration_step << std::endl;;           
-            if(checkConvergence()) break;            
+            d_rhs = d_P_trial - d_internal_force; 
+            d_rhs_G = d_G_trial - d_C * (d_u + d_du);
+            std::cout << "    ------- iteration " << d_contral_param->iteration_step;
+            d_convergence_state = checkConvergence();           
+            if(d_convergence_state) break;            
             Eigen::VectorXd solution;
             linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
             d_ddu = solution.head(d_ddu.size());
@@ -125,18 +140,14 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
-        }   
-        d_u = d_u + d_du;
-        updateElementData();
-        std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
-        d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp);
-        ii++;
+        } 
+        dealWithConvergenceStatus(pinput, pmesh);        
     }
 
 }
 
 
-bool NonLinearStaticSolver::checkConvergence()
+int NonLinearStaticSolver::checkConvergence()
 {
     //判断收敛需要执行两条标准：力和约束
     bool force_convergence = false;
@@ -146,10 +157,10 @@ bool NonLinearStaticSolver::checkConvergence()
     Eigen::SparseMatrix<double> Ct = d_C.transpose(); 
     Eigen::VectorXd temp = d_rhs - Ct * d_lambda;
     double normal_rhs = toolbox::getEigenVectorNormal(temp);
-    double normal_P = toolbox:: getEigenVectorNormal(d_P);
+    double normal_P = toolbox:: getEigenVectorNormal(d_P_trial);
     if (normal_P < eps)
     {
-        std::cout << "\t" << " the iteration error of force is " << normal_rhs << std::endl;
+        std::cout << "\t" << " error = " << normal_rhs << std::endl;
         if (normal_rhs < eps * 1.e2) force_convergence = true;
     }
     else 
@@ -160,11 +171,20 @@ bool NonLinearStaticSolver::checkConvergence()
     }
 
     double normal_rhs_G = toolbox::getEigenVectorNormal(d_rhs_G);
-    std::cout << "\t" << " the iteration error of constrain is " << normal_rhs_G << std::endl;
+    // std::cout << "\t" << " the iteration error of constrain is " << normal_rhs_G << std::endl;
     if (normal_rhs_G < eps) constraint_convergence = true;
 
-    return constraint_convergence && force_convergence;
-
+    if (constraint_convergence && force_convergence)
+    {
+        if (d_contral_param->iteration_step < 3)
+            return 2;
+        else
+            return 1;
+    }
+    else if (d_contral_param->iteration_step > 6)
+        return 3;
+    else
+        return 0;
 }
 
 void NonLinearStaticSolver::updateElementData()
@@ -182,5 +202,37 @@ void NonLinearStaticSolver::updateElementData()
         element_data.jkb_n = element_data.jkb_n1;
         // 更新应力状态
         element_data.stress_n = element_data.stress_n1;
+    }
+}
+
+void NonLinearStaticSolver::dealWithConvergenceStatus(Input * pinput, Mesh * pmesh)
+{
+    if (d_convergence_state == 1 || d_convergence_state == 2)
+    {
+        d_u = d_u + d_du;
+        updateElementData();
+        std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
+        d_actural_dt = d_predict_dt;
+        d_real_time = d_trial_time;
+        d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp);
+        if (d_convergence_state == 2) 
+        {
+            std::cout << "+++++++++++++++++ step size grow up +++++++++++++++" << std::endl;
+            d_predict_dt = d_actural_dt * 1.2;
+        }
+    }
+    else if (d_convergence_state == 3)
+    {
+        std::cout << "********** cut back ***********" << std::endl;
+        d_predict_dt = d_predict_dt / 2.0;
+        d_du.setZero();
+        std::vector<double> temp(d_du.data(), d_du.data() + d_du.size());
+        setVectorToElementData(temp, d_dof_map.get(), d_element_data, "du");
+        d_K = d_K_n;
+        d_internal_force = d_internal_force_n;
+    }
+    else
+    {
+        toolbox::error("not suppout convergence state");
     }
 }
