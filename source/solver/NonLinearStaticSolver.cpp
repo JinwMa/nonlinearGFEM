@@ -81,7 +81,11 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 
 void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
 {
-    
+    if (std::getenv("ONLY_SHOW_MESH"))
+    {
+        d_post->onlymesh(pinput, pmesh);
+        toolbox::error("only show mesh is process");
+    }
     int ii = 0;
     while(ii < d_num_load_step)
     {
@@ -122,9 +126,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
         }   
-        d_u = d_u + d_du;     
+        d_u = d_u + d_du;
+        updateElementData();
         std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
-        setVectorToElementData(temp, d_dof_map.get(), d_element_data, "u");
         d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp);
         ii++;
     }
@@ -161,4 +165,22 @@ bool NonLinearStaticSolver::checkConvergence()
 
     return constraint_convergence && force_convergence;
 
+}
+
+void NonLinearStaticSolver::updateElementData()
+{
+    std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
+    setVectorToElementData(temp, d_dof_map.get(), d_element_data, "u");
+    for (auto & element_data : d_element_data)
+    {
+        // 更新等效塑性应变
+        element_data.eff_p_strain_n = element_data.eff_p_strain_n1;
+        // 更新变形梯度和逆
+        element_data.F_n = element_data.F_n1;
+        element_data.Finv_n = element_data.Finv_n1;
+        // 更新雅可比
+        element_data.jkb_n = element_data.jkb_n1;
+        // 更新应力状态
+        element_data.stress_n = element_data.stress_n1;
+    }
 }

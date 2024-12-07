@@ -481,7 +481,7 @@ void Mesh::buildElementFaceNodeOrder()
    Hex8[2] = {0, 1, 5, 4};
    Hex8[3] = {1, 2, 6, 5};
    Hex8[4] = {2, 3, 7, 6};
-   Hex8[6] = {0, 4, 7, 3};
+   Hex8[5] = {0, 4, 7, 3};
    std::vector<std::vector<int>> Tet4;
    Tet4.resize(4);
    Tet4[0] = {0, 2, 1};

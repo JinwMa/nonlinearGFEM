@@ -46,6 +46,8 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::VectorXd d_rhs_G;
     int d_num_load_step = 10;
 
+    void updateElementData();
+
 
 };
 

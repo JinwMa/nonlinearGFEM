@@ -13,6 +13,9 @@
 using namespace std;
 class Mesh
 {    
+
+    public:
+    ~Mesh(){};
 private:
     static const int d_maxnum_element = 300000;
     static const int d_maxnum_node = 300000;
