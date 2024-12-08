@@ -40,15 +40,13 @@ class NonLinearStaticSolver : public BaseSolver
     Eigen::SparseMatrix<double> d_K;
 
 
-    Eigen::SparseMatrix<double> d_K_n;
-    Eigen::VectorXd d_internal_force_n;
+    // Eigen::SparseMatrix<double> d_K_n;
+    // Eigen::VectorXd d_internal_force_n;
 
 
 
     Eigen::VectorXd d_G;
     Eigen::VectorXd d_P;
-    Eigen::VectorXd d_dP;
-    Eigen::VectorXd d_dG;
     Eigen::VectorXd d_P_trial;
     Eigen::VectorXd d_G_trial;
 
@@ -65,6 +63,7 @@ class NonLinearStaticSolver : public BaseSolver
     void updateElementData();
 
     void dealWithConvergenceStatus(Input * pinput, Mesh * pmesh);
+    void processRollingBack(Input * pinput, Mesh * pmesh);
 
 
 };

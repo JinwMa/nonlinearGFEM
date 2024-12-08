@@ -132,6 +132,99 @@ void BaseSolver::setVectorToElementData(std::vector<double> &vector,
     }
 }
 
+
+void BaseSolver::setEigenVectorToElementData(Eigen::VectorXd &vector,
+                                        Dof_Map *pdof_map,
+                                        std::vector<ObjectElementData> &ElementData,
+                                        std::string name)
+{
+    if (pdof_map == nullptr)
+        toolbox::error("pdof_map is null");
+
+    const int v_size = vector.size();
+    const int num_element = ElementData.size();
+
+    if (name == "u")
+    {
+        for (int i = 0; i < num_element; i++)
+        {
+            auto &elementdata = ElementData[i];
+            int num_nodes = elementdata.node_ids.size();
+            if (num_nodes <= 0)
+                toolbox::error("elementdata is not initialized");
+            if (elementdata.u.size() == 0)
+                elementdata.u.resize(num_nodes);
+            for (int inode = 0; inode < num_nodes; inode++)
+            {
+                int node_id = elementdata.node_ids[inode];
+                auto &dofs = pdof_map->NodesDofs[node_id];
+                int dof_size = dofs.size();
+                if (elementdata.u[inode].size() == 0)
+                    elementdata.u[inode].resize(dof_size);
+                for (size_t idof = 0; idof < dof_size; idof++)
+                {
+                    int dof_index = pdof_map->getDofIndex(node_id, dofs[idof]);
+                    elementdata.u.at(inode).at(idof) = vector[dof_index];
+                }
+            }
+        }
+    }
+    else if (name == "du")
+    {
+        for (int i = 0; i < num_element; i++)
+        {
+            auto &elementdata = ElementData[i];
+            int num_nodes = elementdata.node_ids.size();
+            if (num_nodes <= 0)
+                toolbox::error("elementdata is not initialized");
+            if (elementdata.du.size() == 0)
+                elementdata.du.resize(num_nodes);
+            for (int inode = 0; inode < num_nodes; inode++)
+            {
+                int node_id = elementdata.node_ids[inode];
+                auto &dofs = pdof_map->NodesDofs[node_id];
+                int dof_size = dofs.size();
+                if (elementdata.du[inode].size() == 0)
+                    elementdata.du[inode].resize(dof_size);
+                for (size_t idof = 0; idof < dof_size; idof++)
+                {
+                    int dof_index = pdof_map->getDofIndex(node_id, dofs[idof]);
+                    elementdata.du.at(inode).at(idof) = vector[dof_index];
+                }
+            }
+        }        
+    }
+    else if (name == "ddu")
+    {
+        for (int i = 0; i < num_element; i++)
+        {
+            auto &elementdata = ElementData[i];
+            int num_nodes = elementdata.node_ids.size();
+            if (num_nodes <= 0)
+                toolbox::error("elementdata is not initialized");
+            if (elementdata.ddu.size() == 0)
+                elementdata.ddu.resize(num_nodes);
+            for (int inode = 0; inode < num_nodes; inode++)
+            {
+                int node_id = elementdata.node_ids[inode];
+                auto &dofs = pdof_map->NodesDofs[node_id];
+                int dof_size = dofs.size();
+                if (elementdata.ddu[inode].size() == 0)
+                    elementdata.ddu[inode].resize(dof_size);
+                for (size_t idof = 0; idof < dof_size; idof++)
+                {
+                    int dof_index = pdof_map->getDofIndex(node_id, dofs[idof]);
+                    elementdata.ddu.at(inode).at(idof) = vector[dof_index];
+                }
+            }
+        }            
+    }
+    else
+    {
+        toolbox::error(name + " is given error in BaseSolver::setVectorToElementData");
+    }
+}
+
 void BaseSolver::linear_solver(const Eigen::SparseMatrix<double> &K,
                                Eigen::VectorXd &P,
                                const Eigen::SparseMatrix<double> &C,

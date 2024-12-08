@@ -15,15 +15,13 @@ void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
     d_load_manager = std::make_shared<LoadManger>();
     d_dof_map = std::make_shared<Dof_Map>(pmesh);
     d_post = std::make_shared<Post>("tecplot");
-
-
     initData(pinput, pmesh);
 }
 
 
 void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 {
-    // 构造约束
+    // 初始化约束
     auto start_constraint = std::chrono::high_resolution_clock::now();
     std::cout << "building constraint" << std::endl;
     d_constraint_manager->takeDB(pinput, pmesh);
@@ -35,7 +33,6 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     auto end_dof_map = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration_dof_map = end_dof_map - start_dof_map;
     std::cout << "build DofMap time: " << duration_dof_map.count() << " ms" << std::endl;
-
     // 生成约束矩阵和右端项
     d_C = d_constraint_manager->buildConstrintMatrix(pmesh, d_dof_map.get());
     d_G = d_constraint_manager->buildConstrintForce(pmesh, d_dof_map.get());
@@ -49,10 +46,12 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
     d_u.resize(dof_size);
     d_du.resize(dof_size);
     d_ddu.resize(dof_size);
+
     int num_constrain_equations = d_C.rows();
     d_lambda.resize(num_constrain_equations);
     d_internal_force.resize(dof_size);
     d_rhs.resize(dof_size);
+    d_rhs_G.resize(num_constrain_equations); 
 
     d_u.setZero();
     d_du.setZero();
@@ -64,19 +63,15 @@ void NonLinearStaticSolver::initData(Input * pinput, Mesh * pmesh)
 
 
 
-    // 构造刚度矩阵,构造右端项
+    // 初始化刚度矩阵,初始化右端项
     d_element_assembler->takeDB(pinput, pmesh, d_dof_map.get()); //读单元列表
     std::cout << "building stiffness" << std::endl;
     // d_element_assembler->assembleNonLinearElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_u, d_du, d_ddu, d_K);
     d_element_assembler->assembleElementStiffness(pinput, pmesh, d_dof_map.get(), d_element_data, d_K, d_contral_param.get());
 
     std::cout << "complete the stiffness " << std::endl; 
-
     d_load_manager->takeDB(pinput, pmesh, d_dof_map.get());
-    d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);    
-    d_dP = d_P / d_num_load_step;
-    d_dG = d_G / d_num_load_step;
-    d_rhs_G.resize(d_G.size());    
+    d_load_manager->buildLoadForce(pinput, pmesh, d_dof_map.get(), d_P);      
 
 
     //adaptive load step
@@ -107,8 +102,6 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         // 仅适用于保守约束
         d_G_trial = d_G * d_trial_time;
         d_convergence_state = 0;
-        d_K_n = d_K;
-        d_internal_force_n = d_internal_force;
         while(true)
         {
             d_contral_param->iteration_step++;
@@ -123,21 +116,21 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             d_ddu = solution.head(d_ddu.size());
             d_lambda = solution.tail(d_lambda.size());
             d_du = d_du + d_ddu;
-            std::vector<double> temp(d_du.data(), d_du.data() + d_du.size());
-            setVectorToElementData(temp, d_dof_map.get(), d_element_data, "du");           
+            setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");           
             d_element_assembler->assembleElementStiffness(pinput, pmesh,
                                                           d_dof_map.get(),
                                                           d_element_data, 
                                                           d_K,
                                                           d_contral_param.get());
 
+            
+            std::vector<double> temp;
             d_element_assembler->assembleElementVector(pinput, 
                                                        pmesh, 
                                                        d_dof_map.get(), 
                                                        d_element_data, 
                                                        temp, 
                                                        d_contral_param.get());
-
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
         } 
@@ -181,7 +174,7 @@ int NonLinearStaticSolver::checkConvergence()
         else
             return 1;
     }
-    else if (d_contral_param->iteration_step > 6)
+    else if (d_contral_param->iteration_step > 10)
         return 3;
     else
         return 0;
@@ -189,8 +182,7 @@ int NonLinearStaticSolver::checkConvergence()
 
 void NonLinearStaticSolver::updateElementData()
 {
-    std::vector<double> temp(d_u.data(), d_u.data() + d_u.size());
-    setVectorToElementData(temp, d_dof_map.get(), d_element_data, "u");
+    setEigenVectorToElementData(d_u, d_dof_map.get(), d_element_data, "u");
     for (auto & element_data : d_element_data)
     {
         // 更新等效塑性应变
@@ -224,15 +216,33 @@ void NonLinearStaticSolver::dealWithConvergenceStatus(Input * pinput, Mesh * pme
     else if (d_convergence_state == 3)
     {
         std::cout << "********** cut back ***********" << std::endl;
-        d_predict_dt = d_predict_dt / 2.0;
-        d_du.setZero();
-        std::vector<double> temp(d_du.data(), d_du.data() + d_du.size());
-        setVectorToElementData(temp, d_dof_map.get(), d_element_data, "du");
-        d_K = d_K_n;
-        d_internal_force = d_internal_force_n;
+        d_predict_dt = d_predict_dt / 2.0;        
+        processRollingBack(pinput, pmesh);
     }
     else
     {
         toolbox::error("not suppout convergence state");
     }
+}
+
+
+void NonLinearStaticSolver::processRollingBack(Input * pinput, Mesh * pmesh)
+{
+    d_du.setZero();
+    setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");
+    d_element_assembler->assembleElementStiffness(pinput, pmesh,
+                                                  d_dof_map.get(),
+                                                  d_element_data,
+                                                  d_K,
+                                                  d_contral_param.get());
+
+    std::vector<double> temp;
+    d_element_assembler->assembleElementVector(pinput,
+                                               pmesh,
+                                               d_dof_map.get(),
+                                               d_element_data,
+                                               temp,
+                                               d_contral_param.get());    
+    Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
+    d_internal_force = temp_eigen;
 }

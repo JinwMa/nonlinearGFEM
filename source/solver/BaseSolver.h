@@ -63,6 +63,10 @@ protected:
                                 Dof_Map * pdof_map,
                                 std::vector<ObjectElementData> & ElementData,
                                 std::string name);
+    void setEigenVectorToElementData(Eigen::VectorXd &vector,
+                                     Dof_Map *pdof_map,
+                                     std::vector<ObjectElementData> &ElementData,
+                                     std::string name);
     void linear_solver(const Eigen::SparseMatrix<double> & K,
                                   Eigen::VectorXd & P,
                                   const Eigen::SparseMatrix<double> & C,
