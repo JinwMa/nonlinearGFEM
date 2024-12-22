@@ -34,6 +34,13 @@ class LinearHex8Bbar : public BaseElement
 
         void getShapeFunctionOnIntegrationPoint(std::vector<double> & p_coord,
                                                 std::vector<double> & sf);
+
+
+
+        void getCenterGaussPointSF(double nodes_coordinate[20][3],
+                                   std::vector<double> & CenterShapeFunction,
+                                   std::vector<std::vector<double>> & CenterShapeFunction_dxy,
+                                   double & Center_Value_jkb);
     
     
 };

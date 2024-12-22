@@ -29,6 +29,10 @@ void LinearHex8Bbar::ComputeStiffness(ObjectElementData & element_data,
     vector<vector<double>> SF;
     vector<vector<vector<double>>> SF_dxyz;
     vector<double> detJ;
+
+    vector<double>CSF;
+    vector<vector<double>>CSF_dxyz;
+    double CdetJ;
     
 
     double nodes_coordinate[20][3] = {0.0};
@@ -42,6 +46,7 @@ void LinearHex8Bbar::ComputeStiffness(ObjectElementData & element_data,
 
 
     this->getShapeFunction(nodes_coordinate, d_GaussPoints, SF, SF_dxyz, detJ, d_num_intergration_point);
+    this->getCenterGaussPointSF(nodes_coordinate, CSF, CSF_dxyz, CdetJ);
 
     double D[6][6] = {};
     double F = (matE * (1.0 - v)) / ((1.0 - 2.0 * v) * (1 + v));
@@ -70,6 +75,9 @@ void LinearHex8Bbar::ComputeStiffness(ObjectElementData & element_data,
             double sf_dxnow = SF_dxyz[i][ii][0];
             double sf_dynow = SF_dxyz[i][ii][1];
             double sf_dznow = SF_dxyz[i][ii][2];
+            double csf_dxnow = CSF_dxyz[ii][0];
+            double csf_dynow = CSF_dxyz[ii][1];
+            double csf_dznow = CSF_dxyz[ii][2];
 
             BT[0][0] = sf_dxnow;
             BT[0][3] = sf_dynow;
@@ -81,11 +89,28 @@ void LinearHex8Bbar::ComputeStiffness(ObjectElementData & element_data,
             BT[2][4] = sf_dynow;
             BT[2][5] = sf_dxnow;
 
+            BT[0][0] = sf_dxnow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dxnow;
+            BT[0][1] = -sf_dxnow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dxnow;
+            BT[0][2] = BT[0][1];
+
+            BT[1][0] = -sf_dynow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dynow;
+            BT[1][1] = sf_dynow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dynow;
+            BT[1][2] = BT[1][0];
+
+            BT[2][0] = -sf_dznow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dznow;
+            BT[2][1] = BT[2][0];
+            BT[2][2] = sf_dznow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dznow;
+
+
             for (int jj = 0; jj < 8; jj++)
             {                
                 double sf_dxnow = SF_dxyz[i][jj][0];
                 double sf_dynow = SF_dxyz[i][jj][1];
                 double sf_dznow = SF_dxyz[i][jj][2];
+
+                double csf_dxnow = CSF_dxyz[jj][0];
+                double csf_dynow = CSF_dxyz[jj][1];
+                double csf_dznow = CSF_dxyz[jj][2];
 
                 B[0][0] = sf_dxnow;
                 B[1][1] = sf_dynow;
@@ -96,6 +121,22 @@ void LinearHex8Bbar::ComputeStiffness(ObjectElementData & element_data,
                 B[4][2] = sf_dynow;
                 B[5][0] = sf_dznow;
                 B[5][2] = sf_dxnow;
+
+
+                B[0][0] = sf_dxnow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dxnow;
+                B[1][0] = -sf_dxnow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dxnow;
+                B[2][0] = B[1][0];
+
+                B[0][1] = -sf_dynow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dynow;
+                B[1][1] = sf_dynow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dynow;
+                B[2][1] = B[0][1];
+
+
+                B[0][2] = -sf_dznow * (1.0 / 3.0) + (1.0 / 3.0) * csf_dznow;
+                B[1][2] = B[0][2];
+                B[2][2] = sf_dznow * (2.0 / 3.0) + (1.0 / 3.0) * csf_dznow;
+
+
                 double BTD[3][6] = {};
                 double BTDB[3][3] = {};
                 AmnXBpq(&BT[0][0], 3, 6, &D[0][0], 6, 6, &BTD[0][0]);
@@ -212,6 +253,37 @@ void LinearHex8Bbar::getShapeFunction(double nodes_coordinate[20][3],
             ShapeFunction_dxy[i][ii][2] = DSF[2][ii];
         }
     }
+}
+
+void LinearHex8Bbar::getCenterGaussPointSF(double nodes_coordinate[20][3],
+                                           std::vector<double> & CenterShapeFunction,
+                                           std::vector<std::vector<double>> &CenterShapeFunction_dxy,
+                                           double & Center_Value_jkb)
+{
+    CenterShapeFunction.resize(8);
+    CenterShapeFunction_dxy.resize(8);
+    for (int i = 0; i < 8; i++) CenterShapeFunction_dxy[i].resize(3);
+    std::vector<std::vector<double>> Center_Gauss_Point;
+    Center_Gauss_Point.resize(1);
+    Center_Gauss_Point[0].resize(4);
+
+    Center_Gauss_Point[0][0] = 0.0;
+    Center_Gauss_Point[0][1] = 0.0;
+    Center_Gauss_Point[0][2] = 0.0;
+    Center_Gauss_Point[0][3] = 8.0;
+
+    vector<vector<double>> ShapeFunction;
+    vector<vector<vector<double>>> ShapeFunction_dxy;
+    vector<double> value_jkb;
+    vector<vector<double>> SF;
+    vector<vector<vector<double>>> SF_dxyz;
+    vector<double> detJ;
+
+    this->getShapeFunction(nodes_coordinate, Center_Gauss_Point, SF, SF_dxyz, detJ, 1);
+
+    CenterShapeFunction = SF[0];
+    CenterShapeFunction_dxy = SF_dxyz[0];
+    Center_Value_jkb = detJ[0];
 }
 
 void LinearHex8Bbar::SetElement()
