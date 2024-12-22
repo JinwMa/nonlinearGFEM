@@ -8,7 +8,7 @@ add_library(prelib STATIC ${SOURCES})
 target_include_directories(prelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-target_link_libraries(prelib PRIVATE elementlib)
+target_link_libraries(prelib PRIVATE meshlib inputlib toolboxlib objectlib)
 
 # 指定静态库的输出目录(可选)
 set_target_properties(prelib PROPERTIES

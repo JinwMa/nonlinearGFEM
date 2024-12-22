@@ -27,16 +27,16 @@ public:
     int d_max_nodeid = 0;
     int d_max_elementid = 0;
 
-    map<int, vector<vector<int>>> d_element_face_node_order;
-    std::vector<int> d_element_type;
+    map<int, vector<vector<int>>> d_element_face_node_order; // 单元面片上的节点
+    std::vector<int> d_element_type;                         //每个单元的单元类型
     std::vector<int> d_node_list;
     std::vector<int> d_element_list;
     std::vector<std::vector<double>> d_nodes_coordinate;
     std::vector<std::vector<int>> d_nodes_on_elements;
 
-    map<int, vector<int>> d_node_sets;
-    map<int, vector<int>> d_element_sets;
-    map<int, vector<vector<int>>> d_segment_sets;
+    map<int, vector<int>> d_node_sets;             // 节点集
+    map<int, vector<int>> d_element_sets;          // 单元集
+    map<int, vector<vector<int>>> d_segment_sets;  // 面片集
     unordered_map<int, string> d_element_set_name;
 
     map<int, ObjectBody> d_bodies;
@@ -56,10 +56,12 @@ public:
     }
     void checkmesh();
 
+    // 所谓局部id，指的是节点的全局编号在所有节点中的顺序
     int getNodeLocalId(const int node_global_id)
     {
         return d_node_order_in_list[node_global_id] - 1;
     }
+    // 所谓局部id，指的是单元的全局编号在所有单元中的顺序
     int getElementLocalId(const int element_global_id)
     {
         return d_element_order_in_list[element_global_id] - 1;
