@@ -65,6 +65,9 @@ class NonLinearStaticSolver : public BaseSolver
     void dealWithConvergenceStatus(Input * pinput, Mesh * pmesh);
     void processRollingBack(Input * pinput, Mesh * pmesh);
 
+    void initializeInterationStep();
+    void initializeLoadStep();
+
 
 };
 

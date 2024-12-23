@@ -6,6 +6,7 @@
 using namespace std;
 struct ObjectElementData
 {
+    bool is_updated_interation = false;
     // element level
     bool is_initialized;
     bool is_alive;

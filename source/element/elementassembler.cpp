@@ -202,7 +202,7 @@ void ElementAssembler::assembleElementVector(Input *pinput,
         }
 
         // 读单元参数和设置
-        // pelem->takeDB(pinput, pmesh, name);
+        pelem->takeDB(pinput, pmesh, name);
         // std::vector<int> element_ids = pelem->element_ids;
         auto & element_ids = d_element_sets[iloop];
         this->assembleGroupElementVector(pinput, pmesh, pdofmap, element_ids, pelem, Element_Data, Element_Force, contral_param);
@@ -229,7 +229,7 @@ void ElementAssembler::assembleGroupElementVector(Input *pinput,
         Element_Force_Vectors[i].resize(num_alldof_size);  
     }
     pelement->SetElement();
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int element_now = 0; element_now < element_ids.size(); element_now++)
     {
         int thread_id = omp_get_thread_num();
@@ -237,6 +237,7 @@ void ElementAssembler::assembleGroupElementVector(Input *pinput,
         int element_location = pmesh->d_element_order_in_list[element_id];
         int element_index = element_location - 1;
         auto & element_data = ElementData[element_index];
+        pelement->initializeElement(element_data);
         std::vector<double> elementvector;
         pelement->ComputeInternalForce(element_data, elementvector, contral_param);
         auto node_ids_in_a_element = element_data.element_patch;  

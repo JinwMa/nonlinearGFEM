@@ -30,8 +30,7 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
     std::cout.precision(20);
     elementmat.resize(d_num_edofs * d_num_edofs);
 
-    // 根据位移更新变形梯度，和变形梯度的逆
-    updateF_Finv(element_data);
+    updateInternalVariable(element_data);   
 
     double Ct[3][3][3][3] = {0.0};         //切线模量
 
@@ -523,6 +522,8 @@ void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
     if (!element_data.is_initialized)
         toolbox::error("element is not initialized");
 
+    updateInternalVariable(element_data);
+
     std::cout.precision(20);
     elementvector.resize(d_num_edofs);   
 
@@ -581,4 +582,13 @@ void NonLinearHex8::ComputeInternalForce(ObjectElementData &element_data,
         }        
     }
 
+}
+
+void NonLinearHex8::updateInternalVariable(ObjectElementData & elementdata)
+{
+    if (elementdata.is_updated_interation) return;
+    // 根据位移更新变形梯度，和变形梯度的逆
+    updateF_Finv(elementdata);
+    pmaterial->updateStress(elementdata);
+    elementdata.is_updated_interation = true;
 }

@@ -27,6 +27,9 @@ class BaseMaterial
 
     virtual void updateStressOnIntegrationPoint(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]){};
 
+    virtual void updateStress(ObjectElementData & element_data){};
+
+
 
 public:
     double E = 0.0;

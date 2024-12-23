@@ -98,8 +98,7 @@ void KirchhoffHyperelasticity::getCt(const double Ce[3][3][3][3], const double F
 void KirchhoffHyperelasticity::updateStressOnIntegrationPoint(ObjectElementData & element_data,
                                                               const int ip_order,
                                                               double Ct[3][3][3][3])
-{
-    auto & stress_n1 = element_data.stress_n1[ip_order];
+{    
     auto & F_n1 = element_data.F_n1[ip_order];
     double F[3][3] = {0};
     for (int i = 0; i < 3; i++)
@@ -108,13 +107,30 @@ void KirchhoffHyperelasticity::updateStressOnIntegrationPoint(ObjectElementData 
 
     double jkb = element_data.jkb_n1[ip_order];
 
-    double stress[3][3] = {0};
-
-    getStress(d_C_e_tensor, F, jkb, stress);
-
-    for (int i = 0; i < 3; i++)
-      for (int j = 0; j < 3; j++)
-        stress_n1[i][j] = stress[i][j];
-
     getCt(d_C_e_tensor, F, jkb, Ct);
+}
+
+
+void KirchhoffHyperelasticity::updateStress(ObjectElementData & element_data)
+{
+    int ip_num = element_data.num_integration_points;
+    for (int ip_order = 0; ip_order < ip_num; ip_order++)
+    {
+        auto &stress_n1 = element_data.stress_n1[ip_order];
+        auto &F_n1 = element_data.F_n1[ip_order];
+        double F[3][3] = {0};
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                F[i][j] = F_n1[i][j];
+
+        double jkb = element_data.jkb_n1[ip_order];
+
+        double stress[3][3] = {0};
+
+        getStress(d_C_e_tensor, F, jkb, stress);
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                stress_n1[i][j] = stress[i][j];
+    }    
 }

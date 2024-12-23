@@ -44,6 +44,8 @@ class NonLinearHex8 : public BaseElement
 
        
         void updateF_Finv(ObjectElementData & elementdata);
+
+        void updateInternalVariable(ObjectElementData & elementdata);
 };
 
 

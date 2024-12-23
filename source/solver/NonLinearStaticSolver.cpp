@@ -90,40 +90,16 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
     }
     while(d_real_time < 1.0 - 1.e-10)
     {
-        std::cout << "++++++++++++++++++ load step  " << d_contral_param->load_step + 1 << "  ++++++++"<< std::endl;   
-        d_contral_param->load_step++;    
-        d_contral_param->iteration_step = 0;
-        d_du.setZero();
-        if (d_real_time + d_predict_dt > 1.0) d_predict_dt = 1.0 - d_real_time;
-        d_trial_time = d_real_time + d_predict_dt;
-        std::cout << "++++++++++++++++++ trial time  " << d_trial_time << "  ++++++++"<< std::endl; 
-        // 仅适用于保守载荷
-        d_P_trial = d_P * d_trial_time; 
-        // 仅适用于保守约束
-        d_G_trial = d_G * d_trial_time;
-        d_convergence_state = 0;
+        initializeLoadStep();
         while(true)
         {
+            initializeInterationStep(); 
             d_contral_param->iteration_step++;
-            d_ddu.setZero();                        
-            d_rhs = d_P_trial - d_internal_force; 
-            d_rhs_G = d_G_trial - d_C * (d_u + d_du);
-            std::cout << "    ------- iteration " << d_contral_param->iteration_step;
-            d_convergence_state = checkConvergence();           
-            if(d_convergence_state) break;            
-            Eigen::VectorXd solution;
-            linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
-            d_ddu = solution.head(d_ddu.size());
-            d_lambda = solution.tail(d_lambda.size());
-            d_du = d_du + d_ddu;
-            setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");           
-            d_element_assembler->assembleElementStiffness(pinput, pmesh,
-                                                          d_dof_map.get(),
-                                                          d_element_data, 
-                                                          d_K,
-                                                          d_contral_param.get());
+            d_ddu.setZero();
+            std::cout << "    ------- iteration " << d_contral_param->iteration_step;  
 
-            
+            setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du"); 
+             // 更新内力
             std::vector<double> temp;
             d_element_assembler->assembleElementVector(pinput, 
                                                        pmesh, 
@@ -133,6 +109,29 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
                                                        d_contral_param.get());
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
+            //结束内力更新 
+
+
+            d_rhs = d_P_trial - d_internal_force;
+            d_rhs_G = d_G_trial - d_C * (d_u + d_du);
+            d_convergence_state = checkConvergence();           
+            if(d_convergence_state)
+            {
+                break;                 
+            }     
+            //更新刚度
+            d_element_assembler->assembleElementStiffness(pinput, pmesh,
+                                                          d_dof_map.get(),
+                                                          d_element_data, 
+                                                          d_K,
+                                                          d_contral_param.get());       
+            Eigen::VectorXd solution;
+            linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
+            d_ddu = solution.head(d_ddu.size());
+            d_lambda = solution.tail(d_lambda.size());
+            d_du = d_du + d_ddu;
+            // setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");   
+            // initializeInterationStep();                         
         } 
         dealWithConvergenceStatus(pinput, pmesh);        
     }
@@ -245,4 +244,29 @@ void NonLinearStaticSolver::processRollingBack(Input * pinput, Mesh * pmesh)
                                                d_contral_param.get());    
     Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
     d_internal_force = temp_eigen;
+}
+
+void NonLinearStaticSolver::initializeInterationStep()
+{
+    for (auto & element_data : d_element_data)
+    {
+        element_data.is_updated_interation = false;
+    }    
+}
+
+void  NonLinearStaticSolver::initializeLoadStep()
+{
+    std::cout << "++++++++++++++++++ load step  " << d_contral_param->load_step + 1 << "  ++++++++" << std::endl;
+    d_contral_param->load_step++;
+    d_contral_param->iteration_step = 0;
+    d_du.setZero();
+    if (d_real_time + d_predict_dt > 1.0)
+        d_predict_dt = 1.0 - d_real_time;
+    d_trial_time = d_real_time + d_predict_dt;
+    std::cout << "++++++++++++++++++ trial time  " << d_trial_time << "  ++++++++" << std::endl;
+    // 仅适用于保守载荷
+    d_P_trial = d_P * d_trial_time;
+    // 仅适用于保守约束
+    d_G_trial = d_G * d_trial_time;
+    d_convergence_state = 0;
 }
