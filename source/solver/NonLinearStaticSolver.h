@@ -67,8 +67,6 @@ class NonLinearStaticSolver : public BaseSolver
 
     void initializeInterationStep();
     void initializeLoadStep();
-
-
 };
 
 

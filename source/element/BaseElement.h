@@ -75,8 +75,46 @@ class BaseElement
                                  std::vector<std::vector<double>> & inverse);
     void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
 
+    void ATensorProductB(const double * A, const int m,
+                         const double * B, const int n,
+                         double * C);
 
-    public:
+    void ADotB(const double *A, const int m,
+               const double *B, const int n,
+               double *C);
+
+    void ADotDotB(const double *A, const int m,
+                  const double *B, const int n,
+                  double *C);
+
+    void ThirdTensorLTR(const double A[3][3][3], double B[3][3][3])
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    B[j][k][i] = A[i][j][k];
+                }
+            }
+        }
+    }
+    void ThirdTensorRTL(const double A[3][3][3], double B[3][3][3])
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    B[k][i][j] = A[i][j][k];
+                }
+            }
+        }        
+    }
+
+public:
     //高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
     std::vector<std::vector<double>> d_GaussPoints;
 

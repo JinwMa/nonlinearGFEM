@@ -98,6 +98,20 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             d_ddu.setZero();
             std::cout << "    ------- iteration " << d_contral_param->iteration_step;  
 
+            d_rhs = d_P_trial - d_internal_force;
+            d_rhs_G = d_G_trial - d_C * (d_u + d_du);
+            d_convergence_state = checkConvergence();           
+            if(d_convergence_state)
+            {
+                break;                 
+            }     
+               
+            Eigen::VectorXd solution;
+            linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
+            d_ddu = solution.head(d_ddu.size());
+            d_lambda = solution.tail(d_lambda.size());
+            d_du = d_du + d_ddu;
+
             setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du"); 
              // 更新内力
             std::vector<double> temp;
@@ -109,29 +123,14 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
                                                        d_contral_param.get());
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
-            //结束内力更新 
+            //结束内力更新   
 
-
-            d_rhs = d_P_trial - d_internal_force;
-            d_rhs_G = d_G_trial - d_C * (d_u + d_du);
-            d_convergence_state = checkConvergence();           
-            if(d_convergence_state)
-            {
-                break;                 
-            }     
             //更新刚度
             d_element_assembler->assembleElementStiffness(pinput, pmesh,
                                                           d_dof_map.get(),
                                                           d_element_data, 
                                                           d_K,
-                                                          d_contral_param.get());       
-            Eigen::VectorXd solution;
-            linear_solver(d_K, d_rhs, d_C, d_rhs_G, solution);
-            d_ddu = solution.head(d_ddu.size());
-            d_lambda = solution.tail(d_lambda.size());
-            d_du = d_du + d_ddu;
-            // setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du");   
-            // initializeInterationStep();                         
+                                                          d_contral_param.get());                      
         } 
         dealWithConvergenceStatus(pinput, pmesh);        
     }
