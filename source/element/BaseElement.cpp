@@ -587,7 +587,7 @@ void BaseElement::ADotB(const double *A, const int m,
                 }
             }
         }
-        if (n == 1)
+        else if (n == 1)
         {
             for (int i = 0; i < 9; i++) C[i] = 0.0;
             for (int i = 0; i < 3; i++)
@@ -743,7 +743,7 @@ void BaseElement::ADotDotB(const double *A, const int m,
                 }
             }
         }
-        if (n == 3)
+        else if (n == 3)
         {
             for (int i = 0; i < 27; i++) C[i] = 0.0;
             for (int i = 0; i < 3; i++)
@@ -763,7 +763,7 @@ void BaseElement::ADotDotB(const double *A, const int m,
                 }
             }
         }
-        if (n == 4)
+        else if (n == 4)
         {
             for (int i = 0; i < 81; i++) C[i] = 0.0;
             for (int i = 0; i < 3; i++)

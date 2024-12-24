@@ -114,6 +114,20 @@ class BaseElement
         }        
     }
 
+    void ThirdTensorTranse(const double A[3][3][3], double AT[3][3][3])
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    AT[i][j][k] = A[i][k][j];
+                }
+            }
+        }           
+    }
+
 public:
     //高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
     std::vector<std::vector<double>> d_GaussPoints;
