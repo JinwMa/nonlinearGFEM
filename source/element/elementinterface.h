@@ -5,6 +5,7 @@
 #include "LinearHex8.h"
 #include "LinearTet4.h"
 #include "NonLinearHex8.h"
+#include "NonLinearHex8New.h"
 #include "LinearHex8Bbar.h"
 
 #endif

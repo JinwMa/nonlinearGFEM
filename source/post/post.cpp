@@ -215,7 +215,8 @@ void Post::onlymesh(Input *pinput, Mesh *pmesh)
         }
         if (pinput->getString(elementname + "_type") == "LinearHex8" || 
             pinput->getString(elementname + "_type") == "NonLinearHex8" ||
-            pinput->getString(elementname + "_type") == "LinearHex8Bbar")
+            pinput->getString(elementname + "_type") == "LinearHex8Bbar" ||
+            pinput->getString(elementname + "_type") == "NonLinearHex8New")
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\"" << std::endl;
@@ -334,7 +335,8 @@ void Post::ShowDisplacementOnDeformedConfigration(Input * pinput, Mesh *pmesh, D
         }
         if (pinput->getString(elementname + "_type") == "LinearHex8" || 
             pinput->getString(elementname + "_type") == "NonLinearHex8" ||
-            pinput->getString(elementname + "_type") == "LinearHex8Bbar")
+            pinput->getString(elementname + "_type") == "LinearHex8Bbar" ||
+            pinput->getString(elementname + "_type") == "NonLinearHex8New" )
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;
@@ -448,7 +450,8 @@ void Post::ShowDisplacement(Input * pinput, Mesh *pmesh, Dof_Map *pdofmap, vecto
         }
         if (pinput->getString(elementname + "_type") == "LinearHex8" || 
             pinput->getString(elementname + "_type") == "NonLinearHex8" ||
-            pinput->getString(elementname + "_type") == "LinearHex8Bbar")
+            pinput->getString(elementname + "_type") == "LinearHex8Bbar" ||
+            pinput->getString(elementname + "_type") == "NonLinearHex8New")
         {
             outputFile << "TITLE = \"Example: 3D Finite-Element Data\"" << std::endl;
             outputFile << "VARIABLES = \"X\", \"Y\", \"Z\",  \"ux\",  \"uy\",  \"uz\"" << std::endl;

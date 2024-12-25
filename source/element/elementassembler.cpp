@@ -74,6 +74,10 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
         {
             pelem = new LinearHex8Bbar;
         }
+        else if (element_type == "NonLinearHex8New")
+        {
+            pelem = new NonLinearHex8New;
+        }
         else
         {
             toolbox::error("not supprot this type of element: " + element_type);
@@ -195,6 +199,10 @@ void ElementAssembler::assembleElementVector(Input *pinput,
         if (element_type == "NonLinearHex8")
         {
             pelem = new NonLinearHex8;
+        }
+        else if (element_type == "NonLinearHex8New")
+        {
+            pelem = new NonLinearHex8New;
         }
         else
         {
