@@ -59,7 +59,7 @@ void NonLinearHex8::ComputeStiffness(ObjectElementData &element_data,
             }
         }
 
-        pmaterial->updateStressOnIntegrationPoint(element_data, i, Ct);
+        pmaterial->updateCt(element_data, i, Ct);
         pmaterial->transeCtoD(Ct, D);
         for (int ii = 0; ii < 3; ii++)
         {

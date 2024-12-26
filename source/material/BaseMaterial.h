@@ -25,9 +25,11 @@ class BaseMaterial
 
     virtual void getStress(const double C[3][3][3][3], const double F[3][3], const double jkb, double stress[3][3]){};
 
-    virtual void updateStressOnIntegrationPoint(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]){};
+    virtual void updateCt(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]){};
 
     virtual void updateStress(ObjectElementData & element_data){};
+
+    virtual void getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) {};
 
 
 

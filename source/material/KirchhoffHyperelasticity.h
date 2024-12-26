@@ -12,9 +12,12 @@ class KirchhoffHyperelasticity : public BaseMaterial
 
     void getCt(const double Ce[3][3][3][3], const double F[3][3], const double jkb, double Ct[3][3][3][3]);    
     void getStress(const double C[3][3][3][3], const double F[3][3], const double jkb, double stress[3][3]) override;
-    void updateStressOnIntegrationPoint(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]) override;
+    void updateCt(ObjectElementData & element_data, const int ip_order, double Ct[3][3][3][3]) override;
 
     void updateStress(ObjectElementData & element_data) override;
+
+    void getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) override;
+
 
 private:
 

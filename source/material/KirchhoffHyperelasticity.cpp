@@ -95,7 +95,7 @@ void KirchhoffHyperelasticity::getCt(const double Ce[3][3][3][3], const double F
     transe_C_SE_to_Ct(Ce, F, jkb, Ct);
 }
 
-void KirchhoffHyperelasticity::updateStressOnIntegrationPoint(ObjectElementData & element_data,
+void KirchhoffHyperelasticity::updateCt(ObjectElementData & element_data,
                                                               const int ip_order,
                                                               double Ct[3][3][3][3])
 {    
@@ -133,4 +133,66 @@ void KirchhoffHyperelasticity::updateStress(ObjectElementData & element_data)
             for (int j = 0; j < 3; j++)
                 stress_n1[i][j] = stress[i][j];
     }    
+}
+
+void KirchhoffHyperelasticity::getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du)
+{
+    int num_Gp = element_data.num_integration_points;
+    int num_node = element_data.num_nodes;
+    int size = num_Gp * num_node;
+    dS_du.resize(size);
+    for (int i = 0; i < size; i++) dS_du[i].resize(27);
+
+    double Ct[3][3][3][3] = {0.0};         //切线模量
+    double dNK_dx[3] = {0.0};
+    
+    double delt[3][3] = {0.0};   
+    for (int i = 0; i < 3; i++)
+    {
+        delt[i][i] = 1.0;
+    }
+
+    for (int i = 0; i < num_Gp; i++)
+    {
+        auto stress = element_data.stress_n1[i];
+        updateCt(element_data, i, Ct);
+        for (int j = 0; j < num_node; j++)
+        {
+            double sfdx = element_data.sfdxyz[i][j][0];
+            double sfdy = element_data.sfdxyz[i][j][1];
+            double sfdz = element_data.sfdxyz[i][j][2];
+            double sf_dxnow = element_data.Finv_n1[i][0][0] * sfdx +
+                              element_data.Finv_n1[i][1][0] * sfdy +
+                              element_data.Finv_n1[i][2][0] * sfdz;
+
+            double sf_dynow = element_data.Finv_n1[i][0][1] * sfdx +
+                              element_data.Finv_n1[i][1][1] * sfdy +
+                              element_data.Finv_n1[i][2][1] * sfdz;
+
+            double sf_dznow = element_data.Finv_n1[i][0][2] * sfdx +
+                              element_data.Finv_n1[i][1][2] * sfdy +
+                              element_data.Finv_n1[i][2][2] * sfdz;        
+
+            dNK_dx[0] = sf_dxnow;
+            dNK_dx[1] = sf_dynow;
+            dNK_dx[2] = sf_dznow;    
+            auto & dS_duI = dS_du[i * num_node + j];
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)                    
+                    {
+                        for (int ll = 0; ll < 3; ll++)
+                        {
+                            dS_duI[ii * 9 + jj * 3 + kk] += (Ct[ii][jj][kk][ll] * dNK_dx[ll] -
+                                                            stress[ii][jj] * dNK_dx[ll] * delt[ll][kk] + 
+                                                            dNK_dx[ll] * stress[ll][jj] * delt[ii][kk] + 
+                                                            stress[ii][ll] * dNK_dx[ll] * delt[jj][kk]);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
