@@ -55,6 +55,7 @@ class NonLinearStaticSolver : public BaseSolver
     double d_actural_dt = 0.0;
     double d_trial_time = 0.0;
     double d_predict_dt = 0.0;
+    double d_growth_size = 1.0;
     int d_convergence_state = 0;
 
     Eigen::VectorXd d_rhs_G;

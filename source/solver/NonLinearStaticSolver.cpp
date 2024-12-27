@@ -5,6 +5,7 @@ void NonLinearStaticSolver::takeDB(Input * pinput, const std::string & name)
 {
     if (pinput->ifExist(name + "_load_steps")) d_num_load_step = pinput->getInt(name + "_load_steps");
     std::cout << "number of load steps is " << d_num_load_step << std::endl;
+    if (pinput->ifExist(name + "_step_growth_size")) d_growth_size = pinput->getDouble(name + "_step_growth_size");
 }
 
 void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
@@ -205,6 +206,7 @@ void NonLinearStaticSolver::dealWithConvergenceStatus(Input * pinput, Mesh * pme
         d_actural_dt = d_predict_dt;
         d_real_time = d_trial_time;
         d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp);
+        d_predict_dt = d_actural_dt * d_growth_size;
         if (d_convergence_state == 2) 
         {
             std::cout << "+++++++++++++++++ step size grow up +++++++++++++++" << std::endl;
