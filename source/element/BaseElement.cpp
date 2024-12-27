@@ -25,6 +25,10 @@ void BaseElement::takeDB(Input * pinput, Mesh * pmesh, std::string & name)
     {
         pmaterial = std::make_shared<KirchhoffHyperelasticity>();
     }
+    else if (material_type == "Hypoelastic")
+    {
+        pmaterial = std::make_shared<Hypoelastic>();
+    }
     else
     {
         toolbox::error("not support material type: " + material_type);

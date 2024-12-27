@@ -181,6 +181,32 @@ public:
     }
 
 
+    static void invertMatrix(const double input[3][3], double inverse[3][3]) {
+    // 计算行列式
+    double det = input[0][0] * (input[1][1] * input[2][2] - input[2][1] * input[1][2]) -
+                 input[0][1] * (input[1][0] * input[2][2] - input[2][0] * input[1][2]) +
+                 input[0][2] * (input[1][0] * input[2][1] - input[2][0] * input[1][1]);
+
+    if (det == 0) {
+        error("矩阵不可逆");
+    }
+
+    double invDet = 1.0 / det;
+
+    // 计算伴随矩阵并除以行列式
+    inverse[0][0] = (input[1][1] * input[2][2] - input[2][1] * input[1][2]) * invDet;
+    inverse[0][1] = (input[0][2] * input[2][1] - input[0][1] * input[2][2]) * invDet;
+    inverse[0][2] = (input[0][1] * input[1][2] - input[0][2] * input[1][1]) * invDet;
+    inverse[1][0] = (input[1][2] * input[2][0] - input[1][0] * input[2][2]) * invDet;
+    inverse[1][1] = (input[0][0] * input[2][2] - input[0][2] * input[2][0]) * invDet;
+    inverse[1][2] = (input[1][0] * input[0][2] - input[0][0] * input[1][2]) * invDet;
+    inverse[2][0] = (input[1][0] * input[2][1] - input[2][0] * input[1][1]) * invDet;
+    inverse[2][1] = (input[2][0] * input[0][1] - input[0][0] * input[2][1]) * invDet;
+    inverse[2][2] = (input[0][0] * input[1][1] - input[1][0] * input[0][1]) * invDet;
+
+}
+
+
 };
 
 #endif
