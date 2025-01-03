@@ -54,35 +54,9 @@ void ElementAssembler::assembleElementStiffness(Input *pinput, Mesh *pmesh, Dof_
     int iloop = 0;
 
     for (auto name : d_element_list)
-    {
-        BaseElement *pelem;
-        vector<vector<double>> GaussPoint;
+    {        
         std::string element_type = pinput->getString(name + "_type");
-        if (element_type == "LinearHex8")
-        {
-            pelem = new LinearHex8;
-        }
-        else if (element_type == "LinearTet4")
-        {
-            pelem = new LinearTet4;
-        }
-        else if (element_type == "NonLinearHex8")
-        {
-            pelem = new NonLinearHex8;
-        }
-        else if (element_type == "LinearHex8Bbar")
-        {
-            pelem = new LinearHex8Bbar;
-        }
-        else if (element_type == "NonLinearHex8New")
-        {
-            pelem = new NonLinearHex8New;
-        }
-        else
-        {
-            toolbox::error("not supprot this type of element: " + element_type);
-        }
-
+        BaseElement *pelem = elementSelect(element_type);
         // 读单元参数和设置
         pelem->takeDB(pinput, pmesh, name);
         // std::vector<int> element_ids = pelem->element_ids;
@@ -193,22 +167,8 @@ void ElementAssembler::assembleElementVector(Input *pinput,
     int iloop = 0;
     for (auto name : d_element_list)
     {
-        BaseElement *pelem;
-        vector<vector<double>> GaussPoint;
         std::string element_type = pinput->getString(name + "_type");
-        if (element_type == "NonLinearHex8")
-        {
-            pelem = new NonLinearHex8;
-        }
-        else if (element_type == "NonLinearHex8New")
-        {
-            pelem = new NonLinearHex8New;
-        }
-        else
-        {
-            toolbox::error("not supprot this type of element: " + element_type + "for integration element vector");
-        }
-
+        BaseElement *pelem = elementSelect(element_type);
         // 读单元参数和设置
         pelem->takeDB(pinput, pmesh, name);
         // std::vector<int> element_ids = pelem->element_ids;
@@ -281,5 +241,35 @@ void ElementAssembler::setLocalVectorToGlobalVector(Dof_Map *pdofmap,
             // std::cout << dof_index_global << " " << dof_index_local << std::endl;
             ElementVector[dof_index_global] += elementvector[dof_index_local];
         }
+    }
+}
+
+
+
+BaseElement* ElementAssembler::elementSelect(const std::string & element_type)
+{
+    if (element_type == "LinearHex8")
+    {
+        return new LinearHex8;
+    }
+    else if (element_type == "LinearTet4")
+    {
+        return new LinearTet4;
+    }
+    else if (element_type == "NonLinearHex8")
+    {
+        return new NonLinearHex8;
+    }
+    else if (element_type == "LinearHex8Bbar")
+    {
+        return new LinearHex8Bbar;
+    }
+    else if (element_type == "NonLinearHex8New")
+    {
+        return new NonLinearHex8New;
+    }
+    else
+    {
+        toolbox::error("not supprot this type of element: " + element_type);
     }
 }

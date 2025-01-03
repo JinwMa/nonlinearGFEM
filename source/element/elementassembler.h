@@ -75,6 +75,9 @@ private:
                                      std::vector<std::string> &dofs,
                                      std::vector<double> & elementvector,
                                      std::vector<double> & ElementVector);
+
+
+    BaseElement* elementSelect(const std::string & element_type);
 };
 
 #endif
