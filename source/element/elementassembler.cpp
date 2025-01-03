@@ -268,6 +268,10 @@ BaseElement* ElementAssembler::elementSelect(const std::string & element_type)
     {
         return new NonLinearHex8New;
     }
+    else if (element_type == "NonLinearHex8NewBbar")
+    {
+        return new NonLinearHex8NewBbar;
+    }
     else
     {
         toolbox::error("not supprot this type of element: " + element_type);

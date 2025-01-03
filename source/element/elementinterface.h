@@ -7,5 +7,6 @@
 #include "NonLinearHex8.h"
 #include "NonLinearHex8New.h"
 #include "LinearHex8Bbar.h"
+#include "NonLinearHex8NewBbar.h"
 
 #endif
