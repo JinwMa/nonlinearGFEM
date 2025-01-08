@@ -46,6 +46,11 @@ class NonLinearHex8NewBbar : public BaseElement
         void updateF_Finv(ObjectElementData & elementdata);
 
         void updateInternalVariable(ObjectElementData & elementdata);
+
+        void getCenterGaussPointSF(double nodes_coordinate[20][3],
+                                   std::vector<double> & CenterShapeFunction,
+                                   std::vector<std::vector<double>> & CenterShapeFunction_dxy,
+                                   double & Center_Value_jkb);
 };
 
 

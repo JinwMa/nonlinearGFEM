@@ -31,6 +31,10 @@ class BaseMaterial
 
     virtual void getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) {};
 
+    virtual void updateStressForBbarElement(ObjectElementData & element_data){};
+
+    virtual void getDSDuForBbarElement(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) {};
+
 
 
 public:

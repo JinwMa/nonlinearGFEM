@@ -13,6 +13,8 @@ class Hypoelastic : public BaseMaterial
 
     void getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) override;
     void updateStress(ObjectElementData & element_data) override;
+    void updateStressForBbarElement(ObjectElementData & element_data) override;
+    void getDSDuForBbarElement(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) override;
 
 
 };

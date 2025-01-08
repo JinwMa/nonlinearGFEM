@@ -42,7 +42,9 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
         delt[i][i] = 1.0;
     }
     std::vector<std::vector<double>> dS_du;
-    pmaterial->getDSDu(element_data, dS_du);
+    pmaterial->getDSDuForBbarElement(element_data, dS_du);
+    // pmaterial->getDSDu(element_data, dS_du);
+
 
     for (int i = 0; i < num_GP; i++) // 积分点循环
     {
@@ -51,6 +53,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
         double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
 
         auto stress = element_data.stress_n1[i];
+        double stress_dil = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.0;
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
@@ -74,6 +77,16 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
             dNJ_dx[1] = sf_dynow;
             dNJ_dx[2] = sf_dznow;
 
+            auto dNJ_dXc = element_data.centroid_sfdxy[j];
+            double dNJ_dxc[3] = {0.0};
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    dNJ_dxc[jj] += dNJ_dXc[ii] * element_data.centroid_Finv_n1[ii][jj];
+                }
+            }
+
             for (int k = 0; k < d_num_nodes; k++)
             {
                 sfdx = element_data.sfdxyz[i][k][0];
@@ -95,76 +108,112 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                 dNK_dx[1] = sf_dynow;
                 dNK_dx[2] = sf_dznow;
 
+                auto dNK_dXc = element_data.centroid_sfdxy[k];
+                double dNK_dxc[3] = {0.0};
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    for (int jj = 0; jj < 3; jj++)
+                    {
+                        dNK_dxc[jj] += dNK_dXc[ii] * element_data.centroid_Finv_n1[ii][jj];
+                    }
+                }
+
 
                 // EK = EK_1 - EK_2 + EK_3
                 double EK_1[3][3] = {0.0};
                 double EK_2[3][3] = {0.0};
                 double EK_3[3][3] = {0.0};
                 double EK_4[3][3] = {0.0};
-
                 auto dS_duK = dS_du[i * d_num_nodes + k];
-                for (int ii = 0; ii < 3; ii++)
-                {
-                    for (int jj = 0; jj <3; jj++)
-                    {
-                        for (int p = 0; p < 3; p++)
-                        {
-                            EK_4[ii][p] += dNJ_dx[jj] * dS_duK[ii * 9 + jj * 3 + p];
-                        }
-                    }
-                }
+
                 for (int ii = 0; ii < 3; ii++)
                 {
                     for (int jj = 0; jj < 3; jj++)
                     {
-                        for (int p = 0; p < 3; p++)
+                        for (int kk = 0; kk < 3; kk++)
                         {
-                            EK_1[ii][p] += stress[ii][jj] * dNJ_dx[jj] * dNK_dx[p];
+                            EK_1[ii][kk] += (stress[ii][jj] * dNJ_dx[jj] 
+                                            - stress_dil * dNJ_dx[ii] 
+                                            + stress_dil * dNJ_dxc[ii]) * dNK_dx[kk];
                         }
                     }
                 }
+
+                
                 for (int ii = 0; ii < 3; ii++)
                 {
                     for (int jj = 0; jj < 3; jj++)
                     {
-                        for (int p = 0; p < 3; p++)
+                        for (int kk = 0; kk < 3; kk++)
                         {
-                            EK_2[ii][p] += stress[ii][jj] * dNK_dx[jj] * dNJ_dx[p];
+                            EK_2[ii][kk] += (dS_duK[ii * 9 + jj * 3 + kk] * dNJ_dx[jj] - stress[ii][jj] * dNJ_dx[kk] * dNK_dx[jj]);
                         }
                     }
                 }
+
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int p = 0; p < 3; p++)
+                        {
+                            for (int q = 0; q < 3; q++)
+                            {
+                                EK_3[ii][kk] += (-1.0 / 3.0) * (dS_duK[p * 9 + q * 3 + kk] * delt[p][q]) * (dNJ_dx[ii] - dNJ_dxc[ii]);
+                            }
+                        }
+                    }
+                }
+
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        EK_4[ii][kk] += ((1.0 / 3.0) * stress_dil * dNJ_dx[kk] * dNK_dx[ii] - (1.0 / 3.0) * stress_dil * dNJ_dxc[kk] * dNK_dxc[ii]);
+                    }
+                }
+
+                // for (int ii = 0; ii < 3; ii++)
+                // {
+                //     for (int jj = 0; jj <3; jj++)
+                //     {
+                //         for (int p = 0; p < 3; p++)
+                //         {
+                //             EK_4[ii][p] += dNJ_dx[jj] * dS_duK[ii * 9 + jj * 3 + p];
+                //         }
+                //     }
+                // }
                 // for (int ii = 0; ii < 3; ii++)
                 // {
                 //     for (int jj = 0; jj < 3; jj++)
                 //     {
                 //         for (int p = 0; p < 3; p++)
                 //         {
-                //             for (int q = 0; q < 3; q++)
-                //             {
-                //                 EK_3[ii][p] += (Ct[ii][jj][p][q] * dNK_dx[q] -
-                //                                 dNK_dx[q] * stress[ii][jj] * delt[p][q] + 
-                //                                 dNK_dx[q] * stress[q][jj] * delt[p][ii] +
-                //                                 stress[ii][q] * dNK_dx[q] * delt[p][jj]) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (Ct[ii][jj][p][q] * dNK_dx[q] ) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (- (dNK_dx[q] * stress[ii][jj] * delt[p][q]) * dNJ_dx[jj]);
-
-                //                 // EK_3[ii][p] += (dNK_dx[q] * stress[q][jj] * delt[p][ii]) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (stress[ii][q] * dNK_dx[q] * delt[p][jj]) * dNJ_dx[jj];
-                //             }
+                //             EK_1[ii][p] += stress[ii][jj] * dNJ_dx[jj] * dNK_dx[p];
                 //         }
                 //     }
                 // }
+                // for (int ii = 0; ii < 3; ii++)
+                // {
+                //     for (int jj = 0; jj < 3; jj++)
+                //     {
+                //         for (int p = 0; p < 3; p++)
+                //         {
+                //             EK_2[ii][p] += stress[ii][jj] * dNK_dx[jj] * dNJ_dx[p];
+                //         }
+                //     }
+                // }
+
+
+
+
                 double EK_IJ[3][3] = {};
                 for (int iii = 0; iii < 3; iii++)
                 {
                     for(int jjj = 0; jjj < 3; jjj++)
                     {
-                        double delta = 0.0;
-                        if (iii == jjj) delta = 1.0;
-                        EK_IJ[iii][jjj] = (EK_1[iii][jjj] - EK_2[iii][jjj] + EK_4[iii][jjj]) * weight * JKB * jkb;
+                        EK_IJ[iii][jjj] = (EK_1[iii][jjj] + EK_2[iii][jjj] + EK_3[iii][jjj] + EK_4[iii][jjj]) * weight * JKB * jkb;
+                        // EK_IJ[iii][jjj] = (EK_1[iii][jjj] - EK_2[iii][jjj] + EK_4[iii][jjj]) * weight * JKB * jkb;
                     }
                 }
                 for (int iii = 0; iii < 3; iii++)
@@ -383,7 +432,7 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
 {
     // 初始化element patch
     elementdata.element_patch = elementdata.node_ids;
-    getShapeFunction(nodes_coordinate, GaussPoints, ShapeFunction, ShapeFunction_dxy, value_jkb, num_GP);
+    getShapeFunction(nodes_coordinate, GaussPoints, ShapeFunction, ShapeFunction_dxy, value_jkb, num_GP);    
     // 初始化积分点数目
     elementdata.num_integration_points = GaussPoints.size();
     // 积分点上的形函数
@@ -399,8 +448,8 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
         elementdata.weights[i] = GaussPoints[i][3];
     }
 
-
-
+    double centroid_Jkb;
+    getCenterGaussPointSF(nodes_coordinate, elementdata.centroid_sf, elementdata.centroid_sfdxy, centroid_Jkb);
 
     // 积分点上的雅可比: 构型变化之间的映射
     elementdata.jkb_n.resize(num_GP);
@@ -443,7 +492,7 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
                     elementdata.Finv_n[i][j][k] = 1.0;
                 }
             }
-    }
+    }    
 
     elementdata.jkb_n1 = elementdata.jkb_n;
     elementdata.eff_p_strain_n1 = elementdata.eff_p_strain_n;
@@ -462,6 +511,23 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
         if (elementdata.du[i].size() == 0)
             elementdata.du[i].resize(d_num_node_dof);
     }
+
+    elementdata.centroid_F_n.resize(3);
+    elementdata.centroid_Finv_n.resize(3);
+    for(int i = 0; i < 3; i++) elementdata.centroid_F_n[i].resize(3);
+    for(int i = 0; i < 3; i++) elementdata.centroid_Finv_n[i].resize(3);
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            elementdata.centroid_F_n[i][j] = 0.0;
+            elementdata.centroid_Finv_n[i][j] = 0.0;
+        }
+        elementdata.centroid_F_n[i][i] = 1.0;
+        elementdata.centroid_Finv_n[i][i] = 1.0;
+    }
+    elementdata.centroid_F_n1 = elementdata.centroid_F_n;
+    elementdata.centroid_Finv_n1 = elementdata.centroid_Finv_n;
 
     elementdata.is_initialized = true;    
 }
@@ -517,6 +583,42 @@ void NonLinearHex8NewBbar::updateF_Finv(ObjectElementData &elementdata)
         auto & jkb_n1 = elementdata.jkb_n1[i];
         jkb_n1 = invertMatrix(F_n1, Finv_n1);
     }
+
+    //更新中心点处的变形梯度
+    auto & centroid_F_n1 = elementdata.centroid_F_n1;
+    auto & centroid_Finv_n1 = elementdata.centroid_Finv_n1;
+
+    for (int ii = 0; ii < 3; ii++)
+    {
+        for (int jj = 0; jj < 3; jj++)
+        {
+            centroid_F_n1[ii][jj] = 0.0;
+            if (ii == jj)
+                centroid_F_n1[ii][jj] = 1.0;
+        }
+    }
+
+    for (int inode = 0; inode < d_num_nodes; inode++)
+    {
+         ux = elementdata.u[inode][0] + elementdata.du[inode][0];
+         uy = elementdata.u[inode][1] + elementdata.du[inode][1];
+         uz = elementdata.u[inode][2] + elementdata.du[inode][2];
+         sfdx = elementdata.centroid_sfdxy[inode][0];
+         sfdy = elementdata.centroid_sfdxy[inode][1];
+         sfdz = elementdata.centroid_sfdxy[inode][2];
+         centroid_F_n1[0][0] += ux * sfdx;
+         centroid_F_n1[0][1] += ux * sfdy;
+         centroid_F_n1[0][2] += ux * sfdz;
+
+         centroid_F_n1[1][0] += uy * sfdx;
+         centroid_F_n1[1][1] += uy * sfdy;
+         centroid_F_n1[1][2] += uy * sfdz;
+
+         centroid_F_n1[2][0] += uz * sfdx;
+         centroid_F_n1[2][1] += uz * sfdy;
+         centroid_F_n1[2][2] += uz * sfdz;
+    }
+    double a = invertMatrix(centroid_F_n1, centroid_Finv_n1);
 }
 
 
@@ -536,11 +638,27 @@ void NonLinearHex8NewBbar::ComputeInternalForce(ObjectElementData &element_data,
     std::cout.precision(20);
     elementvector.resize(d_num_edofs);   
 
-    int num_GP = element_data.num_integration_points;    
+    int num_GP = element_data.num_integration_points;  
+
+    int num_node = element_data.num_nodes;
+    double dNI_dxc[num_node][3] = {0.0};
+    auto centroid_Finv = element_data.centroid_Finv_n1;
+    for (int i = 0; i < num_node; i++)
+    {
+        auto dNI_dXc = element_data.centroid_sfdxy[i];
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                dNI_dxc[i][jj] += dNI_dXc[ii] * centroid_Finv[ii][jj];
+            }
+        }
+    }  
     
     for (int i = 0; i < num_GP; i++)
     {
         auto & stress = element_data.stress_n1[i];
+        double stress_dil = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.0;
         double BT[3][6] = {0.0};     // BT
         double F[3][3] = {0.0};
         double Finv[3][3] = {0.0};
@@ -555,38 +673,26 @@ void NonLinearHex8NewBbar::ComputeInternalForce(ObjectElementData &element_data,
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
-            double sfdx = element_data.sfdxyz[i][j][0];
-            double sfdy = element_data.sfdxyz[i][j][1];
-            double sfdz = element_data.sfdxyz[i][j][2];
+            auto dNI_dX = element_data.sfdxyz[i][j];
+            double dNI_dx[3] = {0.0};
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    dNI_dx[jj] += dNI_dX[ii] * Finv[ii][jj]; 
+                }
+            }
 
-            double sf_dxnow = element_data.Finv_n1[i][0][0] * sfdx +
-                              element_data.Finv_n1[i][1][0] * sfdy +
-                              element_data.Finv_n1[i][2][0] * sfdz;
+            for (int ii = 0; ii < 3; ii++)
+            {
+                elementvector[3 * j + ii] += (-stress_dil * dNI_dx[ii] + stress_dil * dNI_dxc[j][ii]) * 
+                                                  element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
 
-            double sf_dynow = element_data.Finv_n1[i][0][1] * sfdx +
-                              element_data.Finv_n1[i][1][1] * sfdy +
-                              element_data.Finv_n1[i][2][1] * sfdz;
-
-            double sf_dznow = element_data.Finv_n1[i][0][2] * sfdx +
-                              element_data.Finv_n1[i][1][2] * sfdy +
-                              element_data.Finv_n1[i][2][2] * sfdz;
-            BT[0][0] = sf_dxnow;
-            BT[0][3] = sf_dynow;
-            BT[0][5] = sf_dznow;
-
-            BT[1][1] = sf_dynow;
-            BT[1][3] = sf_dxnow;
-            BT[1][4] = sf_dznow;
-
-            BT[2][2] = sf_dznow;
-            BT[2][4] = sf_dynow;
-            BT[2][5] = sf_dxnow;
-
-            elementvector[3 * j + 0] += (sf_dxnow * stress[0][0] + sf_dynow * stress[1][0] + sf_dznow * stress[2][0]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
-            elementvector[3 * j + 1] += (sf_dxnow * stress[0][1] + sf_dynow * stress[1][1] + sf_dznow * stress[2][1]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
-            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
-
-          
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    elementvector[3 * j + ii] += (stress[ii][jj] * dNI_dx[jj]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
+                }              
+            }
 
         }        
     }
@@ -598,6 +704,39 @@ void NonLinearHex8NewBbar::updateInternalVariable(ObjectElementData & elementdat
     if (elementdata.is_updated_interation) return;
     // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(elementdata);
-    pmaterial->updateStress(elementdata);
+    pmaterial->updateStressForBbarElement(elementdata);
+    // pmaterial->updateStress(elementdata);
+
     elementdata.is_updated_interation = true;
+}
+
+void NonLinearHex8NewBbar::getCenterGaussPointSF(double nodes_coordinate[20][3],
+                                                 std::vector<double> &CenterShapeFunction,
+                                                 std::vector<std::vector<double>> &CenterShapeFunction_dxy,
+                                                 double &Center_Value_jkb)
+{
+    CenterShapeFunction.resize(8);
+    CenterShapeFunction_dxy.resize(8);
+    for (int i = 0; i < 8; i++) CenterShapeFunction_dxy[i].resize(3);
+    std::vector<std::vector<double>> Center_Gauss_Point;
+    Center_Gauss_Point.resize(1);
+    Center_Gauss_Point[0].resize(4);
+
+    Center_Gauss_Point[0][0] = 0.0;
+    Center_Gauss_Point[0][1] = 0.0;
+    Center_Gauss_Point[0][2] = 0.0;
+    Center_Gauss_Point[0][3] = 8.0;
+
+    vector<vector<double>> ShapeFunction;
+    vector<vector<vector<double>>> ShapeFunction_dxy;
+    vector<double> value_jkb;
+    vector<vector<double>> SF;
+    vector<vector<vector<double>>> SF_dxyz;
+    vector<double> detJ;
+
+    this->getShapeFunction(nodes_coordinate, Center_Gauss_Point, SF, SF_dxyz, detJ, 1);
+
+    CenterShapeFunction = SF[0];
+    CenterShapeFunction_dxy = SF_dxyz[0];
+    Center_Value_jkb = detJ[0];
 }

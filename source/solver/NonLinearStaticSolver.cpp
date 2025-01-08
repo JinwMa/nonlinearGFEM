@@ -113,6 +113,9 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             d_lambda = solution.tail(d_lambda.size());
             d_du = d_du + d_ddu;
 
+            std::vector<double> temp2(d_du.data(), d_du.data() + d_du.size());
+            d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp2);
+
             setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du"); 
              // 更新内力
             std::vector<double> temp;
@@ -173,7 +176,7 @@ int NonLinearStaticSolver::checkConvergence()
         else
             return 1;
     }
-    else if (d_contral_param->iteration_step > 10)
+    else if (d_contral_param->iteration_step > 100)
         return 3;
     else
         return 0;
@@ -193,6 +196,11 @@ void NonLinearStaticSolver::updateElementData()
         element_data.jkb_n = element_data.jkb_n1;
         // 更新应力状态
         element_data.stress_n = element_data.stress_n1;
+        if(element_data.centroid_sfdxy.size() != 0)
+        {
+            element_data.centroid_F_n = element_data.centroid_F_n1;
+            element_data.centroid_Finv_n = element_data.centroid_Finv_n1;
+        }
     }
 }
 

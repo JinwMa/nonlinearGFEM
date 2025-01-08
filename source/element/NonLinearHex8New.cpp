@@ -555,6 +555,24 @@ void NonLinearHex8New::ComputeInternalForce(ObjectElementData &element_data,
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
+            // auto dNI_dX = element_data.sfdxyz[i][j];
+            // double dNI_dx[3] = {0.0};
+            // for (int ii = 0; ii < 3; ii++)
+            // {
+            //     for (int jj = 0; jj < 3; jj++)
+            //     {
+            //         dNI_dx[jj] += dNI_dX[ii] * Finv[ii][jj];
+            //     }
+            // }
+
+            // for (int ii = 0; ii < 3; ii++)
+            // {
+            //     for (int jj = 0; jj < 3; jj++)
+            //     {
+            //         elementvector[3 * j + ii] += (stress[ii][jj] * dNI_dx[jj]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
+            //     }
+            // }
+
             double sfdx = element_data.sfdxyz[i][j][0];
             double sfdy = element_data.sfdxyz[i][j][1];
             double sfdz = element_data.sfdxyz[i][j][2];
@@ -584,9 +602,7 @@ void NonLinearHex8New::ComputeInternalForce(ObjectElementData &element_data,
 
             elementvector[3 * j + 0] += (sf_dxnow * stress[0][0] + sf_dynow * stress[1][0] + sf_dznow * stress[2][0]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
             elementvector[3 * j + 1] += (sf_dxnow * stress[0][1] + sf_dynow * stress[1][1] + sf_dznow * stress[2][1]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
-            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];
-
-          
+            elementvector[3 * j + 2] += (sf_dxnow * stress[0][2] + sf_dynow * stress[1][2] + sf_dznow * stress[2][2]) * element_data.weights[i] * element_data.jkb_n1[i] * element_data.JKB[i];         
 
         }        
     }
