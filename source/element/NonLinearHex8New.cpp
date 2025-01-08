@@ -133,30 +133,6 @@ void NonLinearHex8New::ComputeStiffness(ObjectElementData &element_data,
                         }
                     }
                 }
-                // for (int ii = 0; ii < 3; ii++)
-                // {
-                //     for (int jj = 0; jj < 3; jj++)
-                //     {
-                //         for (int p = 0; p < 3; p++)
-                //         {
-                //             for (int q = 0; q < 3; q++)
-                //             {
-                //                 EK_3[ii][p] += (Ct[ii][jj][p][q] * dNK_dx[q] -
-                //                                 dNK_dx[q] * stress[ii][jj] * delt[p][q] + 
-                //                                 dNK_dx[q] * stress[q][jj] * delt[p][ii] +
-                //                                 stress[ii][q] * dNK_dx[q] * delt[p][jj]) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (Ct[ii][jj][p][q] * dNK_dx[q] ) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (- (dNK_dx[q] * stress[ii][jj] * delt[p][q]) * dNJ_dx[jj]);
-
-                //                 // EK_3[ii][p] += (dNK_dx[q] * stress[q][jj] * delt[p][ii]) * dNJ_dx[jj];
-
-                //                 // EK_3[ii][p] += (stress[ii][q] * dNK_dx[q] * delt[p][jj]) * dNJ_dx[jj];
-                //             }
-                //         }
-                //     }
-                // }
                 double EK_IJ[3][3] = {};
                 for (int iii = 0; iii < 3; iii++)
                 {

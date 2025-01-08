@@ -58,6 +58,8 @@ class NonLinearStaticSolver : public BaseSolver
     double d_growth_size = 1.0;
     int d_convergence_state = 0;
 
+    double d_eps = 0.0;
+
     Eigen::VectorXd d_rhs_G;
     int d_num_load_step = 10;
 

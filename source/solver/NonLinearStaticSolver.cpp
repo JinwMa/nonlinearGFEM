@@ -6,6 +6,8 @@ void NonLinearStaticSolver::takeDB(Input * pinput, const std::string & name)
     if (pinput->ifExist(name + "_load_steps")) d_num_load_step = pinput->getInt(name + "_load_steps");
     std::cout << "number of load steps is " << d_num_load_step << std::endl;
     if (pinput->ifExist(name + "_step_growth_size")) d_growth_size = pinput->getDouble(name + "_step_growth_size");
+
+    if (pinput->ifExist(name + "_eps")) d_eps = pinput->getDouble(name + "_eps");
 }
 
 void NonLinearStaticSolver::init(Input * pinput, Mesh * pmesh)
@@ -113,8 +115,8 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             d_lambda = solution.tail(d_lambda.size());
             d_du = d_du + d_ddu;
 
-            std::vector<double> temp2(d_du.data(), d_du.data() + d_du.size());
-            d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp2);
+            // std::vector<double> temp2(d_du.data(), d_du.data() + d_du.size());
+            // d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp2);
 
             setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du"); 
              // 更新内力
@@ -149,6 +151,7 @@ int NonLinearStaticSolver::checkConvergence()
     bool constraint_convergence = false;
 
     double eps = 1.E-8;
+    if (d_eps > 1.E-20) eps = d_eps;
     Eigen::SparseMatrix<double> Ct = d_C.transpose(); 
     Eigen::VectorXd temp = d_rhs - Ct * d_lambda;
     double normal_rhs = toolbox::getEigenVectorNormal(temp);
@@ -176,7 +179,7 @@ int NonLinearStaticSolver::checkConvergence()
         else
             return 1;
     }
-    else if (d_contral_param->iteration_step > 100)
+    else if (d_contral_param->iteration_step > 15)
         return 3;
     else
         return 0;

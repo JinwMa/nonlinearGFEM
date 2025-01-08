@@ -19,6 +19,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     message(STATUS "The operating system is Linux")
+    ############################################################################
+    #笔记本需要修改下面这两行
+    #############################################################################
     set(MKLROOT "/home/majinwei/intel/oneapi/mkl/2024.2")
     set(EIGEN3_INCLUDE_DIR "/home/majinwei/wal-nonlinearfem/eigen-3.4.0")
 endif()

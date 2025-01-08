@@ -18,6 +18,7 @@ void Hypoelastic::updateStress(ObjectElementData & element_data)
     int num_node = element_data.num_nodes;
     double delt[3][3] = {0.0};
     for (int ii = 0; ii < 3; ii++) delt[ii][ii] = 1.0;
+
     for (int i = 0; i < num_GP; i++) // 循环积分点
     {
         auto & stress_n = element_data.stress_n[i];     //平衡构型下的应力
@@ -30,6 +31,7 @@ void Hypoelastic::updateStress(ObjectElementData & element_data)
             }
         }
         auto & Fn = element_data.F_n[i];
+        // 1 形成Fm
         double dxm_dX[3][3] = {0.0};
         double du_dX[3][3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
@@ -47,8 +49,10 @@ void Hypoelastic::updateStress(ObjectElementData & element_data)
             }
         }
 
+        // 2形成Fm逆
         double dxm_dX_inv[3][3];
         toolbox::invertMatrix(dxm_dX, dxm_dX_inv);
+        // 3形成Im
         double Im[3][3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
         {
@@ -127,6 +131,8 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
     {
         auto stress = element_data.stress_n[i];
         auto & Fn = element_data.F_n[i];
+
+        // 1形成Fm
         double dxm_dX[3][3] = {0.0};
         double du_dX[3][3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
@@ -143,6 +149,7 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
                 }
             }
         }
+        // 2形成Fm的逆
         double dxm_dX_inv[3][3];
         toolbox::invertMatrix(dxm_dX, dxm_dX_inv);
         double Im[3][3] = {0.0};
@@ -191,6 +198,7 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
                 QT[ii][jj] = Q[jj][ii];
             }
         }
+        // 上述过程类似应力更新过程
 
         for (int K = 0; K < num_node; K++)
         {
@@ -230,15 +238,7 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
                     }
                 }
             }
-            // for (int ii = 0; ii < 3; ii++)
-            // {
-            //     for (int jj = 0; jj < 3; jj++)
-            //     {
-            //         for (int kk = 0; kk < 3; kk++)
-            //           std::cout << ddm_du_K[ii][jj][kk] << std::endl;
-            //     }
-            // }
-            // exit(0);
+
             double dQ_du_k[3][3][3] = {0.0};
             for (int ii = 0; ii < 3; ii++)
             {
@@ -292,24 +292,27 @@ void Hypoelastic::updateStressForBbarElement(ObjectElementData & element_data)
     //处理形心处应变
     double e_dil_Bbar = 0.0;
     auto centroid_Fn = element_data.centroid_F_n;
-    double centroid_dxm_dX[3][3] = {0.0};
+
     // 形心处的变形梯度
-    for (int ii = 0; ii < 3; ii++)
+    auto centroid_dxm_dX = centroid_Fn;
+    for (int i = 0; i < num_node; i++)
     {
-        for (int jj = 0; jj < 3; jj++)
+        auto du_I = element_data.du[i];
+        auto dNI_dX = element_data.centroid_sfdxy[i];
+        for (int ii = 0; ii < 3; ii++)
         {
-            centroid_dxm_dX[ii][jj] = centroid_Fn[ii][jj];
-            for (int i = 0; i < num_node; i++)
-            {
-                auto du_I = element_data.du[i];
-                auto dNI_dX = element_data.centroid_sfdxy[i];
+            for (int jj = 0; jj < 3; jj++)
+            {                
                 centroid_dxm_dX[ii][jj] += (0.5 * du_I[ii] * dNI_dX[jj]);
             }
         }
     }
+    // 形心处变形梯度的逆
     double centroid_dxm_dX_inv[3][3] = {0.0};
     toolbox::invertMatrix(centroid_dxm_dX, centroid_dxm_dX_inv);
 
+
+    // 形心处增量体应变
     for (int i = 0; i < num_node; i++)
     {
         auto centroid_dNI_dX = element_data.centroid_sfdxy[i];
@@ -335,8 +338,7 @@ void Hypoelastic::updateStressForBbarElement(ObjectElementData & element_data)
     for (int i = 0; i < num_GP; i++) // 循环积分点
     {
         // #############################
-        // #############################
-        double e_dil = 0.0; 
+        // #############################        
         auto & stress_n = element_data.stress_n[i];     //平衡构型下的应力
         auto & stress_n1  = element_data.stress_n1[i];  //待更新的应力
         for (int ii = 0; ii < 3; ii++)
@@ -377,7 +379,7 @@ void Hypoelastic::updateStressForBbarElement(ObjectElementData & element_data)
             }
         }
 
-
+        double e_dil = 0.0;
         for (int ii = 0; ii < num_node; ii++)
         {
             auto du_K = element_data.du[ii];
@@ -471,23 +473,22 @@ void Hypoelastic::getDSDuForBbarElement(ObjectElementData & element_data, std::v
     for (int i = 0; i < num_node; i++) centroid_de_du[i].resize(27);
 
     auto centroid_Fn = element_data.centroid_F_n;
-    double centroid_dxm_dX[3][3] = {0.0};
-    // 形心处的变形梯度
-    for (int ii = 0; ii < 3; ii++)
+    auto centroid_dxm_dX = centroid_Fn;
+    for (int i = 0; i < num_node; i++)
     {
-        for (int jj = 0; jj < 3; jj++)
+        auto du_I = element_data.du[i];
+        auto dNI_dX = element_data.centroid_sfdxy[i];
+        for (int ii = 0; ii < 3; ii++)
         {
-            centroid_dxm_dX[ii][jj] = centroid_Fn[ii][jj];
-            for (int i = 0; i < num_node; i++)
-            {
-                auto du_I = element_data.du[i];
-                auto dNI_dX = element_data.centroid_sfdxy[i];
+            for (int jj = 0; jj < 3; jj++)
+            {                
                 centroid_dxm_dX[ii][jj] += (0.5 * du_I[ii] * dNI_dX[jj]);
             }
         }
     }
     double centroid_dxm_dX_inv[3][3] = {0.0};
     toolbox::invertMatrix(centroid_dxm_dX, centroid_dxm_dX_inv);
+
     double centroid_dNIs_dxm[num_node][3] = {0.0};
     for (int i = 0; i < num_node; i++)
     {
@@ -681,19 +682,10 @@ void Hypoelastic::getDSDuForBbarElement(ObjectElementData & element_data, std::v
                     {
                         ddm_du_K[ii][jj][kk] = ddm_du_K[ii][jj][kk] - dNK_dxm[kk] * delt[ii][jj] * (1.0 / 3.0) + (1.0 / 3.0) * T1[ii][jj][kk]
                                                + centroid_de_du[K][ii * 9 + jj * 3 + kk];
+                        // std::cout << - dNK_dxm[kk] * delt[ii][jj] * (1.0 / 3.0) + (1.0 / 3.0) * T1[ii][jj][kk] << "  " << centroid_de_du[K][ii * 9 + jj * 3 + kk] << std::endl;
                     }
                 }
             }
-
-            // for (int ii = 0; ii < 3; ii++)
-            // {
-            //     for (int jj = 0; jj < 3; jj++)
-            //     {
-            //         for (int kk = 0; kk < 3; kk++)
-            //           std::cout << ddm_du_K[ii][jj][kk] << std::endl;
-            //     }
-            // }
-            // exit(0);
 
 
             double dQ_du_k[3][3][3] = {0.0};
