@@ -15,17 +15,17 @@ bool BaseConstraint::if_dof_in_mset(const int node_id, const string dof)
 {
     int node_dof_index;
     if (dof == "ux")
-        node_dof_index = (node_id - 1) * 6 + 0;
+        node_dof_index = node_id * 10 + 0;
     else if (dof == "uy")
-        node_dof_index = (node_id - 1) * 6 + 1;
+        node_dof_index = node_id * 10 + 1;
     else if (dof == "uz")
-        node_dof_index = (node_id - 1) * 6 + 2;
+        node_dof_index = node_id * 10 + 2;
     else if (dof == "rx")
-        node_dof_index = (node_id - 1) * 6 + 3;
+        node_dof_index = node_id * 10 + 3;
     else if (dof == "ry")
-        node_dof_index = (node_id - 1) * 6 + 4;
+        node_dof_index = node_id * 10 + 4;
     else if (dof == "rz")
-        node_dof_index = (node_id - 1) * 6 + 5;
+        node_dof_index = node_id * 10 + 5;
     else
         toolbox::error("dof is inputed wrong");
 
@@ -45,17 +45,17 @@ void BaseConstraint::addToMset(const int node_id, const string dof)
 {
     int node_dof_index;
     if (dof == "ux")
-        node_dof_index = (node_id - 1) * 6 + 0;
+        node_dof_index = node_id * 10 + 0;
     else if (dof == "uy")
-        node_dof_index = (node_id - 1) * 6 + 1;
+        node_dof_index = node_id * 10 + 1;
     else if (dof == "uz")
-        node_dof_index = (node_id - 1) * 6 + 2;
+        node_dof_index = node_id * 10 + 2;
     else if (dof == "rx")
-        node_dof_index = (node_id - 1) * 6 + 3;
+        node_dof_index = node_id * 10 + 3;
     else if (dof == "ry")
-        node_dof_index = (node_id - 1) * 6 + 4;
+        node_dof_index = node_id * 10 + 4;
     else if (dof == "rz")
-        node_dof_index = (node_id - 1) * 6 + 5;
+        node_dof_index = node_id * 10 + 5;
     else
         toolbox::error("dof is inputed wrong");
     m_set.insert(node_dof_index);

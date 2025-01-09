@@ -107,3 +107,22 @@ Eigen::VectorXd ConstraintManager::buildConstrintForce(Mesh * pmesh, Dof_Map * p
     
     return G;
 }
+
+
+void ConstraintManager::buildMsetDofs(Dof_Map * pdofmap)
+{
+    for (auto it : all_m_set)
+    {
+        int node_id = it / 10;
+        int dof_index = it % 10;
+        std::string dof;
+        if (dof_index == 0) dof = "ux";
+        else if (dof_index == 1) dof = "uy";
+        else if (dof_index == 2) dof = "uz";
+        else if (dof_index == 3) dof = "rx";
+        else if (dof_index == 4) dof = "ry";
+        else if (dof_index == 5) dof = "rz";
+        else toolbox::error("wrong dof index");
+        d_m_set_dofs.insert(pdofmap->getDofIndex(node_id, dof));
+    }
+}
