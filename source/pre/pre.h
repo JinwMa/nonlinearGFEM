@@ -22,6 +22,8 @@ class Pre
     Pre(){};
     ~Pre(){};
     void preprocess(Input * pinput, Mesh * pmesh);
+    private:
+    void neckingBar(Input * pinput, Mesh * pmesh);
 };
 
 
