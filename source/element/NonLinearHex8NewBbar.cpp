@@ -30,7 +30,17 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
     std::cout.precision(20);
     elementmat.resize(d_num_edofs * d_num_edofs);
 
-    updateInternalVariable(element_data);   
+    std::vector<std::vector<double>> dS_du;
+    // pmaterial->getDSDuForBbarElement(element_data, dS_du);
+    pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
+    if (!element_data.is_updated_interation) 
+    {
+        // 根据位移更新变形梯度，和变形梯度的逆
+        updateF_Finv(element_data);
+        // pmaterial->updateStress(element_data);
+        element_data.is_updated_interation = true;
+    }
+    // updateInternalVariable(element_data);   
     // 循环所有积分点
     int num_GP = element_data.num_integration_points;    
 
@@ -41,8 +51,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
     {
         delt[i][i] = 1.0;
     }
-    std::vector<std::vector<double>> dS_du;
-    pmaterial->getDSDuForBbarElement(element_data, dS_du);
+    
     // pmaterial->getDSDu(element_data, dS_du);
 
 

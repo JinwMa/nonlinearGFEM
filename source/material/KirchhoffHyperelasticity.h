@@ -18,6 +18,14 @@ class KirchhoffHyperelasticity : public BaseMaterial
 
     void getDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) override;
 
+    void updateStressAndDSDu(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) override;
+
+    virtual void updateStressAndDSDuForBbarElement(ObjectElementData & element_data, std::vector<std::vector<double>> & dS_du) {};
+
+
+
+
+
 
 private:
 
