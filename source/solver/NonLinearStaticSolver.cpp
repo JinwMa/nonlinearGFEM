@@ -119,7 +119,16 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
             // d_post->ShowDisplacementOnDeformedConfigration(pinput, pmesh, d_dof_map.get(), temp2);
 
             setEigenVectorToElementData(d_du, d_dof_map.get(), d_element_data, "du"); 
-             // 更新内力
+            
+
+            //更新刚度
+            d_element_assembler->assembleElementStiffness(pinput, pmesh,
+                                                          d_dof_map.get(),
+                                                          d_element_data, 
+                                                          d_K,
+                                                          d_contral_param.get());
+
+            // 更新内力
             std::vector<double> temp;
             d_element_assembler->assembleElementVector(pinput, 
                                                        pmesh, 
@@ -129,14 +138,7 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
                                                        d_contral_param.get());
             Eigen::VectorXd temp_eigen = Eigen::Map<Eigen::VectorXd>(temp.data(), temp.size());
             d_internal_force = temp_eigen;
-            //结束内力更新   
-
-            //更新刚度
-            d_element_assembler->assembleElementStiffness(pinput, pmesh,
-                                                          d_dof_map.get(),
-                                                          d_element_data, 
-                                                          d_K,
-                                                          d_contral_param.get());                      
+            //结束内力更新                       
         } 
         dealWithConvergenceStatus(pinput, pmesh);        
     }
