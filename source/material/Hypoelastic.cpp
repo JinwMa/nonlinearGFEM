@@ -238,7 +238,6 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
                     }
                 }
             }
-
             double dQ_du_k[3][3][3] = {0.0};
             for (int ii = 0; ii < 3; ii++)
             {
@@ -250,9 +249,22 @@ void Hypoelastic::getDSDu(ObjectElementData & element_data, std::vector<std::vec
                         {
                             for (int q = 0; q < 3; q++)
                             {
-                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj] +
-                                                        0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
+                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj]);
                             }
+                        }
+                    }
+                }
+            }
+
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int p = 0; p < 3; p++)
+                        {
+                            dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
                         }
                     }
                 }
@@ -687,7 +699,6 @@ void Hypoelastic::getDSDuForBbarElement(ObjectElementData & element_data, std::v
                 }
             }
 
-
             double dQ_du_k[3][3][3] = {0.0};
             for (int ii = 0; ii < 3; ii++)
             {
@@ -699,9 +710,22 @@ void Hypoelastic::getDSDuForBbarElement(ObjectElementData & element_data, std::v
                         {
                             for (int q = 0; q < 3; q++)
                             {
-                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj] +
-                                                        0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
+                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj]);
                             }
+                        }
+                    }
+                }
+            }
+
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int p = 0; p < 3; p++)
+                        {
+                            dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
                         }
                     }
                 }
@@ -884,9 +908,22 @@ void Hypoelastic::updateStressAndDSDu(ObjectElementData &element_data, std::vect
                         {
                             for (int q = 0; q < 3; q++)
                             {
-                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj] +
-                                                        0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
+                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj]);
                             }
+                        }
+                    }
+                }
+            }
+
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int p = 0; p < 3; p++)
+                        {
+                            dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
                         }
                     }
                 }
@@ -998,7 +1035,7 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                     {
                         for (int p = 0; p < 3; p++)
                         {
-                            T2[ii][jj][kk] += centroid_dNIs_dxm[K][kk] * centroid_dNIs_dxm[J][p] * du_K[p] * delt[ii][jj] * (1.0 / 3.0);
+                            T2[ii][jj][kk] += 0.5 * centroid_dNIs_dxm[K][kk] * centroid_dNIs_dxm[J][p] * du_K[p] * delt[ii][jj] * (1.0 / 3.0);
                         }
                     }
                 }
@@ -1195,7 +1232,7 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                         {
                             for (int p = 0; p < 3; p++)
                             {
-                                T1[ii][jj][kk] += dNJ_dxm[kk] * dNK_dxm[p] * du_J[p] * delt[ii][jj]; 
+                                T1[ii][jj][kk] += 0.5 * dNJ_dxm[kk] * dNK_dxm[p] * du_J[p] * delt[ii][jj]; 
                             }
                         }
                     }
@@ -1228,9 +1265,22 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                         {
                             for (int q = 0; q < 3; q++)
                             {
-                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj] +
-                                                        0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
+                                dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][q][kk] * Q[q][jj]);
                             }
+                        }
+                    }
+                }
+            }
+
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int p = 0; p < 3; p++)
+                        {
+                            dQ_du_k[ii][jj][kk] += (0.5 * R1_inv[ii][p] * dW_du_K[p][jj][kk]);
                         }
                     }
                 }

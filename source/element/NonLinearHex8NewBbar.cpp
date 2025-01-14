@@ -32,7 +32,8 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
 
     std::vector<std::vector<double>> dS_du;
     // pmaterial->getDSDuForBbarElement(element_data, dS_du);
-    pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
+    // pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
+    pmaterial->updateStressAndDSDu(element_data, dS_du);
     if (!element_data.is_updated_interation) 
     {
         // 根据位移更新变形梯度，和变形梯度的逆
@@ -141,10 +142,16 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                     {
                         for (int kk = 0; kk < 3; kk++)
                         {
-                            EK_1[ii][kk] += (stress[ii][jj] * dNJ_dx[jj] 
-                                            - stress_dil * dNJ_dx[ii] 
-                                            + stress_dil * dNJ_dxc[ii]) * dNK_dx[kk];
+                            EK_1[ii][kk] += (stress[ii][jj] * dNJ_dx[jj]) * dNK_dx[kk];
                         }
+                    }
+                }
+
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        EK_1[ii][kk] += (-stress_dil * dNJ_dx[ii] + stress_dil * dNJ_dxc[ii]) * dNK_dx[kk];
                     }
                 }
 
@@ -178,7 +185,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                 {
                     for (int kk = 0; kk < 3; kk++)
                     {
-                        EK_4[ii][kk] += ((1.0 / 3.0) * stress_dil * dNJ_dx[kk] * dNK_dx[ii] - (1.0 / 3.0) * stress_dil * dNJ_dxc[kk] * dNK_dxc[ii]);
+                        EK_4[ii][kk] += (stress_dil * dNJ_dx[kk] * dNK_dx[ii] - stress_dil * dNJ_dxc[kk] * dNK_dxc[ii]);
                     }
                 }
 
@@ -713,8 +720,8 @@ void NonLinearHex8NewBbar::updateInternalVariable(ObjectElementData & elementdat
     if (elementdata.is_updated_interation) return;
     // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(elementdata);
-    pmaterial->updateStressForBbarElement(elementdata);
-    // pmaterial->updateStress(elementdata);
+    // pmaterial->updateStressForBbarElement(elementdata);
+    pmaterial->updateStress(elementdata);
 
     elementdata.is_updated_interation = true;
 }
