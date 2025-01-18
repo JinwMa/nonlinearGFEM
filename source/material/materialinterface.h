@@ -5,6 +5,7 @@
 #include "LinearElasticity.h"
 #include "KirchhoffHyperelasticity.h"
 #include "Hypoelastic.h"
+#include "Hypoelastoplastic.h"
 
 
 
