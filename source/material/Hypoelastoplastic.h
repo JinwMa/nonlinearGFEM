@@ -54,7 +54,7 @@ class Hypoelastoplastic : public BaseMaterial
                             const double e_dil_Bbar,
                             const double Fm_Bbar[3][3],
                             const double Fm_Bbar_inv[3][3],
-                            std::vector<std::vector<double>> centroid_de_du);
+                            std::vector<std::vector<double>> & centroid_de_du);
 
 
     void get_e_dil(ObjectElementData & element_data,
@@ -67,7 +67,7 @@ class Hypoelastoplastic : public BaseMaterial
                                         const int node_num,
                                         const double Fm_inv[3][3],
                                         const double dNK_dxm[3],
-                                        const std::vector<std::vector<double>> centroid_de_du,
+                                        const std::vector<std::vector<double>> & centroid_de_du,
                                         double ddm_du_K[3][3][3]);
 
 

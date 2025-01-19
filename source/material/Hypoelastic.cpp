@@ -879,29 +879,31 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
 
     std::vector<std::vector<double>> centroid_de_du;
     centroid_de_du.resize(num_node);
-    for (int i = 0; i < num_node; i++) centroid_de_du[i].resize(27);    
+    for (int i = 0; i < num_node; i++) centroid_de_du[i].resize(27);  
 
     // 标准单元
-    double du_dX[3][3];
-    double Fm[3][3];
-    double Fm_inv[3][3];
-    double Im[3][3];
-    double W[3][3];
-    double dm[3][3];
-    double Q[3][3];
-    double R1_inv[3][3];
-    double R2[3][3];
+    double du_dX[3][3] = {0.0};
+    double Fm[3][3] = {0.0};
+    double Fm_inv[3][3] = {0.0};
+    double Im[3][3] = {0.0};
+    double W[3][3] = {0.0};
+    double dm[3][3] = {0.0};
+    double Q[3][3] = {0.0};
+    double R1_inv[3][3] = {0.0};
+    double R2[3][3] = {0.0};
 
+    // 
     double dIm_du_K[3][3][3];
     double ddm_du_K[3][3][3];
     double dW_du_K[3][3][3];
     double dQ_du_K[3][3][3];
     double dNK_dxm[3];
-    double e_dil;
 
-    double e_dil_Bbar;
-    double Fm_Bbar[3][3];
-    double Fm_Bbar_inv[3][3];
+  
+    
+    double e_dil_Bbar = 0.0;
+    double Fm_Bbar[3][3] = {0.0};
+    double Fm_Bbar_inv[3][3] = {0.0};
     this->preBbar(element_data,
                   e_dil_Bbar,
                   Fm_Bbar,
@@ -924,6 +926,7 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                 stress_n1[ii][jj] = 0.0;
             }
         }
+
         this->getQetc(element_data, i,
                       du_dX,
                       Fm,
@@ -934,7 +937,18 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                       Q,
                       R1_inv,
                       R2);
-        double QT[3][3];
+
+        double e_dil = 0.0;
+        this->get_e_dil(element_data, i, Fm_inv, e_dil);
+
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                dm[ii][jj] = dm[ii][jj] - e_dil * delt[ii][jj] + e_dil_Bbar * delt[ii][jj];
+            }
+        }
+        double QT[3][3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -943,18 +957,6 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
             }
         }
 
-        this->get_e_dil(element_data,
-                        i,
-                        Fm_inv,
-                        e_dil);   
-        for (int ii = 0; ii < 3; ii++)
-        {
-            for (int jj = 0; jj < 3; jj++)
-            {
-                
-                dm[ii][jj] = -e_dil * delt[ii][jj] + e_dil_Bbar * delt[ii][jj];
-            }
-        }  
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -974,7 +976,7 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
         {
             auto & dS_du_K = dS_du[i * num_node + K];
             for (int iii = 0; iii < dS_du_K.size(); iii++) dS_du_K[iii] = 0.0; 
-            
+
             this->getDQetc(element_data, i, K,
                            Fm_inv,
                            Im,
@@ -1013,7 +1015,7 @@ void Hypoelastic::updateStressAndDSDuForBbarElement(ObjectElementData &element_d
                 }
             }
         }
-    }    
+    } 
 }
 
 
@@ -1266,11 +1268,11 @@ void Hypoelastic::get_centroid_de_du(ObjectElementData &element_data,
                                      const double e_dil_Bbar,
                                      const double Fm_Bbar[3][3],
                                      const double Fm_Bbar_inv[3][3],
-                                     std::vector<std::vector<double>> centroid_de_du)
+                                     std::vector<std::vector<double>> & centroid_de_du)
 {
+    int num_node = element_data.num_nodes;    
     double delt[3][3] = {0.0};
     for (int i = 0; i < 3; i++) delt[i][i] = 1.0;
-    int num_node = element_data.num_nodes;
     double centroid_dNIs_dxm[num_node][3] = {0.0};
     for (int i = 0; i < num_node; i++)
     {
@@ -1355,7 +1357,7 @@ void Hypoelastic::update_ddm_du_K_ForBbarElement(ObjectElementData & element_dat
                                                  const int node_num,
                                                  const double Fm_inv[3][3],
                                                  const double dNK_dxm[3],
-                                                 const std::vector<std::vector<double>> centroid_de_du,
+                                                 const std::vector<std::vector<double>> & centroid_de_du,
                                                  double ddm_du_K[3][3][3])
 {
     double delt[3][3] = {0.0};

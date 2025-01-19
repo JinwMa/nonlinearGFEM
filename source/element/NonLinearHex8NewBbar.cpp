@@ -32,8 +32,8 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
 
     std::vector<std::vector<double>> dS_du;
     // pmaterial->getDSDuForBbarElement(element_data, dS_du);
-    // pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
-    pmaterial->updateStressAndDSDu(element_data, dS_du);
+    pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
+    // pmaterial->updateStressAndDSDu(element_data, dS_du);
     if (!element_data.is_updated_interation) 
     {
         // 根据位移更新变形梯度，和变形梯度的逆
