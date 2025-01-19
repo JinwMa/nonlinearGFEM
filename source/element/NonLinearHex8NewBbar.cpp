@@ -31,14 +31,11 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
     elementmat.resize(d_num_edofs * d_num_edofs);
 
     std::vector<std::vector<double>> dS_du;
-    // pmaterial->getDSDuForBbarElement(element_data, dS_du);
     pmaterial->updateStressAndDSDuForBbarElement(element_data, dS_du);
-    // pmaterial->updateStressAndDSDu(element_data, dS_du);
     if (!element_data.is_updated_interation) 
     {
         // 根据位移更新变形梯度，和变形梯度的逆
         updateF_Finv(element_data);
-        // pmaterial->updateStress(element_data);
         element_data.is_updated_interation = true;
     }
     // updateInternalVariable(element_data);   
@@ -188,37 +185,6 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                         EK_4[ii][kk] += (stress_dil * dNJ_dx[kk] * dNK_dx[ii] - stress_dil * dNJ_dxc[kk] * dNK_dxc[ii]);
                     }
                 }
-
-                // for (int ii = 0; ii < 3; ii++)
-                // {
-                //     for (int jj = 0; jj <3; jj++)
-                //     {
-                //         for (int p = 0; p < 3; p++)
-                //         {
-                //             EK_4[ii][p] += dNJ_dx[jj] * dS_duK[ii * 9 + jj * 3 + p];
-                //         }
-                //     }
-                // }
-                // for (int ii = 0; ii < 3; ii++)
-                // {
-                //     for (int jj = 0; jj < 3; jj++)
-                //     {
-                //         for (int p = 0; p < 3; p++)
-                //         {
-                //             EK_1[ii][p] += stress[ii][jj] * dNJ_dx[jj] * dNK_dx[p];
-                //         }
-                //     }
-                // }
-                // for (int ii = 0; ii < 3; ii++)
-                // {
-                //     for (int jj = 0; jj < 3; jj++)
-                //     {
-                //         for (int p = 0; p < 3; p++)
-                //         {
-                //             EK_2[ii][p] += stress[ii][jj] * dNK_dx[jj] * dNJ_dx[p];
-                //         }
-                //     }
-                // }
 
 
 
@@ -720,8 +686,7 @@ void NonLinearHex8NewBbar::updateInternalVariable(ObjectElementData & elementdat
     if (elementdata.is_updated_interation) return;
     // 根据位移更新变形梯度，和变形梯度的逆
     updateF_Finv(elementdata);
-    // pmaterial->updateStressForBbarElement(elementdata);
-    pmaterial->updateStress(elementdata);
+    pmaterial->updateStressForBbarElement(elementdata);
 
     elementdata.is_updated_interation = true;
 }
