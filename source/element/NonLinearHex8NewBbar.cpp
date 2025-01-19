@@ -440,9 +440,12 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
     
     // 等效塑性应变
     elementdata.eff_p_strain_n.resize(num_GP);
+    elementdata.kappa_n.resize(num_GP);
     for (int i = 0; i < num_GP; i++)
+    {
         elementdata.eff_p_strain_n[i] = 0.0;
-
+        elementdata.kappa_n[i] = pmaterial->d_init_kappa;
+    }
     // 变形梯度 应力 变形梯度逆
     elementdata.F_n.resize(num_GP);
     elementdata.Finv_n.resize(num_GP);
@@ -478,6 +481,7 @@ void NonLinearHex8NewBbar::initialize_element(double nodes_coordinate[20][3],
 
     elementdata.jkb_n1 = elementdata.jkb_n;
     elementdata.eff_p_strain_n1 = elementdata.eff_p_strain_n;
+    elementdata.kappa_n1 = elementdata.kappa_n;
 
     elementdata.F_n1 = elementdata.F_n;
     elementdata.Finv_n1 = elementdata.Finv_n;

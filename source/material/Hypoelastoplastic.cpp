@@ -6,6 +6,7 @@ void Hypoelastoplastic::takeDB(Input * pinput, std::string & name)
 {
     E = pinput->getDouble(name + "_modulus");
     u = pinput->getDouble(name + "_radio");
+    d_init_kappa = pinput->getDouble(name + "_init_kappa");
     getC_e_tensor(d_C_e_tensor);
 }
 

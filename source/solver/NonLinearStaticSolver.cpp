@@ -194,6 +194,8 @@ void NonLinearStaticSolver::updateElementData()
     {
         // 更新等效塑性应变
         element_data.eff_p_strain_n = element_data.eff_p_strain_n1;
+        // 更新屈服半径
+        element_data.kappa_n = element_data.kappa_n1;
         // 更新变形梯度和逆
         element_data.F_n = element_data.F_n1;
         element_data.Finv_n = element_data.Finv_n1;

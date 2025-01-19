@@ -63,77 +63,24 @@ class BaseElement
     
 
     protected:
-    void AmnXBpq(const double * A, const int m, const int n,
-                 const double * B, const int p, const int q,
-                 double * C);
+        void AmnXBpq(const double *A, const int m, const int n,
+                     const double *B, const int p, const int q,
+                     double *C);
 
-    void AXB3663(const double A[3][6], const double B[6][3], double C[3][3]);
-    void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
-    void AXB3883(const double A[3][8], const double B[8][3], double C[3][3]);
-    double invertMatrix(const double input[3][3], double inverse[3][3]);
-    double invertMatrix(const std::vector<std::vector<double>> & input,
-                                 std::vector<std::vector<double>> & inverse);
-    void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
+        void AXB3663(const double A[3][6], const double B[6][3], double C[3][3]);
+        void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
+        void AXB3883(const double A[3][8], const double B[8][3], double C[3][3]);
+        double invertMatrix(const double input[3][3], double inverse[3][3]);
+        double invertMatrix(const std::vector<std::vector<double>> &input,
+                            std::vector<std::vector<double>> &inverse);
+        void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
 
-    void ATensorProductB(const double * A, const int m,
-                         const double * B, const int n,
-                         double * C);
-
-    void ADotB(const double *A, const int m,
-               const double *B, const int n,
-               double *C);
-
-    void ADotDotB(const double *A, const int m,
-                  const double *B, const int n,
-                  double *C);
-
-    void ThirdTensorLTR(const double A[3][3][3], double B[3][3][3])
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    B[j][k][i] = A[i][j][k];
-                }
-            }
-        }
-    }
-    void ThirdTensorRTL(const double A[3][3][3], double B[3][3][3])
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    B[k][i][j] = A[i][j][k];
-                }
-            }
-        }        
-    }
-
-    void ThirdTensorTranse(const double A[3][3][3], double AT[3][3][3])
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    AT[i][j][k] = A[i][k][j];
-                }
-            }
-        }           
-    }
-
-public:
-    //高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
-    std::vector<std::vector<double>> d_GaussPoints;
+    public:
+        // 高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
+        std::vector<std::vector<double>> d_GaussPoints;
 
     protected:
-    std::shared_ptr<BaseMaterial> pmaterial;
+        std::shared_ptr<BaseMaterial> pmaterial;
     
 };
 

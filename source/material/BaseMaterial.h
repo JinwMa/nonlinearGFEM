@@ -46,6 +46,9 @@ public:
 
     protected:
     double d_C_e_tensor[3][3][3][3];
+
+    public:
+    double d_init_kappa = 0.0;
 };
 
 

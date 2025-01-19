@@ -50,6 +50,9 @@ struct ObjectElementData
     vector<double> eff_p_strain_n;
     vector<double> eff_p_strain_n1;
 
+    vector<double> kappa_n;
+    vector<double> kappa_n1;
+
     // BbarElement
     vector<double> centroid_sf;
     vector<vector<double>> centroid_sfdxy;
