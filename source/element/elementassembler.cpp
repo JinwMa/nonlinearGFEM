@@ -2,7 +2,8 @@
 #include <omp.h>
 
 void ElementAssembler::takeDB(Input *pinput, Mesh *pmesh, Dof_Map *pdofmap)
-{    
+{   
+    if (pinput->ifExist("MAX_THREADS"))  max_threads = pinput->getInt("MAX_THREADS");
     d_element_list = pinput->getVectorString("element_list");    
     for (auto name : d_element_list)
     {

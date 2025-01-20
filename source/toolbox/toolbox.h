@@ -256,6 +256,19 @@ static void invertMatrix(const std::vector<std::vector<double>> & input, std::ve
 
 }
 
+static void getTensorNormal(const double A[3][3], double & normal)
+{
+    normal = 0.0;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            normal += A[i][j] * A[i][j];
+        }
+    }
+    normal = std::sqrt(normal);
+}
+
 
 };
 
