@@ -8,6 +8,7 @@ void Hypoelastoplastic::takeDB(Input * pinput, std::string & name)
     u = pinput->getDouble(name + "_radio");
     d_init_kappa = pinput->getDouble(name + "_init_kappa");
     getC_e_tensor(d_C_e_tensor);
+    if (pinput->ifExist(name + "_iner_loop_tol")) d_iner_loop_tol = pinput->getDouble(name + "_iner_loop_tol");
 }
 
 void Hypoelastoplastic::updateStress(ObjectElementData & element_data)
@@ -1508,7 +1509,7 @@ void Hypoelastoplastic::getDeltaGamma(const double epn,
     deltaGamma = 0.0;
     double G2 = G(epn, normal_stress_dev, mu, init_Y, deltaGamma);
     double G_abs = std::fabs(G2);
-    double tol = 1.E-12;
+    double tol = d_iner_loop_tol;
     int i = 0;
     while (G_abs > tol)
     {
@@ -1549,10 +1550,10 @@ void Hypoelastoplastic::getCep(const double lambda,
             }
         }
     }
-    double beta1 = c * kappa_n1 / normal_stress_dev;
+    double beta1 = c * kappa_n1 / normal_stress_dev - 1.0;
     double beta2 = mu + kappa_dx(init_Y, epn1) / 3.0;
     beta2 = mu / beta2;
-    beta2 = beta2 + beta1 - 1.0;
+    beta2 = beta2 + beta1;
     const double kk1 = lambda + 2.0 * mu / 3.0;
     for (int i = 0; i < 3; i++)
     {
@@ -1562,9 +1563,8 @@ void Hypoelastoplastic::getCep(const double lambda,
             {
                 for (int l = 0; l < 3; l++)
                 {
-                    Cep[i][j][k][l] = kk1 * I[i][j] * I[k][l] +
-                                      2.0 * mu * beta1 * I_dev[i][j][k][l] - 
-                                      2.0 * mu * beta2 * n[i][j] * n[k][l];
+                    Cep[i][j][k][l] = d_C_e_tensor[i][j][k][l] - 
+                                      2.0 * mu * (-beta1 * I_dev[i][j][k][l] + beta2 * n[i][j] * n[k][l]);
                 }
             }
         }

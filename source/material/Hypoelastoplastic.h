@@ -113,6 +113,9 @@ class Hypoelastoplastic : public BaseMaterial
                 const double kappa_n1,
                 const double normal_stress_dev,
                 double Cep[3][3][3][3]);
+
+    private:
+    double d_iner_loop_tol = 1.E-12;
 };
 
 
