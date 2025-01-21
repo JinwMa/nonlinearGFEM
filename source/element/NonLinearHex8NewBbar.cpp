@@ -59,7 +59,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
         double JKB = element_data.JKB[i]; // 母单元映射雅可比
         double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
 
-        auto stress = element_data.stress_n1[i];
+        const auto & stress = element_data.stress_n1[i];
         double stress_dil = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.0;
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
@@ -84,7 +84,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
             dNJ_dx[1] = sf_dynow;
             dNJ_dx[2] = sf_dznow;
 
-            auto dNJ_dXc = element_data.centroid_sfdxy[j];
+            const auto & dNJ_dXc = element_data.centroid_sfdxy[j];
             double dNJ_dxc[3] = {0.0};
             for (int ii = 0; ii < 3; ii++)
             {
@@ -115,7 +115,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                 dNK_dx[1] = sf_dynow;
                 dNK_dx[2] = sf_dznow;
 
-                auto dNK_dXc = element_data.centroid_sfdxy[k];
+                const auto & dNK_dXc = element_data.centroid_sfdxy[k];
                 double dNK_dxc[3] = {0.0};
                 for (int ii = 0; ii < 3; ii++)
                 {
@@ -131,7 +131,7 @@ void NonLinearHex8NewBbar::ComputeStiffness(ObjectElementData &element_data,
                 double EK_2[3][3] = {0.0};
                 double EK_3[3][3] = {0.0};
                 double EK_4[3][3] = {0.0};
-                auto dS_duK = dS_du[i * d_num_nodes + k];
+                const auto & dS_duK = dS_du[i * d_num_nodes + k];
 
                 for (int ii = 0; ii < 3; ii++)
                 {
