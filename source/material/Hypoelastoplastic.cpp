@@ -922,11 +922,11 @@ void Hypoelastoplastic::updateStressAndDSDuForBbarElement(ObjectElementData &ele
 
     for (int i = 0; i < num_GP; i++) // 循环积分点
     {
-        auto stress = element_data.stress_n[i];
+        const auto & stress = element_data.stress_n[i];
         auto & stress_n1  = element_data.stress_n1[i];  //待更新的应力
 
         // 弹塑性相关变量：
-        auto epn = element_data.eff_p_strain_n[i];
+        const auto & epn = element_data.eff_p_strain_n[i];
         auto & epn1 = element_data.eff_p_strain_n1[i];
         auto & kappa_n1 = element_data.kappa_n1[i];
         double stress_trial[3][3] = {0.0}; // 试探应力
@@ -1135,7 +1135,7 @@ void Hypoelastoplastic::getQetc(ObjectElementData & element_data, const int ip_n
                           double R2[3][3])
 {
     double delt[3][3] = {0.0};
-    auto Fn = element_data.F_n[ip_num];
+    const auto & Fn = element_data.F_n[ip_num];
     int num_node = element_data.num_nodes;
     // 形成Fm 和 du_dX
     // 初始化各种变量
@@ -1158,8 +1158,8 @@ void Hypoelastoplastic::getQetc(ObjectElementData & element_data, const int ip_n
 
     for (int K = 0; K < num_node; K++)
     {
-        auto du_K = element_data.du[K];
-        auto dNK_dX = element_data.sfdxyz[ip_num][K];
+        const auto & du_K = element_data.du[K];
+        const auto & dNK_dX = element_data.sfdxyz[ip_num][K];
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -1235,7 +1235,7 @@ void Hypoelastoplastic::getDQetc(ObjectElementData & element_data, const int ip_
             }
         }
     }
-    auto dNK_dX = element_data.sfdxyz[ip_num][node_num];
+    const auto & dNK_dX = element_data.sfdxyz[ip_num][node_num];
     for (int ii = 0; ii < 3; ii++)
     {
         for (int jj = 0; jj < 3; jj++)
@@ -1307,7 +1307,7 @@ void Hypoelastoplastic::preBbar(ObjectElementData & element_data,
                           double Fm_Bbar[3][3],
                           double Fm_Bbar_inv[3][3])
 {
-    auto centroid_Fn = element_data.centroid_F_n;    
+    const auto & centroid_Fn = element_data.centroid_F_n;    
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
@@ -1320,8 +1320,8 @@ void Hypoelastoplastic::preBbar(ObjectElementData & element_data,
 
     for (int i = 0; i < num_node; i++)
     {
-        auto du_I = element_data.du[i];
-        auto dNI_dX = element_data.centroid_sfdxy[i];
+        const auto & du_I = element_data.du[i];
+        const auto & dNI_dX = element_data.centroid_sfdxy[i];
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -1336,8 +1336,8 @@ void Hypoelastoplastic::preBbar(ObjectElementData & element_data,
 
     for (int i = 0; i < num_node; i++)
     {
-        auto centroid_dNI_dX = element_data.centroid_sfdxy[i];
-        auto du_I = element_data.du[i];
+        const auto & centroid_dNI_dX = element_data.centroid_sfdxy[i];
+        const auto & du_I = element_data.du[i];
         double centroid_dNI_dxm[3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
         {
@@ -1369,7 +1369,7 @@ void Hypoelastoplastic::get_centroid_de_du(ObjectElementData &element_data,
     double centroid_dNIs_dxm[num_node][3] = {0.0};
     for (int i = 0; i < num_node; i++)
     {
-        auto centroid_dNI_dX = element_data.centroid_sfdxy[i];
+        const auto & centroid_dNI_dX = element_data.centroid_sfdxy[i];
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -1385,7 +1385,7 @@ void Hypoelastoplastic::get_centroid_de_du(ObjectElementData &element_data,
         double T2[3][3][3] = {0.0};
         for (int K = 0; K < num_node; K++)
         {
-            auto du_K = element_data.du[K];
+            const auto & du_K = element_data.du[K];
             for (int ii = 0; ii < 3; ii++)
             {
                 for (int jj = 0; jj < 3; jj++)
@@ -1425,8 +1425,8 @@ void Hypoelastoplastic::get_e_dil(ObjectElementData & element_data,
     int num_node = element_data.num_nodes;
     for (int ii = 0; ii < num_node; ii++)
         {
-            auto du_K = element_data.du[ii];
-            auto dNK_dX = element_data.sfdxyz[ip_num][ii];
+            const auto & du_K = element_data.du[ii];
+            const auto & dNK_dX = element_data.sfdxyz[ip_num][ii];
             double dNK_dxm[3] = {0.0};
             for (int jj = 0; jj < 3; jj++)
             {
@@ -1459,8 +1459,8 @@ void Hypoelastoplastic::update_ddm_du_K_ForBbarElement(ObjectElementData & eleme
     double T1[3][3][3] = {0.0};
     for (int J = 0; J < num_node; J++)
     {
-        auto du_J = element_data.du[J];
-        auto dNJ_dX = element_data.sfdxyz[ip_num][J];
+        const auto & du_J = element_data.du[J];
+        const auto & dNJ_dX = element_data.sfdxyz[ip_num][J];
         double dNJ_dxm[3] = {0.0};
         for (int ii = 0; ii < 3; ii++)
         {

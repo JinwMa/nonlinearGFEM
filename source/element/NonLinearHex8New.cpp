@@ -60,7 +60,7 @@ void NonLinearHex8New::ComputeStiffness(ObjectElementData &element_data,
         double JKB = element_data.JKB[i]; // 母单元映射雅可比
         double jkb = element_data.jkb_n1[i]; // 构型变化之雅可比
 
-        auto stress = element_data.stress_n1[i];
+        const auto & stress = element_data.stress_n1[i];
 
         for (int j = 0; j < d_num_nodes; j++) // 节点循环
         {
@@ -112,7 +112,7 @@ void NonLinearHex8New::ComputeStiffness(ObjectElementData &element_data,
                 double EK_3[3][3] = {0.0};
                 double EK_4[3][3] = {0.0};
 
-                auto dS_duK = dS_du[i * d_num_nodes + k];
+                const auto & dS_duK = dS_du[i * d_num_nodes + k];
                 for (int ii = 0; ii < 3; ii++)
                 {
                     for (int jj = 0; jj <3; jj++)
