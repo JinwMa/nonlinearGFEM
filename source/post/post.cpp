@@ -129,6 +129,12 @@ void Post::BuildPostNodes(Mesh *pmesh, Dof_Map *pdofmap, vector<double> & displa
         PostNodes[i].uy = displacement[pdofmap->getDofIndex(nodeid, "uy")];
         PostNodes[i].uz = displacement[pdofmap->getDofIndex(nodeid, "uz")];
 
+        // 输出归一化：
+        if (std::fabs(PostNodes[i].ux) < d_eps) PostNodes[i].ux = 0.0;
+        if (std::fabs(PostNodes[i].uy) < d_eps) PostNodes[i].uy = 0.0;
+        if (std::fabs(PostNodes[i].uz) < d_eps) PostNodes[i].uz = 0.0;
+
+
         
         PostNodes[i].x = pmesh->d_nodes_coordinate[nodeorder - 1][0] + PostNodes[i].ux;
         PostNodes[i].y = pmesh->d_nodes_coordinate[nodeorder - 1][1] + PostNodes[i].uy;

@@ -30,6 +30,7 @@ class Post
     private:
     string outputFilename;
     vector<ObjectNode> PostNodes;
+    const double d_eps = 1.E-7;
 
 };
 
