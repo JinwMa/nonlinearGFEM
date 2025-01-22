@@ -9,7 +9,7 @@ void solve(Input * pinput, Mesh * pmesh)
 {
     BaseSolver *structsolver;
     vector<string> solver_name = pinput->getVectorString("solver_list");
-    assert(solver_name.size() != 1);
+    assert(solver_name.size() == 1);
     for (size_t i = 0; i < solver_name.size(); i++)
     {
         string solver_type = pinput->getString(solver_name[i] + "_type");

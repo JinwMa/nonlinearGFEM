@@ -30,7 +30,19 @@ endif()
 include_directories(${EIGEN3_INCLUDE_DIR} ${MKLROOT}/include)
 # 设置MKL库目录
 link_directories(${MKLROOT}/lib/intel64)
-# link_directories(/home/ma/intel/oneapi/2024.1/lib)
+
+
+# 添加编译器标志，启用 16 字节或 32 字节的对齐支持
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-DEIGEN_DONT_ALIGN_STATICALLY -march=native)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(/DEIGEN_DONT_ALIGN_STATICALLY /arch:AVX)
+endif()
+
+# add_compile_options(-DEIGEN_DONT_ALIGN_STATICALLY) # 避免静态内存对齐问题（适用于某些环境）。
+# add_definitions(-DEIGEN_MAKE_ALIGNED_OPERATOR_NEW)
+# add_definitions(-DEIGEN_DEFAULT_TO_ROW_MAJOR)      # 默认使用行优先存储。
+# add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY)     # 避免静态对齐问题。
 
 #添加MKL相关定义 加速计算
 add_definitions(-DEIGEN_USE_MKL_ALL)
@@ -120,7 +132,7 @@ endif()
 
 # 设置编译器标志以优化执行速度
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math -fsanitize=address")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math -fsanitize=address")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3 -g -march=native -flto -fno-fat-lto-objects -funroll-loops -ffast-math")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
     set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} -flto")
