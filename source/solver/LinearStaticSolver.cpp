@@ -77,6 +77,8 @@ void LinearStaticSolver::solve(Input *pinput, Mesh *pmesh)
     std::vector<double> displacement(solution.data(), solution.data() + d_P.size());
     post.ShowDisplacement(pinput, pmesh, d_dof_map.get(), displacement);
     if (std::getenv("CHECKSOLUTION") != nullptr)post.check_error(pinput, pmesh, d_dof_map.get());
+    d_P.resize(0);
+    d_G.resize(0);
 }
 
 

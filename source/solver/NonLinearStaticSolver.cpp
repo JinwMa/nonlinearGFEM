@@ -143,6 +143,17 @@ void NonLinearStaticSolver::solve(Input * pinput, Mesh * pmesh)
         dealWithConvergenceStatus(pinput, pmesh);        
     }
 
+    d_G.resize(0);
+    d_P.resize(0);
+    d_P_trial.resize(0);
+    d_G_trial.resize(0);
+    d_u.resize(0);
+    d_du.resize(0);
+    d_ddu.resize(0);
+    d_lambda.resize(0);
+    d_internal_force.resize(0);
+    d_rhs.resize(0);
+    d_rhs_G.resize(0);
 }
 
 
