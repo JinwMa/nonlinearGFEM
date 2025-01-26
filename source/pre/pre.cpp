@@ -10,6 +10,11 @@ void Pre::preprocess(Input *pinput, Mesh *pmesh)
         std::cout << "preprocessing necking bar" << std::endl;
         neckingBar(pinput, pmesh);
     }
+    else if (name == "Kirchhoff_hyperelasticity_nonlinear-cantileverbeam")
+    {
+        std::cout << "preprocessing Kirchhoff_hyperelasticity_nonlinear-cantileverbeam" << std::endl;
+        kirchhoffHyperelasticityNonlinearCantileverbeam(pinput, pmesh);
+    }
 }
 
 void Pre::neckingBar(Input *pinput, Mesh *pmesh)
@@ -79,4 +84,25 @@ void Pre::neckingBar(Input *pinput, Mesh *pmesh)
         x = x * e;
         y = y * e;
     }
+}
+
+void Pre::kirchhoffHyperelasticityNonlinearCantileverbeam(Input * pinput, Mesh * pmesh)
+{
+    std::vector<double> random_nums;
+    std::string random_num_file_name = pinput->getString("input_random_number_file");
+    double distorted_degree = pinput->getDouble("preprocessing_distorted_degree");
+    std::ifstream random_num_file(random_num_file_name, std::ios::in);
+    if (!random_num_file.is_open()) {
+        toolbox::error(random_num_file_name + " failed to open");
+    }
+    std::string line;
+    for (int i = 0; i < pmesh->d_actual_node_count; i++)
+    {
+        std::getline(random_num_file, line);
+        std::istringstream iss(line);
+        double random_num;
+        iss >> random_num;
+        random_nums.push_back(random_num);
+    }
+    
 }

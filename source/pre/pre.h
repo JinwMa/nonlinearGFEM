@@ -24,6 +24,7 @@ class Pre
     void preprocess(Input * pinput, Mesh * pmesh);
     private:
     void neckingBar(Input * pinput, Mesh * pmesh);
+    void kirchhoffHyperelasticityNonlinearCantileverbeam(Input * pinput, Mesh * pmesh);
 };
 
 

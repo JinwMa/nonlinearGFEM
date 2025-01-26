@@ -754,26 +754,29 @@ void Hypoelastoplastic::getDSDuForBbarElement(ObjectElementData & element_data, 
 
 void Hypoelastoplastic::updateStressAndDSDu(ObjectElementData &element_data, std::vector<std::vector<double>> &dS_du) 
 {
+    const double s23 = std::sqrt(2.0 / 3.0);
+    const double mu = 0.5 * E / (u + 1.0);
+    const double lambda = u * E / ((u + 1.0) * (1.0 - 2.0 * u));
+    double delt[3][3] = {0.0};
+    for (int ii = 0; ii < 3; ii++) delt[ii][ii] = 1.0;
     int num_GP = element_data.num_integration_points;
     int num_node = element_data.num_nodes;
     int size = num_GP * num_node;
     dS_du.resize(size);
-    for (int i = 0; i < size; i++) dS_du[i].resize(27);
+    for (int i = 0; i < size; i++) dS_du[i].resize(27);  
 
-    double delt[3][3] = {0.0};
-    for (int ii = 0; ii < 3; ii++) delt[ii][ii] = 1.0;
+    // 标准单元
+    double du_dX[3][3] = {0.0};
+    double Fm[3][3] = {0.0};
+    double Fm_inv[3][3] = {0.0};
+    double Im[3][3] = {0.0};
+    double W[3][3] = {0.0};
+    double dm[3][3] = {0.0};
+    double Q[3][3] = {0.0};
+    double R1_inv[3][3] = {0.0};
+    double R2[3][3] = {0.0};
 
-    double du_dX[3][3];
-    double Fm[3][3];
-    double Fm_inv[3][3];
-    double Im[3][3];
-    double W[3][3];
-    double dm[3][3];
-    double Q[3][3];
-    double R1_inv[3][3];
-    double R2[3][3];
-
-    //
+    // 
     double dIm_du_K[3][3][3];
     double ddm_du_K[3][3][3];
     double dW_du_K[3][3][3];
@@ -782,8 +785,24 @@ void Hypoelastoplastic::updateStressAndDSDu(ObjectElementData &element_data, std
 
     for (int i = 0; i < num_GP; i++) // 循环积分点
     {
-        auto stress = element_data.stress_n[i];
+        const auto & stress = element_data.stress_n[i];
         auto & stress_n1  = element_data.stress_n1[i];  //待更新的应力
+
+        // 弹塑性相关变量：
+        const auto & epn = element_data.eff_p_strain_n[i];
+        auto & epn1 = element_data.eff_p_strain_n1[i];
+        auto & kappa_n1 = element_data.kappa_n1[i];
+        double stress_trial[3][3] = {0.0}; // 试探应力
+        double stress_trial_dev[3][3] = {0.0}; // 试探偏应力
+        double stress_dev[3][3] = {0.0}; // 真实偏应力
+        double trance_stress_trial = 0.0;  // 试探应力的迹
+        double kappa_trial = element_data.kappa_n[i];
+        double normal_stress_dev = 0.0;
+        double direct_normal[3][3] = {0.0};
+        double Cep[3][3][3][3] = {0.0};
+        double deltaGama = 0.0;
+
+
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
@@ -791,7 +810,8 @@ void Hypoelastoplastic::updateStressAndDSDu(ObjectElementData &element_data, std
                 stress_n1[ii][jj] = 0.0;
             }
         }
-        this->getQetc(element_data, i, 
+
+        this->getQetc(element_data, i,
                       du_dX,
                       Fm,
                       Fm_inv,
@@ -809,23 +829,93 @@ void Hypoelastoplastic::updateStressAndDSDu(ObjectElementData &element_data, std
                 QT[ii][jj] = Q[jj][ii];
             }
         }
-        // 上述过程类似应力更新过程
-         for (int ii = 0; ii < 3; ii++)
-         {
-             for (int jj = 0; jj < 3; jj++)
-             {
-                 for (int kk = 0; kk < 3; kk++)
-                 {
-                     for (int ll = 0; ll < 3; ll++)
-                     {
-                         stress_n1[ii][jj] += (Q[ii][kk] * stress[kk][ll] * QT[ll][jj] +
-                                               d_C_e_tensor[ii][jj][kk][ll] * dm[kk][ll]);
-                     }
-                 }
-             }
-         }
 
+        // 获取试探应力
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                for (int kk = 0; kk < 3; kk++)
+                {
+                    for (int ll = 0; ll < 3; ll++)
+                    {
+                        stress_trial[ii][jj] += (Q[ii][kk] * stress[kk][ll] * QT[ll][jj] +
+                                              d_C_e_tensor[ii][jj][kk][ll] * dm[kk][ll]);
+                    }
+                }
+            }
+        }
+        // 试探应力的迹
+        trance_stress_trial = stress_trial[0][0] + stress_trial[1][1] + stress_trial[2][2];
+        // 试探偏应力
+        for (int ii = 0; ii < 3; ii++)
+        {
+            for (int jj = 0; jj < 3; jj++)
+            {
+                stress_trial_dev[ii][jj] = stress_trial[ii][jj] - 
+                                           trance_stress_trial * delt[ii][jj] * (1.0 / 3.0);
+            }
+        }
+        // 获取偏应力的模
+        toolbox::getTensorNormal(stress_trial_dev, normal_stress_dev);
 
+        // 判断1：弹性阶段
+        if (normal_stress_dev < s23 * kappa_trial)
+        {
+            //更新应力
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    stress_n1[ii][jj] = stress_trial_dev[ii][jj] + 
+                                        trance_stress_trial * delt[ii][jj] * (1.0 / 3.0); 
+                }
+            }         
+            //等效塑性应变
+            epn1 = epn;
+            // 屈服半径
+            kappa_n1 = kappa_trial;       
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    for (int kk = 0; kk < 3; kk++)
+                    {
+                        for (int ll = 0; ll < 3; ll++)
+                        {
+                            Cep[ii][jj][kk][ll] = d_C_e_tensor[ii][jj][kk][ll];
+                        }
+                    }
+                }
+            }        
+        }
+        else
+        {
+            //获取单位normal张量
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    direct_normal[ii][jj] = stress_trial_dev[ii][jj] / normal_stress_dev;
+                }
+            }
+            // 重中之重，计算deltaGamma
+            this->getDeltaGamma(epn, normal_stress_dev, mu, d_init_kappa, deltaGama);
+            // std::cout << deltaGama << std::endl;
+            // 计算最终的偏应力状态
+            for (int ii = 0; ii < 3; ii++)
+            {
+                for (int jj = 0; jj < 3; jj++)
+                {
+                    stress_n1[ii][jj] = stress_trial_dev[ii][jj] - 
+                                        deltaGama * 2.0 * mu * direct_normal[ii][jj] + 
+                                        trance_stress_trial * delt[ii][jj] * (1.0 / 3.0);
+                }
+            }
+            epn1 = epn + s23 * deltaGama;
+            kappa_n1 = kappa(d_init_kappa, epn1);
+            this->getCep(lambda, mu, d_init_kappa, direct_normal, epn1, kappa_n1, normal_stress_dev, Cep);
+        }
 
         for (int K = 0; K < num_node; K++)
         {
@@ -855,14 +945,14 @@ void Hypoelastoplastic::updateStressAndDSDu(ObjectElementData &element_data, std
                             {
                                 dS_du_K[ii * 9 + jj * 3 + kk] += (dQ_du_K[ii][p][kk] * stress[p][q] * Q[jj][q] + 
                                                                   Q[ii][p] * stress[p][q] * dQ_du_K[jj][q][kk] + 
-                                                                  d_C_e_tensor[ii][jj][p][q] * ddm_du_K[p][q][kk]);
+                                                                  Cep[ii][jj][p][q] * ddm_du_K[p][q][kk]);
                             }
                         }                        
                     }
                 }
             }
         }
-    }
+    } 
 }
 
 
@@ -962,6 +1052,7 @@ void Hypoelastoplastic::updateStressAndDSDuForBbarElement(ObjectElementData &ele
         double e_dil = 0.0;
         this->get_e_dil(element_data, i, Fm_inv, e_dil);
 
+        //更新dm
         for (int ii = 0; ii < 3; ii++)
         {
             for (int jj = 0; jj < 3; jj++)
