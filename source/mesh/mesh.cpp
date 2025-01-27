@@ -450,22 +450,6 @@ void Mesh::buildBodies(Input * pinput)
         }
         body_id++;
     }
-
-    // for (auto it : d_body_name_map_to_id)
-    // {
-    //     std::cout << it.first << " " << it.second << std::endl;
-    // }
-
-    // for (auto it : d_bodies)
-    // {
-    //     std::cout << "body id = " << it.first << std::endl;
-    //     for (auto it2 : it.second.Element_ids)
-    //     {
-    //         std::cout << "      element id = " << it2 << std::endl;
-    //     }
-    // }
-
-    // exit(0);
 }
 
 void Mesh::buildElementFaceNodeOrder()
@@ -491,4 +475,14 @@ void Mesh::buildElementFaceNodeOrder()
 
    d_element_face_node_order[1] = Hex8;
    d_element_face_node_order[2] = Tet4;
+}
+
+void Mesh::getOuterFaceOfElementSet(const std::vector<int> & element_set,
+                                    std::vector<std::set<int>> & element_set_outer_faces)
+{
+}
+
+void Mesh::getOuterNodeOfElementSet(const vector<set<int>> &element_set_outer_faces,
+                                    vector<set<int>> &element_set_outer_nodes)
+{
 }

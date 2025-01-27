@@ -46,13 +46,17 @@ public:
     unordered_map<int, int> d_element_order_in_list;
 
     unordered_map<int, vector<int>>d_elements_of_nodes;
+    vector<std::set<int>> d_all_outer_faces;
+    std::unordered_set<int> d_all_outer_nodes;
+
+
     Mesh(Input * pinput, const std::string &filename) : d_mesh_filename(filename)
     {
-        buildElementFaceNodeOrder();
-        readmeshfile();
-        checkmesh();
-        getElementSetName(pinput);
-        buildBodies(pinput);
+        buildElementFaceNodeOrder(); // 创建单元上节点的序号
+        readmeshfile();              // 读网格 节点集 单元集 面片集 
+        checkmesh();                 // 检查网格
+        getElementSetName(pinput);   // 反向获取每个单元的input信息
+        buildBodies(pinput);         // 建立网格中的实体集 
     }
     void checkmesh();
 
@@ -75,6 +79,10 @@ private:
     void buildElementsOfNodes();
     void buildBodies(Input * pinput);
     void buildElementFaceNodeOrder();
+    void getOuterFaceOfElementSet(const vector<int> & element_set,
+                                  vector<set<int>> & element_set_outer_faces); // 获取单元集的外表面面片
+    void getOuterNodeOfElementSet(const vector<set<int>> & element_set_outer_faces,
+                                  vector<set<int>> & element_set_outer_nodes);
 };
 
 #endif // FILE1_H
