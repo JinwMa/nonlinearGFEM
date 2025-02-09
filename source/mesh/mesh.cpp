@@ -478,11 +478,35 @@ void Mesh::buildElementFaceNodeOrder()
 }
 
 void Mesh::getOuterFaceOfElementSet(const std::vector<int> & element_set,
-                                    std::vector<std::set<int>> & element_set_outer_faces)
+                                    std::set<std::set<int>> & element_set_outer_faces)
 {
-}
+    element_set_outer_faces.clear();
+    int num_elements = element_set.size();
 
-void Mesh::getOuterNodeOfElementSet(const vector<set<int>> &element_set_outer_faces,
-                                    vector<set<int>> &element_set_outer_nodes)
-{
+    //循环单元集中所有的单元
+    for (int i = 0; i < num_elements; i++)
+    {
+        int element_id = element_set[i];
+        int element_order = getElementLocalId(element_id);
+        int element_type = d_element_type[element_order];
+        auto element_faces = d_element_face_node_order[element_type];
+        int num_faces = element_faces.size();
+
+        // 一般来说，对于固定单元，每个面上的节点数目是相同的
+        int num_nodes_on_faces = element_faces[0].size();
+        //循环每个单元的每个面
+        for (int ii = 0; ii < num_faces; ii++)
+        {
+            std::set<int> nodes_on_face;
+            for (int iii = 0; iii < num_nodes_on_faces; iii++)
+            {
+                int node_id = d_nodes_on_elements[element_order][element_faces[ii][iii]];
+                nodes_on_face.insert(node_id);
+            }  
+            if (element_set_outer_faces.find(nodes_on_face) == element_set_outer_faces.end())
+                element_set_outer_faces.insert(nodes_on_face);
+            else
+                element_set_outer_faces.erase(nodes_on_face);
+        }
+    }    
 }

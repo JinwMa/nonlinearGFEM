@@ -104,5 +104,8 @@ void Pre::kirchhoffHyperelasticityNonlinearCantileverbeam(Input * pinput, Mesh *
         iss >> random_num;
         random_nums.push_back(random_num);
     }
+
+    std::set<set<int>> aaa;
+    pmesh->getOuterFaceOfElementSet(pmesh->d_element_list, aaa);
     
 }
