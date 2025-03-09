@@ -3,56 +3,200 @@
 #include <fstream>
 #include <string>
 #include <unordered_set>
+#include <regex>
 
-void Input::read_input_file(const string filename)
+int Input::check_line(const string &line)
 {
-    std::ifstream inputFile(filename); // 打开文件
+    // 规则 1: 空行
+    if (std::regex_match(line, std::regex("^\\s*")))
+    {
+        return 1;
+    }
+
+    // 规则 2: 注释行（以 // 开头）
+    if (std::regex_match(line, std::regex("^\\s*[\\/]{2}")))
+    {
+        return 2;
+    }
+
+    // 规则 3: 单独一个 {
+    if (std::regex_match(line, std::regex("^\\s*\\{{1}\\s*")))
+    {
+        return 3;
+    }
+
+    // 规则 4: 单独一个 }
+    if (std::regex_match(line, std::regex("^\\s*}{1}\\s*$")))
+    {
+        return 4;
+    }
+
+    // 规则 5: 一串字符，中间没有空格
+    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*$")))
+    {
+        return 5;
+    }
+
+    // 规则 6: key=string1, string2, string3 形式的数据记录
+    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[a-zA-Z]+\\w*(\\s*,\\s*[a-zA-Z]+\\w*)*\\s*$")))
+    {
+        return 6;
+    }
+
+    // 规则 7: key=double1/int1, double2/int2, double3/int3 形式的数据记录
+    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*-?\\d+\\.?\\d*(\\s*,\\s*-?\\d+\\.?\\d*)*\\s*$")))
+    {
+        return 7;
+    }
+
+    // 规则 8: key=路径 形式的数据记录
+    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[\\/\\.\\w]*\\s*$")))
+    {
+        return 8;
+    }
+
+    // 如果以上规则都不匹配，则返回 false
+    return 0;
+}
+
+void Input::checkInput(const string & filename)
+{
+    std::ifstream inputFile(filename); // 打开文件 
     if (!inputFile)
     {
         std::cerr << "无法打开文件:" << filename << std::endl;
         exit(0);
-    }
+    }   
     std::string line;
-    while (std::getline(inputFile, line))
-    { // 按行读取文件内容
-        // 查找注释符号的位置
+    std::string line_last, line_now, line_next;
+    //当前行行号
+    int line_num = 0;  
+    line_last = line;  
+    int num_common = 0;    
+    while (std::getline(inputFile, line)) //读取当前行
+    {
+        line_num++;  //获取当前行号
+        //仅取注释之前的输入
         std::size_t commentPos = line.find("//");
         if (commentPos != std::string::npos)
         {
             line = line.substr(0, commentPos); // 保留注释符号前的部分
         }
-        if (!line.empty())
-        { // 如果不是空行,则检查
+        //对当前行进行检查
+        //首先去除line前后的空格
+        line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+        line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
+        if(!check_line(line))
+        {
+            std::cout << "输入文件错误 - 行号： " << line_num << "行输入不符合规则,请检查" << std::endl;
+            std::cout << line << std::endl;
+            exit(0);
+        }
+        if (line == "{")
+        {
+            num_common++;
+            if (!std::regex_match(line_last, std::regex("^\\s*\\w+\\s*$")))
+            {
+                std::cout << "输入文件错误 - 行号：" << line_num << " 行的上一行应该是数据块的名字" << std::endl;
+                std::cout << line << std::endl;
+                exit(0);
+            }
+        }
+        if (line == "}")
+        {
+            num_common--;
+        }
+        line_last = line;
+    }    
+    if (!num_common==0)
+    {
+        std::cout << "输入文件错误： 数据块没有闭合" << std::endl;
+        std::cout << line << std::endl;
+        exit(0);
+    }
+}
+
+void Input::read(const string & filename)
+{
+    // 根数据块
+    d_root_db = std::make_shared<DataBase>();
+    // 根数据块没有父节点
+    auto current_db = d_root_db;
+    current_db->d_name = "root data base";
+    std::ifstream inputFile(filename); // 打开文件
+    if (!inputFile)
+    {
+        std::cerr << "无法打开文件:" << filename << std::endl;
+        exit(0);
+    }   
+    std::string line;    
+    std::string line_last;
+    int line_num = 0;
+    while(std::getline(inputFile, line)) //
+    {
+        line_num++;
+        //仅取注释之前的输入
+        std::size_t commentPos = line.find("//");
+        if (commentPos != std::string::npos)
+        {
+            line = line.substr(0, commentPos); // 保留注释符号前的部分
+        }
+        int line_type = check_line(line);
+        if(line_type == 1 || line_type == 2 || line_type == 3)
+        {
+            // 无需处理
+        }
+        else if(line_type == 4)
+        {
+            // }: 数据块的指针指向上一层
+            current_db = current_db->d_father_db;
+        }
+        else if(line_type == 5)
+        {
+            // 进入新的数据模块
+            std::string common_name = line;
+            // 去除common_name前后的空白字符
+            common_name.erase(common_name.find_last_not_of(" \t\n\r\f\v") + 1);
+            common_name.erase(0, common_name.find_first_not_of(" \t\n\r\f\v")); 
+            // new一个智能指针指向子数据块
+            auto son_db = make_shared<DataBase>();
+            // 新的db块的父指针要指向当前数据块
+            son_db->d_father_db = current_db;
+            // 新db块的名字
+            son_db->d_name = common_name;
+            // 把新产生的数据块塞到当前数据库的子数据块中
+            current_db->d_son_dbs[common_name] = son_db;
+            // 把新数据块的名字统计进当前数据块的名单中
+            current_db->d_all_keys.insert(common_name);
+            // 当前数据块替换成子数据块
+            current_db = son_db;
+        }
+        else if (line_type == 6 || line_type == 7 || line_type == 8)
+        {
             std::size_t equalPos = line.find('=');
             if (line.find('=') == std::string::npos)
             {
                 std::cerr << "错误:行中没有找到等号:" << line << std::endl;
             }
-
             std::string key = line.substr(0, equalPos);
             std::string values = line.substr(equalPos + 1);
-
             // 去除key前后的空白字符
             key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1);
             key.erase(0, key.find_first_not_of(" \t\n\r\f\v"));
-
             if (key.empty() || key.find(' ') != std::string::npos)
             {
                 std::cerr << "错误:键必须是唯一且不能包含空格:" << line << std::endl;
-                continue;
+                exit(0);
             }
-
-            if (keys.find(key) != keys.end())
+            if (current_db->d_all_keys.find(key) != current_db->d_all_keys.end())
             {
-                std::cerr << "错误:键必须是唯一的,发现重复键:" << key << std::endl;
-                continue;
+                std::cerr << "数据块： " << current_db->d_name << " 中的" << "错误:键必须是唯一的,发现重复键:" << key << std::endl;
+                exit(0);
             }
-            keys.insert(key);
-
+            current_db->d_all_keys.insert(key);
             // 去除values前后的空白字符
             values.erase(values.find_last_not_of(" \t\n\r\f\v") + 1);
             values.erase(0, values.find_first_not_of(" \t\n\r\f\v"));
-
             std::vector<std::string> valueList;
             std::stringstream ss(values);
             std::string value;
@@ -76,23 +220,26 @@ void Input::read_input_file(const string filename)
                     valueList.push_back(subValue);
                 }
             }
-            db[key] = valueList;
+            current_db->d_key_values[key] = valueList;
+        }
+        else
+        {
+            std::cout << line_type << std::endl;
+            std::cout << "不支持的输入类型： " << line_num << " 行" << std::endl;
+            exit(0);
         }
     }
-
-    inputFile.close(); // 关闭文件
 }
 
 
-int Input::getInt(std::string name)
+int DataBase::getInt(std::string name)
 {
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
     }
-    //判断value是不是只有一个值
     if (it->second.size() != 1)
     {
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
@@ -101,10 +248,10 @@ int Input::getInt(std::string name)
     return num;
 }
 
-double Input::getDouble(std::string name)
+double DataBase::getDouble(std::string name)
 {
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
@@ -115,14 +262,14 @@ double Input::getDouble(std::string name)
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
     }
     double value = std::stod(it->second[0].c_str());
-    return value;
+    return value;    
 }
 
-std::vector<int> Input::getVectorInt(std::string name)
+std::vector<int> DataBase::getVectorInt(std::string name)
 {
     std::vector<int> nums;
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
@@ -139,14 +286,14 @@ std::vector<int> Input::getVectorInt(std::string name)
         int num = std::atoi(temp.c_str());
         nums.push_back(num);
     }
-    return nums;
+    return nums;    
 }
 
-std::vector<double> Input::getVectorDouble(std::string name)
+std::vector<double> DataBase::getVectorDouble(std::string name)
 {
     std::vector<double> values;
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
@@ -163,13 +310,13 @@ std::vector<double> Input::getVectorDouble(std::string name)
         double value = std::stod(temp.c_str());
         values.push_back(value);
     }
-    return values;
+    return values;    
 }
 
-std::string Input::getString(string name)
+std::string DataBase::getString(string name)
 {
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
@@ -180,14 +327,14 @@ std::string Input::getString(string name)
         std::cout << "the size of value of " << it->first << " is more than one" << std::endl;
     }
     string str = it->second[0];
-    return str;
+    return str;    
 }
 
-std::vector<std::string> Input::getVectorString(std::string name)
+std::vector<std::string> DataBase::getVectorString(std::string name)
 {
     std::vector<std::string> strings;
-    auto it = db.find(name);
-    if (it == db.end())
+    auto it = d_key_values.find(name);
+    if (it == d_key_values.end())
     {
         std::cout << "not found " << name << " in input" << std::endl;
         exit(1);
@@ -203,12 +350,24 @@ std::vector<std::string> Input::getVectorString(std::string name)
         std::string temp = it->second[i];
         strings.push_back(temp);
     }
-    return strings;
+    return strings;    
 }
 
-bool Input::ifExist(std::string name)
+std::shared_ptr<DataBase> DataBase::getDataBase(std::string name)
 {
-    auto it = db.find(name);
-    if (it != db.end()) return true;
-    else return false;
+    auto it = d_son_dbs.find(name);
+    if (it == d_son_dbs.end())
+    {
+        std::cout << "not found " << name << " in block: " << d_name << std::endl;
+        exit(1);
+    }
+    return it->second;
 }
+
+bool DataBase::ifExist(std::string name)
+{
+    auto it = d_all_keys.find(name);
+    if (it != d_all_keys.end()) return true;
+    else return false;    
+}
+

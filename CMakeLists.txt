@@ -84,7 +84,6 @@ add_executable(M3D source/main.cpp  source/test.cpp source/solve.cpp)
 target_link_libraries(M3D PUBLIC OpenMP::OpenMP_CXX)
 # 链接MKL库
 target_link_libraries(M3D PRIVATE mkl_intel_lp64 mkl_core mkl_intel_thread iomp5)
-
 target_link_libraries(M3D PRIVATE  pthread dl m)
 
 # target_link_libraries(M3D PRIVATE  mkl_sequential)
@@ -94,54 +93,37 @@ target_link_libraries(M3D PRIVATE  pthread dl m)
 # 添加mesh子目录,如果还有别的子目录,则继续添加即可,目前先做到手动添加 #默认当前目录为CMakeLists.txt所在目录
 add_subdirectory(source/input)
 add_subdirectory(source/mesh)
-add_subdirectory(source/post)
+# add_subdirectory(source/post)
 add_subdirectory(source/object)
-add_subdirectory(source/solver)
-
-add_subdirectory(source/material)
-add_subdirectory(source/element)
-add_subdirectory(source/load)
-add_subdirectory(source/constraint)
-add_subdirectory(source/pre)
+# add_subdirectory(source/solver)
+# add_subdirectory(source/material)
+# add_subdirectory(source/element)
+# add_subdirectory(source/load)
+# add_subdirectory(source/constraint)
+# add_subdirectory(source/pre)
 add_subdirectory(source/toolbox)
 
-
-
-
-
 # 链接子目录下的动态库
-
-
-target_link_libraries(M3D PRIVATE materiallib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/material)
-
+# target_link_libraries(M3D PRIVATE materiallib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/material)
 target_link_libraries(M3D PRIVATE meshlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
-
 target_link_libraries(M3D PRIVATE inputlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
-
-target_link_libraries(M3D PRIVATE postlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
-
+# target_link_libraries(M3D PRIVATE postlib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
 target_link_libraries(M3D PRIVATE objectlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/object)
-
-target_link_libraries(M3D PRIVATE solverlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
-
-target_link_libraries(M3D PRIVATE elementlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
-
-target_link_libraries(M3D PRIVATE loadlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
-
-target_link_libraries(M3D PRIVATE constraintlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
-
-target_link_libraries(M3D PRIVATE prelib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
-
+# target_link_libraries(M3D PRIVATE solverlib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
+# target_link_libraries(M3D PRIVATE elementlib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
+# target_link_libraries(M3D PRIVATE loadlib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
+# target_link_libraries(M3D PRIVATE constraintlib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
+# target_link_libraries(M3D PRIVATE prelib)
+# target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
 target_link_libraries(M3D PRIVATE toolboxlib)
 target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
 

@@ -10,10 +10,11 @@
 void Mesh::readmeshfile()
 {    
     std::streampos pos;
-    std::ifstream inputFile(d_mesh_filename); // 打开文件
+    std::string mesh_file_name = d_mesh_db->getString("file");
+    std::ifstream inputFile(mesh_file_name); // 打开文件
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
+        std::cerr << "无法打开文件:" << mesh_file_name << std::endl;
     }
     std::string line;
     while (std::getline(inputFile, line))
@@ -22,11 +23,16 @@ void Mesh::readmeshfile()
         line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
         line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
         std::string line_lower = line;
+        // 将整行变成小写
         std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
 
-
+        
+        // 读单元
         if (line_lower.substr(0, 8) == "*element" && line_lower.substr(8, 8) != "_")
         {
+            //从这里开始是为了读单元的类型，如果读不到就会报错
+            // ########################################
+            // ########################################
             int element_type = -1;
             std::string typeValue;
             size_t typePos = line_lower.find("type=");
@@ -56,9 +62,12 @@ void Mesh::readmeshfile()
             {
                 toolbox::error("not support type of element " + typeValue);
             }
+            // #############################################################
+            // #############################################################
+            // 单元类型读取完毕
             while (true)
             {
-                pos = inputFile.tellg();
+                pos = inputFile.tellg();  // 用于记录当前文件读到的位置，做好标记，方便seekg返回这里重新读
                 if(!std::getline(inputFile, line))break;
                 // 去除前后的空白字符
                 line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
@@ -84,7 +93,6 @@ void Mesh::readmeshfile()
                     exit(0);
                     continue;
                 }
-
                 int node_id;
                 std::vector<int> aelement;
                 while (iss >> node_id)
@@ -94,13 +102,12 @@ void Mesh::readmeshfile()
                 }                
                 if (!aelement.empty())
                 {         
-                    d_nodes_on_elements.push_back(aelement);           
+                    d_element_connectivity.push_back(aelement);           
                     ++d_actual_element_count;
                     // element_ids[d_actual_element_count - 1] = element_id;
-                    d_element_list.push_back(element_id);
+                    d_element_global_ids.push_back(element_id);
                     d_element_type.push_back(element_type);
-                    d_element_order_in_list[element_id] = d_actual_element_count;
-                    if (element_id > d_max_elementid) d_max_elementid = element_id;
+                    d_element_local_ids[element_id] = d_actual_element_count - 1;
                 }
             }
         }
@@ -142,10 +149,8 @@ void Mesh::readmeshfile()
                 {
                     d_nodes_coordinate.push_back(coordinates_of_one_node);
                     ++d_actual_node_count;
-                    // node_ids[d_actual_node_count - 1] = node_id;
-                    d_node_list.push_back(node_id);
-                    d_node_order_in_list[node_id] = d_actual_node_count;
-                    if (node_id > d_max_nodeid) d_max_nodeid = node_id;
+                    d_node_global_ids.push_back(node_id);
+                    d_node_local_ids[node_id] = d_actual_node_count - 1;
                 }  
             }
         }
@@ -281,7 +286,6 @@ void Mesh::readmeshfile()
                 }
             }
         }
-
         else if (line_lower.substr(0, 12) == "*segment_set")
         {
             int segment_set_id;
@@ -357,14 +361,17 @@ void Mesh::readmeshfile()
     }
     inputFile.close();
     buildElementsOfNodes();
+    std::cout << "当前模型中有: " << std::endl;
+    std::cout << "    单元" << d_actual_element_count << std::endl;
+    std::cout << "    节点" << d_actual_node_count << std::endl;
 }
 
 void Mesh::checkmesh()
 {
-    if (!d_actual_node_count == d_node_list.size())
+    if (!d_actual_node_count == d_node_global_ids.size())
     throw std::runtime_error("单元中节点数目无法对齐");
 
-    if (!d_actual_element_count == d_element_list.size())
+    if (!d_actual_element_count == d_element_global_ids.size())
     throw std::runtime_error("单元中单元数目无法对齐");
 
     if (!d_element_type.size() == d_actual_element_count)
@@ -377,80 +384,24 @@ void Mesh::checkmesh()
 }
 
 
-void Mesh::getElementSetName(Input * pinput)
-{
-    if (!pinput->ifExist("element_list")) return;
-    std::vector<std::string>element_list = pinput->getVectorString("element_list");
-    for (auto name : element_list)
-    {
-        std::vector<int> element_ids;
-        std::string element_set_type = pinput->getString(name + "_set_type");
-        if (element_set_type == "range")
-        {
-            std::vector<int> begin_end = pinput->getVectorInt(name + "_range");
-            if (begin_end.size() != 2) toolbox::error("element range of " + name + " is wrong");
-            int begin = begin_end[0];
-            int end = begin_end[1];
-            for (int i = begin; i <= end; i++)
-            {
-                element_ids.push_back(i);
-            }
-        }
-        else
-        {
-            toolbox::error("not support teyp of " + element_set_type + "in " + "name");
-        }
-        for (int i = 0; i < element_ids.size(); i++)
-        {
-            int element_id = element_ids[i];
-            d_element_set_name[element_id] = name;
-        }
-    }
-
-}
-
 void Mesh::buildElementsOfNodes()
 {
     //循环所有的单元
     for (int i = 0; i < d_actual_element_count; i++)
     {
-        int element_id = d_element_list[i];
-        int element_order = d_element_order_in_list[element_id] - 1;
+        int element_id = d_element_global_ids[i];
+        int element_order = getElementLocalId(element_id);
         // 循环单元上的节点
-        for (int j = 0; j < d_nodes_on_elements[element_order].size(); j++)
+        for (int j = 0; j < d_element_connectivity[element_order].size(); j++)
         {
-            int node_id = d_nodes_on_elements[element_order][j];
+            int node_id = d_element_connectivity[element_order][j];
             d_elements_of_nodes[node_id].push_back(element_id);
         }
     }
 }
 
 
-void Mesh::buildBodies(Input * pinput)
-{
-    if (!pinput->ifExist("body_list")) return;
-    std::vector<std::string> body_list = pinput->getVectorString("body_list");
-    int body_id = 0;
-    for (auto body_name : body_list)
-    {
-        d_body_name_map_to_id[body_name] = body_id;
-        if (pinput->ifExist(body_name + "_element_ids"))
-        {
-            std::vector<int> element_ids = pinput->getVectorInt(body_name + "_element_ids");
-            d_bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
-        }
-        if (pinput->ifExist(body_name + "_element_sets"))
-        {
-            std::vector<int> element_sets = pinput->getVectorInt(body_name + "_element_sets");
-            for (int ii : element_sets)
-            {
-                const auto & element_ids = d_element_sets[ii];
-                d_bodies[body_id].Element_ids.insert(element_ids.begin(), element_ids.end());
-            }
-        }
-        body_id++;
-    }
-}
+
 
 void Mesh::buildElementFaceNodeOrder()
 {
@@ -500,7 +451,7 @@ void Mesh::getOuterFaceOfElementSet(const std::vector<int> & element_set,
             std::set<int> nodes_on_face;
             for (int iii = 0; iii < num_nodes_on_faces; iii++)
             {
-                int node_id = d_nodes_on_elements[element_order][element_faces[ii][iii]];
+                int node_id = d_element_connectivity[element_order][element_faces[ii][iii]];
                 nodes_on_face.insert(node_id);
             }  
             if (element_set_outer_faces.find(nodes_on_face) == element_set_outer_faces.end())
