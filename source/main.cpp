@@ -4,6 +4,7 @@
 #include "input.h"
 #include "mesh.h"
 
+void solve(std::shared_ptr<DataBase> solve_db, Mesh & mesh);
 int main(int argc, char *argv[])
 {
     // 读取输入文件
@@ -20,6 +21,8 @@ int main(int argc, char *argv[])
 
     // 创建网格类
     Mesh mesh(mesh_db);
-    
+
+    solve(root_db->getDataBase("solve"), mesh);
+
     return 0;
 }

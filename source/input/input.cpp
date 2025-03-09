@@ -106,6 +106,18 @@ void Input::checkInput(const string & filename)
         {
             num_common--;
         }
+        if (check_line(line) == 5)
+        {
+            std::streampos pos = inputFile.tellg();
+            std::getline(inputFile, line_next);
+            if (check_line(line_next) != 3)
+            {
+                std::cout << "输入文件错误 - 行号： " << line_num << " 行的下一行应该跟着一个用花括号包裹的数据块" << std::endl;
+                exit(0);
+            }
+            inputFile.clear();
+            inputFile.seekg(pos);
+        }
         line_last = line;
     }    
     if (!num_common==0)
