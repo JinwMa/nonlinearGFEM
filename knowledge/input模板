@@ -1,0 +1,37 @@
+global_control
+{
+    mesh_file = path_to_mesh_file
+}
+
+modal_market
+{
+    load
+    {
+
+    }
+    constraint
+    {
+
+    }
+    element
+    {
+
+    }
+    material
+    {
+
+    }
+    ...
+}
+
+solve
+{
+    solver_list = solver0
+    solver0
+    {
+        type = linear_static_solver
+        refer_load_list = load0, load1
+        refer_constraint_list = constraint0, constraint1
+        refer_element_list = element0
+    }
+}

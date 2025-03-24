@@ -6,18 +6,14 @@
 using namespace std;
 struct ObjectElementData
 {
-    bool is_updated_interation = false;
+    bool is_updated_iteration = false;
     // element level
     bool is_initialized;
     bool is_alive;
-    int element_id;
-    int element_order;
-    int element_layer;
-    string element_type;
-
+    int element_local_id;
     // node level
     int num_nodes;
-    vector<int> node_ids;
+    vector<int> node_local_ids;
     vector<int> element_patch;
     vector<vector<double>> u;
     vector<vector<double>> du;

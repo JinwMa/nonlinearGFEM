@@ -3,57 +3,105 @@
 #include <fstream>
 #include <string>
 #include <unordered_set>
-#include <regex>
+// #include <regex>
 
 int Input::check_line(const string &line)
 {
-    // 规则 1: 空行
-    if (std::regex_match(line, std::regex("^\\s*")))
-    {
-        return 1;
+    std::string line_temp = line;
+    const size_t size = std::strlen(line_temp.c_str());     // line 长度
+    size_t pos = 0;                                         // 第一个非空字符的位置
+    while (pos < line.size() && std::isspace(line[pos])) {
+        pos++;
     }
+    size_t equal_pos = line.find('=');                      // 等号的位置
+    // 规则 1: 空行
+    // if (std::regex_match(line, std::regex("^\\s*")))
+    // {
+    //     return 1;
+    // }
+
+    if (line.empty()) return 1;
 
     // 规则 2: 注释行（以 // 开头）
-    if (std::regex_match(line, std::regex("^\\s*[\\/]{2}")))
-    {
-        return 2;
-    }
+    // if (std::regex_match(line, std::regex("^\\s*[\\/]{2}")))
+    // {
+    //     return 2;
+    // }
+
+    if (line.substr(0,2) == "//") return 2;
 
     // 规则 3: 单独一个 {
-    if (std::regex_match(line, std::regex("^\\s*\\{{1}\\s*")))
-    {
-        return 3;
-    }
+    // if (std::regex_match(line, std::regex("^\\s*\\{{1}\\s*")))
+    // {
+    //     return 3;
+    // }
+
+    
+
+    if (line[0] == '{' && line.size() ==1) return 3;
 
     // 规则 4: 单独一个 }
-    if (std::regex_match(line, std::regex("^\\s*}{1}\\s*$")))
-    {
-        return 4;
-    }
+    // if (std::regex_match(line, std::regex("^\\s*}{1}\\s*$")))
+    // {
+    //     return 4;
+    // }
+
+    if (line[0] == '}' && line.size() ==1) return 4;
+
+
+    // if (line[pos] == '}' && size == (pos + 1)) return 4;
 
     // 规则 5: 一串字符，中间没有空格
-    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*$")))
+    // if (std::regex_match(line, std::regex("^\\s*\\w+\\s*$")))
+    // {
+    //     return 5;
+    // }
+    int if5 = 0;
+    for (size_t i = pos; i < size; i++)
     {
-        return 5;
+        char ch = line[i];
+        if (!std::isalnum(static_cast<unsigned char>(ch)) && ch != '_') 
+        {
+            if5++;
+            break;
+        }
+        
+        if (ch == '=') 
+        {
+            if5++;
+            break;
+        }
+    }
+    if(if5 == 0) return 5;
+
+
+    // key = value1, value2, value3
+    if (equal_pos != std::string::npos)
+    {
+        std::string key = line.substr(0, equal_pos);
+        std::string values = line.substr(equal_pos + 1);
+        deleteSpace(key);
+        deleteSpace(values);
+        if (key.size() > 0 && values.size() > 0) return 6;
     }
 
-    // 规则 6: key=string1, string2, string3 形式的数据记录
-    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[a-zA-Z]+\\w*(\\s*,\\s*[a-zA-Z]+\\w*)*\\s*$")))
-    {
-        return 6;
-    }
+    // // 规则 6: key=string1, string2, string3 形式的数据记录
+    // if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[a-zA-Z]+\\w*(\\s*,\\s*[a-zA-Z]+\\w*)*\\s*$")))
+    // {
+    //     return 6;
+    // }
 
-    // 规则 7: key=double1/int1, double2/int2, double3/int3 形式的数据记录
-    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*-?\\d+\\.?\\d*(\\s*,\\s*-?\\d+\\.?\\d*)*\\s*$")))
-    {
-        return 7;
-    }
+    // // 规则 7: key=double1/int1, double2/int2, double3/int3 形式的数据记录
+    // if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*-?\\d+\\.?\\d*(\\s*,\\s*-?\\d+\\.?\\d*)*\\s*$")))
+    // {
+    //     return 7;
+    // }
 
-    // 规则 8: key=路径 形式的数据记录
-    if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[\\/\\.\\w]*\\s*$")))
-    {
-        return 8;
-    }
+    // // 规则 8: key=路径 形式的数据记录
+    // if (std::regex_match(line, std::regex("^\\s*\\w+\\s*=\\s*[\\/\\.\\w]+.*[\\/\\.\\w]+\\s*$")))
+    // {
+    //     return 8;
+    // }
 
     // 如果以上规则都不匹配，则返回 false
     return 0;
@@ -72,6 +120,7 @@ void Input::checkInput(const string & filename)
     //当前行行号
     int line_num = 0;  
     line_last = line;  
+    deleteSpace(line_last);
     int num_common = 0;    
     while (std::getline(inputFile, line)) //读取当前行
     {
@@ -95,7 +144,8 @@ void Input::checkInput(const string & filename)
         if (line == "{")
         {
             num_common++;
-            if (!std::regex_match(line_last, std::regex("^\\s*\\w+\\s*$")))
+            // if (!std::regex_match(line_last, std::regex("^\\s*\\w+\\s*$")))
+            if (check_line(line_last) != 5)
             {
                 std::cout << "输入文件错误 - 行号：" << line_num << " 行的上一行应该是数据块的名字" << std::endl;
                 std::cout << line << std::endl;
@@ -110,6 +160,7 @@ void Input::checkInput(const string & filename)
         {
             std::streampos pos = inputFile.tellg();
             std::getline(inputFile, line_next);
+            deleteSpace(line_next);
             if (check_line(line_next) != 3)
             {
                 std::cout << "输入文件错误 - 行号： " << line_num << " 行的下一行应该跟着一个用花括号包裹的数据块" << std::endl;
@@ -133,8 +184,11 @@ void Input::read(const string & filename)
     // 根数据块
     d_root_db = std::make_shared<DataBase>();
     // 根数据块没有父节点
-    auto current_db = d_root_db;
+    auto current_db = d_root_db;    
     current_db->d_name = "root data base";
+
+    int layer = 0;
+    current_db->d_layer = layer;
     std::ifstream inputFile(filename); // 打开文件
     if (!inputFile)
     {
@@ -153,6 +207,7 @@ void Input::read(const string & filename)
         {
             line = line.substr(0, commentPos); // 保留注释符号前的部分
         }
+        deleteSpace(line);                     // 删除字符前后的空格
         int line_type = check_line(line);
         if(line_type == 1 || line_type == 2 || line_type == 3)
         {
@@ -162,9 +217,11 @@ void Input::read(const string & filename)
         {
             // }: 数据块的指针指向上一层
             current_db = current_db->d_father_db;
+            layer--;
         }
         else if(line_type == 5)
         {
+            layer++;
             // 进入新的数据模块
             std::string common_name = line;
             // 去除common_name前后的空白字符
@@ -182,8 +239,9 @@ void Input::read(const string & filename)
             current_db->d_all_keys.insert(common_name);
             // 当前数据块替换成子数据块
             current_db = son_db;
+            current_db->d_layer = layer;
         }
-        else if (line_type == 6 || line_type == 7 || line_type == 8)
+        else if (line_type == 6 )
         {
             std::size_t equalPos = line.find('=');
             if (line.find('=') == std::string::npos)
@@ -381,5 +439,13 @@ bool DataBase::ifExist(std::string name)
     auto it = d_all_keys.find(name);
     if (it != d_all_keys.end()) return true;
     else return false;    
+}
+
+
+
+void Input::deleteSpace(std::string & str)
+{
+    str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
+    str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
 }
 

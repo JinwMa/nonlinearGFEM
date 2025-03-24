@@ -19,6 +19,8 @@ class DataBase
     DataBase(){};
     ~DataBase(){};
 
+    int d_layer;
+
     vector<int> getVectorInt(string);
     vector<double> getVectorDouble(string);
     int getInt(string);
@@ -49,6 +51,10 @@ class Input
     void checkInput(const string & filename);
     int check_line(const string & line);
     void read(const string & filename);
+
+
+    private:
+    void deleteSpace(std::string & str);
 };
 
 #endif // INPUT1_H

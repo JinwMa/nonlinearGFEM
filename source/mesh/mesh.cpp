@@ -10,7 +10,7 @@
 void Mesh::readmeshfile()
 {    
     std::streampos pos;
-    std::string mesh_file_name = d_mesh_db->getString("file");
+    std::string mesh_file_name = d_mesh_db->getString("mesh_file");
     std::ifstream inputFile(mesh_file_name); // 打开文件
     if (!inputFile)
     {

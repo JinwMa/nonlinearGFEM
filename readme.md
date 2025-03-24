@@ -1,3 +1,4 @@
+# 安装
 1. 安装Eigen
       只需要移植文件即可 
       当前Eigen已经记录到git中,可以直接clone,后面需要修改CMakeLists.txt中的路径
@@ -10,24 +11,17 @@
       2.4 执行 source ~/.bashrc
       2.5 执行 echo $MKLROOT, 查询是否正确安装MKL库
 3. 修改CMakeLists.txt
-4. git push origin HEAD username: Ma_2032 password: mjw091212
+4. git push origin HEAD username: Ma_2023 password: mjw091212
+<br><br>
 
-设计理念:
-1. 关于input格式
-   input文件通篇采用 key = values 的格式,支持空格和 // 注释
-   在设计中,不支持标题的分级,但标题的分级可以通过key的名称体现出来,例如:
-   refer_element_list = "element0", "element1"
-   element0_type = "soild_linear"
-   在单元列表中,存在"element0",就必须在input中存在对应的单元描述
-   尽管这两条信息在输入文件中的位置可以是随意的,但应尽量放在一块,以增加input文件的可读性
+# 设计理念:
+1. 关于input格式   
+   参考knowledeg中的input模板
+
+   
 2. mesh类
    mesh类的设计支持多part,支持节点编号从非0开始,为了实现这一目的,设计了如下的成员变量
-   d_node_list: 存储所有节点的编号信息
-   d_element_list: 存储所有单元的编号信息
-   d_nodes_coordinate: 按顺序存放节点的坐标
-   d_nodes_on_elements: 按顺序存放单元中的节点
-   d_node_order_in_list: 节点在list中的位置         对应的位置都没有-1,在取用的时候注意下标
-   d_element_order_in_list: 单元在list中的位置
+   mesh中的单元和节点维护两套编号：对接输入的称为全局编号，用于计算的称为局部编号
 
 3. 约束中的重复约束
    约束基类中定义了unordered_set m_set: 参考了NSC手册
