@@ -35,6 +35,7 @@ class DataBase
     map<string, vector<string>> d_key_values;
     map<string, shared_ptr<DataBase>> d_son_dbs;
     shared_ptr<DataBase> d_father_db;
+    shared_ptr<DataBase> d_root_db;
 };
 
 

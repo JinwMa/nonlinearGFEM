@@ -10,11 +10,13 @@ using namespace std;
 class DofMap
 {
     public:
-    DofMap();
+    DofMap(){};
     ~DofMap(){};
     public:
     vector<int>d_dof_map;
-    unordered_map<int, vector<string>> d_nodes_dofs;
+    vector<int>d_nodes_dofs;
+
+    int d_opened_dof_size = 0;
 
 
     private:
@@ -23,9 +25,12 @@ class DofMap
 
     public:
     void buildNodeDofs(shared_ptr<Mesh> mesh);
+    void buildDofMap();
     void takeDB(shared_ptr<DataBase> db);
     int getDofIndex(const int node_local_id, const string dof_lab);
     int getDofIndex(const int node_local_id, const int dof_order);
+
+    void addNodeDof(const int node_local_id, const string dof);
 
 
 };

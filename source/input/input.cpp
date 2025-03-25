@@ -8,7 +8,7 @@
 int Input::check_line(const string &line)
 {
     std::string line_temp = line;
-    const size_t size = std::strlen(line_temp.c_str());     // line 长度
+    auto size = line.size();                                // line 长度
     size_t pos = 0;                                         // 第一个非空字符的位置
     while (pos < line.size() && std::isspace(line[pos])) {
         pos++;
@@ -189,6 +189,7 @@ void Input::read(const string & filename)
 
     int layer = 0;
     current_db->d_layer = layer;
+    current_db->d_root_db = d_root_db;
     std::ifstream inputFile(filename); // 打开文件
     if (!inputFile)
     {
@@ -240,6 +241,7 @@ void Input::read(const string & filename)
             // 当前数据块替换成子数据块
             current_db = son_db;
             current_db->d_layer = layer;
+            current_db->d_root_db = d_root_db;
         }
         else if (line_type == 6 )
         {
