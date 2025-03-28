@@ -5,10 +5,12 @@
 #include<string>
 #include<vector>
 #include<unordered_set>
-
+#include<Eigen/Dense>
+#include<Eigen/Sparse>
 #include"input.h"
 #include"mesh.h"
 #include"toolbox.h"
+
 
 using namespace std;
 
@@ -25,9 +27,10 @@ class BaseConstraint
     public:
     BaseConstraint(){};
     virtual ~BaseConstraint(){};
-    virtual void takeDB(shared_ptr<DataBase> db, shared_ptr<Mesh> mesh) = 0;
+    virtual void takeDB(shared_ptr<DataBase> db) = 0;
     virtual void buildDofMap() = 0;
-    virtual void buildContraintEquations(shared_ptr<Mesh> mesh, vector<ConstraintEquation> CEs) = 0;
+    virtual void buildConstraintEquations(shared_ptr<Mesh> mesh, vector<ConstraintEquation> & CEs) = 0;
+    virtual void buildConstraintMatrix(vector<Eigen::Triplet<double>> & ijValue);
 
 
     bool if_dof_in_mset(const int node_id, const string dof);
