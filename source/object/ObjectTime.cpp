@@ -1,13 +1,13 @@
 #include"ObjectTime.h"
 
 
-void Time::start()
+void TimeMater::start()
 {
     auto cpu_time = std::chrono::high_resolution_clock::now();
     d_cpu_time_list.push_back(cpu_time);
 }
 
-void Time::getPassedCpuTimeFromLast()
+void TimeMater::getPassedCpuTimeFromLast()
 {
     auto cpu_time = std::chrono::high_resolution_clock::now();
     d_cpu_time_list.push_back(cpu_time);
@@ -18,7 +18,7 @@ void Time::getPassedCpuTimeFromLast()
 }
 
 
-void Time::getPassedCpuTimeFromStart()
+void TimeMater::getPassedCpuTimeFromStart()
 {
     auto cpu_time = std::chrono::high_resolution_clock::now();
     d_cpu_time_list.push_back(cpu_time);

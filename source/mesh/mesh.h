@@ -28,8 +28,8 @@ public:
 
     map<int, vector<vector<int>>> d_element_face_node_order; // element_face_node
     std::vector<int> d_element_type;                         // element_type
-    std::vector<int> d_node_global_ids;                      // node outer ids in order
-    std::vector<int> d_element_global_ids;                   // element outer ids in order
+    std::vector<int> d_node_external_ids;                      // node outer ids in order
+    std::vector<int> d_element_external_ids;                   // element outer ids in order
     std::vector<std::vector<double>> d_nodes_coordinate;     // nodes' coordinate
     std::vector<std::vector<int>> d_element_connectivity;    // elements' connectivity
 
@@ -38,8 +38,8 @@ public:
     map<int, vector<vector<int>>> d_segment_sets;            // 面片集 : 存储形式: 一个片段代表一个面片
     
 
-    unordered_map<int, int> d_node_local_ids;
-    unordered_map<int, int> d_element_local_ids;
+    unordered_map<int, int> d_node_internal_ids;
+    unordered_map<int, int> d_element_internal_ids;
 
     unordered_map<int, vector<int>>d_elements_of_nodes;      // 节点关联的单元
 
@@ -52,25 +52,25 @@ public:
     }
     void checkmesh();
 
-    int getNodeLocalId(const int node_global_id)
+    int getNodeInternalId(const int node_global_id)
     {
-        return d_node_local_ids[node_global_id];
+        return d_node_internal_ids[node_global_id];
     }
 
     
-    int getElementLocalId(const int element_global_id)
+    int getElementInternalId(const int element_global_id)
     {
-        return d_element_local_ids[element_global_id];
+        return d_element_internal_ids[element_global_id];
     }
 
-    int getElementGlobalId(const int element_local_id)
+    int getElementExternalId(const int element_local_id)
     {
-        return d_element_global_ids[element_local_id];
+        return d_element_external_ids[element_local_id];
     }
 
-    int getNodeGlobalId(const int node_local_id)
+    int getNodeExternalId(const int node_local_id)
     {
-        return d_node_global_ids[node_local_id];
+        return d_node_external_ids[node_local_id];
     }
 
 

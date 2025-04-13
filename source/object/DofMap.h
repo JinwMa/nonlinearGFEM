@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <map>
+#include <set>
 #include "mesh.h"
 #include "input.h"
 #include "toolbox.h"
@@ -10,27 +12,42 @@ using namespace std;
 class DofMap
 {
     public:
-    DofMap(){};
+    DofMap(shared_ptr<Mesh> mesh)
+    {
+        d_mesh = mesh;
+        initializeDofTag();
+        buildNodeDofs();
+    };
     ~DofMap(){};
     public:
     vector<int>d_dof_map;
-    vector<int>d_nodes_dofs;
 
     int d_opened_dof_size = 0;
 
+    map<string, int> d_dof_tag_to_int;
+    map<int, string> d_dof_int_to_tag;
+    map<int, set<int>> d_nodes_dofs;
 
-    private:
-    int d_max_size_dof = 6;
-
+    vector<int> d_nodes_dof_index;
 
     public:
-    void buildNodeDofs(shared_ptr<Mesh> mesh);
+    // 根据单元特征开放节点上的自由度
+    void buildNodeDofs();
     void buildDofMap();
-    void takeDB(shared_ptr<DataBase> db);
-    int getDofIndex(const int node_local_id, const string dof_lab);
-    int getDofIndex(const int node_local_id, const int dof_order);
+    int getDofIndex(const int node_internal_id, const string dof_lab);
+    // int getDofIndex(const int node_internal_id, const int dof_order);
 
-    void addNodeDof(const int node_local_id, const string dof);
+    void addNodeDof(const int node_internal_id, const string dof_lab);
+    void removeNodeDof(const int node_internal_id, const string dof_lab);
+
+    void printNodesDofs();
+
+    // 建立或更新节点自由度的起始值
+    void setNodesDofIndex();
+
+    private:
+    void initializeDofTag();
+    shared_ptr<Mesh> d_mesh;
 
 
 };

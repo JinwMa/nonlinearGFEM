@@ -4,11 +4,11 @@
 #include "input.h"
 #include "mesh.h"
 #include "ObjectTime.h"
-
+#include "DofMap.h"
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh);
 int main(int argc, char *argv[])
 {
-    Time::getInstance()->start();
+    TimeMater::getInstance()->start();
     // 读取输入文件
     auto input = make_shared<Input>(argv[1]);
     // 设置根数据库
@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
     // 创建网格类
     auto mesh = make_shared<Mesh>(global_control_db);
 
+    auto dof_map = make_shared<DofMap>(mesh);
+
     // 求解
     solve(root_db->getDataBase("solve"), mesh);
-    Time::getInstance()->getPassedCpuTimeFromLast();
+    TimeMater::getInstance()->getPassedCpuTimeFromLast();
     return 0;
 }

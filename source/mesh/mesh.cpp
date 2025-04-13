@@ -105,9 +105,9 @@ void Mesh::readmeshfile()
                     d_element_connectivity.push_back(aelement);           
                     ++d_actual_element_count;
                     // element_ids[d_actual_element_count - 1] = element_id;
-                    d_element_global_ids.push_back(element_id);
+                    d_element_external_ids.push_back(element_id);
                     d_element_type.push_back(element_type);
-                    d_element_local_ids[element_id] = d_actual_element_count - 1;
+                    d_element_internal_ids[element_id] = d_actual_element_count - 1;
                 }
             }
         }
@@ -149,8 +149,8 @@ void Mesh::readmeshfile()
                 {
                     d_nodes_coordinate.push_back(coordinates_of_one_node);
                     ++d_actual_node_count;
-                    d_node_global_ids.push_back(node_id);
-                    d_node_local_ids[node_id] = d_actual_node_count - 1;
+                    d_node_external_ids.push_back(node_id);
+                    d_node_internal_ids[node_id] = d_actual_node_count - 1;
                 }  
             }
         }
@@ -368,10 +368,10 @@ void Mesh::readmeshfile()
 
 void Mesh::checkmesh()
 {
-    if (!d_actual_node_count == d_node_global_ids.size())
+    if (!d_actual_node_count == d_node_external_ids.size())
     throw std::runtime_error("单元中节点数目无法对齐");
 
-    if (!d_actual_element_count == d_element_global_ids.size())
+    if (!d_actual_element_count == d_element_external_ids.size())
     throw std::runtime_error("单元中单元数目无法对齐");
 
     if (!d_element_type.size() == d_actual_element_count)
@@ -389,8 +389,8 @@ void Mesh::buildElementsOfNodes()
     //循环所有的单元
     for (int i = 0; i < d_actual_element_count; i++)
     {
-        int element_id = d_element_global_ids[i];
-        int element_order = getElementLocalId(element_id);
+        int element_id = d_element_external_ids[i];
+        int element_order = getElementInternalId(element_id);
         // 循环单元上的节点
         for (int j = 0; j < d_element_connectivity[element_order].size(); j++)
         {
@@ -438,7 +438,7 @@ void Mesh::getOuterFaceOfElementSet(const std::vector<int> & element_set,
     for (int i = 0; i < num_elements; i++)
     {
         int element_id = element_set[i];
-        int element_order = getElementLocalId(element_id);
+        int element_order = getElementInternalId(element_id);
         int element_type = d_element_type[element_order];
         auto element_faces = d_element_face_node_order[element_type];
         int num_faces = element_faces.size();
