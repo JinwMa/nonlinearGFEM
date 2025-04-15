@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
+#include "BaseAtomSolver.h"
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh);
 int main(int argc, char *argv[])
 {

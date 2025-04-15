@@ -15,10 +15,14 @@
 cmake_minimum_required(VERSION 3.13)
 project(SolverLib)
 
-file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 # 指定静态库的名称和包含的源文件
 add_library(solverlib STATIC ${SOURCES})
 target_include_directories(solverlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(solverlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/AtomSolver)
+target_include_directories(solverlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/FlowSolver)
+
+
 
 
 target_link_libraries(solverlib PRIVATE toolboxlib elementlib inputlib meshlib postlib objectlib constraintlib loadlib materiallib)

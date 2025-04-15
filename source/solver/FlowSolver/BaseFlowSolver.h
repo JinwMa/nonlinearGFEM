@@ -1,5 +1,5 @@
-#ifndef BASESOLVER_H
-#define BASESOLVER_H
+#ifndef BASEFLOWSOLVER_H
+#define BASEFLOWSOLVER_H
 
 #include <string>
 #include <iostream>
@@ -20,41 +20,46 @@
 #include "input.h"
 #include "mesh.h"
 
+#include "BaseAtomSolver.h"
 
 
-class BaseSolver
+
+class BaseFlowSolver
 {
     public:
-    BaseSolver(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh)
+    BaseFlowSolver(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh)
     {
         d_solve_db = solve_db;
         d_mesh = mesh;
     }
-    ~BaseSolver();
+    virtual ~BaseFlowSolver();
 
 
-    
-    void takeDB();
-    void initializeSolver();
-    void initializeLoadStep();
-    void initializeIterationStep();
-
-    void solve();
-    void solveOneTimeStep();
-    void solveOneIterationStep();
-
-
+    // 成员变量：
     //input && mesh
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
-
     //Timer
     double d_predict_dt; //预测时间步长
     double d_actural_dt; //真实时间步长
     double d_last_time;  //上一步时间
     double d_current_time; //当前时间
     double d_next_time;  //下一步时间
-    double d_growth_size; //载荷步缩放比例
+    double d_growth_size; //时间步缩放比例
+
+
+    virtual void init();
+    virtual void solve();
+        
+    virtual void takeDB();
+    virtual void initializeSolver();
+    virtual void initializeTimeStep();
+    virtual void initializeIterationStep();
+
+    virtual void solveOneTimeStep();
+
+
+    
 
     //Manger
 };

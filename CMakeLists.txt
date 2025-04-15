@@ -103,29 +103,42 @@ add_subdirectory(source/constraint)
 add_subdirectory(source/pre)
 add_subdirectory(source/toolbox)
 
+
+# # 递归查找所有子目录
+# file(GLOB_RECURSE INCLUDE_DIRS LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/source/*)
+     
+# # 过滤出目录（排除文件）
+# list(FILTER INCLUDE_DIRS INCLUDE REGEX ".*/$")
+
+# # 添加到目标
+# target_include_directories(M3D PRIVATE ${INCLUDE_DIRS})
+
 # 链接子目录下的动态库
 target_link_libraries(M3D PRIVATE materiallib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/material)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/material)
 target_link_libraries(M3D PRIVATE meshlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/mesh)
 target_link_libraries(M3D PRIVATE inputlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/input)
 target_link_libraries(M3D PRIVATE postlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/post)
 target_link_libraries(M3D PRIVATE objectlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/object)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/object)
 target_link_libraries(M3D PRIVATE solverlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/solver)
 target_link_libraries(M3D PRIVATE elementlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/element)
 target_link_libraries(M3D PRIVATE loadlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/load)
 target_link_libraries(M3D PRIVATE constraintlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/constraint)
 target_link_libraries(M3D PRIVATE prelib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/pre)
 target_link_libraries(M3D PRIVATE toolboxlib)
-target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
+#target_include_directories(M3D PRIVATE ${PROJECT_SOURCE_DIR}/source/toolbox)
+
+
+
 
 
 
