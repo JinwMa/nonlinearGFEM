@@ -47,6 +47,9 @@ class BaseFlowSolver
     double d_next_time;  //下一步时间
     double d_growth_size; //时间步缩放比例
 
+    bool d_continue_flag = true;  //是否停止迭代
+    std::shared_ptr<BaseAtomSolver> d_atom_solver;
+
 
     virtual void init();
     virtual void solve();
@@ -54,9 +57,9 @@ class BaseFlowSolver
     virtual void takeDB();
     virtual void initializeSolver();
     virtual void initializeTimeStep();
-    virtual void initializeIterationStep();
 
-    virtual void solveOneTimeStep();
+    virtual void inOneTimeStep();
+    virtual void timePassOn();
 
 
     
