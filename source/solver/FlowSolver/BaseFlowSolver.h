@@ -32,7 +32,7 @@ class BaseFlowSolver
         d_solve_db = solve_db;
         d_mesh = mesh;
     }
-    virtual ~BaseFlowSolver();
+    virtual ~BaseFlowSolver(){};
 
 
     // 成员变量：

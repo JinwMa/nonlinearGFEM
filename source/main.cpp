@@ -5,7 +5,6 @@
 #include "mesh.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
-#include "BaseAtomSolver.h"
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh);
 int main(int argc, char *argv[])
 {
@@ -22,7 +21,6 @@ int main(int argc, char *argv[])
     auto mesh = make_shared<Mesh>(global_control_db);
 
     auto dof_map = make_shared<DofMap>(mesh);
-
     // 求解
     solve(root_db->getDataBase("solve"), mesh);
     TimeMater::getInstance()->getPassedCpuTimeFromLast();
