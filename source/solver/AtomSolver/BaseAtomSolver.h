@@ -40,9 +40,16 @@ class BaseAtomSolver
     // 成员函数
     virtual void takeDB();
     virtual void initializeSolver();
-    virtual void initializeIterationStep();     // 初始化迭代步
+    virtual void initializeTimeStep(const double current_time);
+    /*
+    // 初始化迭代步
+    */
+    virtual void initializeIterationStep();     
     virtual void solveOneTimeStep(const double, const double, double &);
-    virtual void afterSolve();                  // 后处理接口
+    /*
+    // 后处理接口
+    */
+    virtual void afterSolve();                  
 
 };
 

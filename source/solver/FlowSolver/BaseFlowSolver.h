@@ -1,21 +1,21 @@
 #ifndef BASEFLOWSOLVER_H
 #define BASEFLOWSOLVER_H
 
-#include <string>
-#include <iostream>
-#include <vector>
-#include <Eigen/Sparse>
-#include <Eigen/PardisoSupport>
-#include <Eigen/Dense>
-#include <ctime>
-#include <fstream>
-#include <omp.h>
-#include <chrono>
-#include <sstream>
-#include <map>
-#include <unordered_set>
-#include <thread>
-#include <Eigen/IterativeLinearSolvers>
+// #include <string>
+// #include <iostream>
+// #include <vector>
+// #include <Eigen/Sparse>
+// #include <Eigen/PardisoSupport>
+// #include <Eigen/Dense>
+// #include <ctime>
+// #include <fstream>
+// #include <omp.h>
+// #include <chrono>
+// #include <sstream>
+// #include <map>
+// #include <unordered_set>
+// #include <thread>
+// #include <Eigen/IterativeLinearSolvers>
 
 #include "input.h"
 #include "mesh.h"
@@ -41,12 +41,14 @@ class BaseFlowSolver
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
     //Timer
-    double d_predict_dt; //预测时间步长
-    double d_actural_dt; //真实时间步长
-    double d_last_time;  //上一步时间
-    double d_current_time; //当前时间
-    double d_next_time;  //下一步时间
-    double d_growth_size; //时间步缩放比例
+    double d_start_time;
+    double d_end_time;
+    double d_predict_dt;         //预测时间步长
+    double d_actual_dt;         //真实时间步长
+    double d_last_time;          //上一步时间
+    double d_current_time;       //当前时间
+    double d_next_time;          //下一步时间
+    double d_growth_size;        //时间步缩放比例
 
     bool d_continue_flag = true;  //是否停止迭代
     std::shared_ptr<BaseAtomSolver> d_atom_solver;
