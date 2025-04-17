@@ -34,13 +34,15 @@ class BaseAtomSolver
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
 
-    // 成员函数
-    virtual void takeDB(){};
-    virtual void initializeSolver(){};
-    virtual void initializeIterationStep(){};     // 初始化迭代步
-    virtual void solveOneTimeStep(){};
+    // 
 
-    virtual void afterSolve(){};                  // 后处理接口
+
+    // 成员函数
+    virtual void takeDB();
+    virtual void initializeSolver();
+    virtual void initializeIterationStep();     // 初始化迭代步
+    virtual void solveOneTimeStep(const double, const double, double &);
+    virtual void afterSolve();                  // 后处理接口
 
 };
 
