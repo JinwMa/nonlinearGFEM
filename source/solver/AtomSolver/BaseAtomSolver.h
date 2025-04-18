@@ -19,6 +19,7 @@
 
 #include "input.h"
 #include "mesh.h"
+#include "ConstraintManager.h"
 #include "DofMap.h"
 class BaseAtomSolver
 {
@@ -34,17 +35,36 @@ class BaseAtomSolver
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
 
-    // 
+    // Manager
+    std::shared_ptr<ConstraintManager> d_constraint_manger;
+
+    //
+    std::shared_ptr<DofMap> d_dof_map;
 
 
     // 成员函数
+    /*
+    读取参数
+    */
     virtual void takeDB();
+    /*
+    初始化求解器：
+    manager初始化
+    数据初始化
+    */
     virtual void initializeSolver();
+    /*
+    载荷步初始化
+    根据时间信息更新载荷 约束等信息
+    */
     virtual void initializeTimeStep(const double current_time);
     /*
     // 初始化迭代步
     */
-    virtual void initializeIterationStep();     
+    virtual void initializeIterationStep();    
+    /*
+    一个时间步内的求解过程
+    */ 
     virtual void solveOneTimeStep(const double, const double, double &);
     /*
     // 后处理接口
