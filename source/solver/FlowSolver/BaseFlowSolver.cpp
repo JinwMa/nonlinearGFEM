@@ -1,7 +1,5 @@
 #include "BaseFlowSolver.h"
 
-
-
 void BaseFlowSolver::init()
 {
     this->takeDB();
@@ -23,11 +21,16 @@ void BaseFlowSolver::solve()
 
 void BaseFlowSolver::takeDB()
 {
-    d_atom_solver = std::make_shared<StructuralSolver>(d_solve_db, d_mesh);    
+    std::string solver_type = d_solve_db->getString("type");
+    if (true)
+    {
+        d_atom_solver = make_shared<BaseAtomSolver>(d_solve_db, d_mesh);
+    }
 }
 
 void BaseFlowSolver::initializeSolver()
 {
+    if (d_atom_solver == nullptr) toolbox::error("atom solver is not init");
     d_atom_solver->takeDB();
     d_atom_solver->initializeSolver();
 }

@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     auto dof_map = make_shared<DofMap>(mesh);
     // 求解
-    solve(root_db->getDataBase("solve"), mesh);
+    solve(root_db->getDataBase("solver"), mesh);
     TimeMater::getInstance()->getPassedCpuTimeFromLast();
     return 0;
 }

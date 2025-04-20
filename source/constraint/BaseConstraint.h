@@ -10,37 +10,45 @@
 #include"input.h"
 #include"mesh.h"
 #include"toolbox.h"
+#include"DofMap.h"
 
 
 using namespace std;
 
 struct ConstraintEquation
 {
-    vector<int> node_local_ids;
-    vector<string> dof_list;
-    vector<double> factors;
+    int equation_id;
+    int slave_node_id;
+    string slave_dof;
+    double slave_factor;
+    vector<int> master_node_ids;
+    vector<string> master_dofs;
+    vector<double> master_factors;
     double rhs = 0.0;
 };
 
 class BaseConstraint
 {
     public:
-    BaseConstraint(){};
+    BaseConstraint() = delete;
+    BaseConstraint(shared_ptr<DataBase> db, shared_ptr<Mesh> mesh, shared_ptr<DofMap> dofmap){
+        d_db = db;
+        d_mesh = mesh;
+        d_dof_map = dofmap;
+    };
     virtual ~BaseConstraint(){};
-    virtual void takeDB(shared_ptr<DataBase> db) = 0;
-    virtual void buildDofMap() = 0;
-    virtual void buildConstraintEquations(shared_ptr<Mesh> mesh, vector<ConstraintEquation> & CEs) = 0;
-    virtual void buildConstraintMatrix(vector<Eigen::Triplet<double>> & ijValue);
-
-
-    bool if_dof_in_mset(const int node_id, const string dof);
-    bool if_dof_in_mset(const int node_dof_index);
-    void addToMset(const int node_id, const string dof);
-    void addToMset(const int node_dof_index);
+    virtual void takeDB() {};
+    virtual string type() {return "unkown";};
+    virtual void buildDofs(){};
+    virtual void buildConstraintEquations(vector<ConstraintEquation> & CEs) {};
+    
+    void addDofToSlaveDofs(const int node_id, const string dof, vector<int> & allSlaveDofs){};
+    void addDofsToMasterDofs(const vector<int> & node_ids, const vector<string> dofs, vector<int> & allMasterDofs){};
 
     public:
-    unordered_set<int> m_set;
-
+    shared_ptr<Mesh> d_mesh;
+    shared_ptr<DataBase> d_db;
+    shared_ptr<DofMap> d_dof_map;
 };
 
 

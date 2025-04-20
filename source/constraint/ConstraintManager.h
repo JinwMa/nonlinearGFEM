@@ -9,6 +9,7 @@
 
 #include"input.h"
 #include"mesh.h"
+
 #include"BaseConstraint.h"
 #include"DofMap.h"
 #include<Eigen/Sparse>
@@ -19,13 +20,35 @@ using namespace std;
 class ConstraintManager
 {
     public:    
-    ConstraintManager(){};
+    ConstraintManager(shared_ptr<DataBase> db, shared_ptr<Mesh> mesh, shared_ptr<DofMap> dofmap){
+        d_mesh = mesh;
+        d_db = db;
+        d_dof_map = dofmap;
+    };
     ~ConstraintManager(){};
-    void takeDB(shared_ptr<DataBase> db);
-    vector<ConstraintEquation> buildConstrintEquation();
+    // 不要把takeDB接口直接暴露给外部
+    void init()
+    {
+        takeDB();
+    }
+    void takeDB();
+    void buildDofs();
+    void buildConstrintEquation();
+    void assembleStiffness(){};
+    void assembleInternalFoce(){};
+    void assembleGMatrix(){};
+    void assembleGVector(){};
 
-    unordered_set<int> all_m_set;
-    // unordered_set<int> d_m_set_dofs;
+    //
+    vector<ConstraintEquation> d_CEs_vec;
+    vector<shared_ptr<BaseConstraint>> d_constraints;
+    vector<int> d_all_slave_dofs;
+    vector<int> d_all_master_dofs;
+
+    //
+    shared_ptr<Mesh> d_mesh;
+    shared_ptr<DataBase> d_db; 
+    shared_ptr<DofMap> d_dof_map;
 };
 
 
