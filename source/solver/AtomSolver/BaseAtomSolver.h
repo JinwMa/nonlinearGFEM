@@ -21,6 +21,9 @@
 #include "mesh.h"
 #include "ConstraintManager.h"
 #include "DofMap.h"
+#include "ObjectElementData.h"
+#include "ObjectControlParam.h"
+#include "ElementAssembler.h"
 class BaseAtomSolver
 {
     public:
@@ -32,6 +35,7 @@ class BaseAtomSolver
     virtual ~BaseAtomSolver(){};
 
     // 成员变量
+    std::vector<ElementData>d_elementData;
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
 
@@ -40,6 +44,8 @@ class BaseAtomSolver
 
     //
     std::shared_ptr<DofMap> d_dof_map;
+    std::shared_ptr<ObjectControlParam> d_control_param;
+    std::shared_ptr<ElementAssembler> d_elementAssembler;
 
 
     // 成员函数

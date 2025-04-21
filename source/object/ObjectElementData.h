@@ -4,7 +4,7 @@
 #include<string>
 #include<vector>
 using namespace std;
-struct ObjectElementData
+struct ElementData
 {
     // 留下的都是必要的
 
