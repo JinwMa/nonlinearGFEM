@@ -21,7 +21,7 @@
 #include "mesh.h"
 
 #include "BaseAtomSolver.h"
-#include "StructuralSolver.h"
+#include "StructuralAtomSolver.h"
 
 
 

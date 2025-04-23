@@ -6,7 +6,7 @@ void ConstraintManager::takeDB()
     for (int i = 0; i < constraint_list.size(); i++)
     {
         std::string iconstraint = constraint_list[i];
-        auto db = d_db->d_root_db->getDataBase("modal_market")->getDataBase("constraint")->getDataBase(iconstraint);
+        auto db = d_db->d_root_db->getDataBase("modal_market")->getDataBase(iconstraint);
         std::string constraint_type = db->getString("type");
         if (true)
         {

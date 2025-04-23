@@ -1,0 +1,31 @@
+#ifndef LINEARHEX81_H
+#define LINEARHEX81_H
+
+#include "BaseElement.h"
+
+class LinearHex8 : public BaseElement
+{    
+    public:
+    using BaseClass = BaseElement;
+    LinearHex8(){};
+    virtual ~LinearHex8() {};
+    virtual void init();
+    virtual void initElementData(ElementData & elementData);
+    virtual void updateElementData(ElementData & elementData);
+    virtual void elementStiffness(ElementData & elementData,
+                                  std::vector<double> & elementMat,
+                                  std::shared_ptr<ObjectControlParam> control = nullptr);
+    virtual void elementInterForce(ElementData & elementData,
+                                   std::vector<double> & elementVector,
+                                   std::shared_ptr<ObjectControlParam> control = nullptr);
+
+
+    //
+    int d_integration_order = 2;
+    int d_numEdofs = 24;
+    int d_numNodes = 8;
+    std::vector<std::string> d_dof_labs = {"ux", "uy", "uz"};
+};
+
+
+#endif

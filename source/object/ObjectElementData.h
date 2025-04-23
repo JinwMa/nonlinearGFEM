@@ -14,7 +14,8 @@ struct ElementData
     bool iteration_first = true;                  // 是否在迭代步中初始化该单元信息  
 
     // 单元基本信息
-    vector<int> node_local_ids;                   // 单元上节点的局部编号
+    int element_internal_id;
+    vector<int> node_internal_ids;                   // 单元上节点的局部编号
     vector<vector<double>> nodes_coords;          // 节点坐标信息
     vector<vector<double>> u;                     // 节点位移
     vector<vector<double>> du;                    // 节点增量位移
@@ -44,6 +45,8 @@ struct ElementData
     // 屈服半径
     vector<double> kappa_n;
     vector<double> kappa_n1;
+
+    void debugPrint();
     
 };
 

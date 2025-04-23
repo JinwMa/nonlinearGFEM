@@ -24,7 +24,7 @@ void BaseFlowSolver::takeDB()
     std::string solver_type = d_solve_db->getString("type");
     if (true)
     {
-        d_atom_solver = make_shared<BaseAtomSolver>(d_solve_db, d_mesh);
+        d_atom_solver = make_shared<StructuralAtomSolver>(d_solve_db, d_mesh);
     }
 }
 

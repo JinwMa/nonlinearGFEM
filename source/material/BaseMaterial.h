@@ -11,8 +11,8 @@ class BaseMaterial
     BaseMaterial(){};
     virtual ~BaseMaterial(){};
     virtual void takeDB(std::shared_ptr<DataBase> db) final;
-    virtual void getD(double D[6][6]);
-    virtual void getStressAndDsDu(ElementData & element_data); 
+    virtual void getD(double D[6][6]){};
+    virtual void getStressAndDsDu(ElementData & element_data){}; 
 
     //
     public:

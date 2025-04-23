@@ -8,6 +8,8 @@
 #include "mesh.h"
 #include "ObjectControlParam.h"
 #include "ObjectElementData.h"
+#include "BaseElement.h"
+#include "LinearHex8.h"
 
 class ElementAssembler
 {
@@ -16,26 +18,28 @@ class ElementAssembler
 
     public:
     ElementAssembler(std::shared_ptr<DataBase> db,
-                    std::shared_ptr<DofMap> dof_map,
-                    std::shared_ptr<Mesh> mesh)
+                    std::shared_ptr<Mesh> mesh,                    
+                    std::shared_ptr<DofMap> dof_map)
     {
         d_mesh = mesh;
         d_db = db;
         d_dof_map = dof_map;
     }
-    virtual ~ElementAssembler();
+    virtual ~ElementAssembler(){};
     
     void init()
     {
         takeDB();
     }
-    void takeDB(){};
+    void takeDB();
     void assembleMaterix(const std::string type, 
-                         std::vector<ElementData> elementData,
-                         Eigen::SparseMatrix<double> & matrix);
+                         std::vector<ElementData> & elementData,
+                         Eigen::SparseMatrix<double> & matrix){};
     void assembleVector(const std::string type, 
-                        std::vector<ElementData> elementData,
-                        Eigen::VectorXd & vector);
+                        std::vector<ElementData> & elementData,
+                        Eigen::VectorXd & vector){};
+
+    void allocateElementData(std::vector<ElementData> & elementData);
 
 
     public:
@@ -43,7 +47,8 @@ class ElementAssembler
     std::shared_ptr<DofMap> d_dof_map;
     std::shared_ptr<Mesh> d_mesh;
     std::vector<std::string> d_element_list;
- 
+    std::vector<std::shared_ptr<BaseElement>> d_element_pointers;
+    std::vector<std::vector<int>> d_element_groups;
 };
 
 

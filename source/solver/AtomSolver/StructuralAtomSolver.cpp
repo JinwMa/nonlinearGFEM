@@ -1,0 +1,62 @@
+#include "StructuralAtomSolver.h"
+
+
+
+void StructuralAtomSolver::takeDB()
+{
+
+}
+
+
+void StructuralAtomSolver::initializeSolver()
+{
+    // 自由度映射表
+    d_dof_map = make_shared<DofMap>(d_mesh);
+    // 迭代控制器
+    d_control_param = make_shared<ObjectControlParam>();
+    // 约束管理器
+    d_constraint_manger = make_shared<ConstraintManager>(d_solve_db, d_mesh, d_dof_map);
+    d_constraint_manger->init();
+    // 组装代理
+    d_elementAssembler = make_shared<ElementAssembler>(d_solve_db, d_mesh, d_dof_map);
+    d_elementAssembler->init();
+    // 初始化ElementData
+    d_elementAssembler->allocateElementData(d_elementData);
+}
+
+void StructuralAtomSolver::initializeTimeStep(const double current_time)
+{
+
+}
+
+void StructuralAtomSolver::initializeIterationStep()
+{
+
+}
+
+void StructuralAtomSolver::solveOneTimeStep(const double current_time,
+                                            const double predict_dt,
+                                            double &actual_dt)
+{
+
+}
+
+
+void StructuralAtomSolver::afterSolve()
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
