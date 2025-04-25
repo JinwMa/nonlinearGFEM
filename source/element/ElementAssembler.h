@@ -8,8 +8,7 @@
 #include "mesh.h"
 #include "ObjectControlParam.h"
 #include "ObjectElementData.h"
-#include "BaseElement.h"
-#include "LinearHex8.h"
+#include "ElementInterface.h"
 
 class ElementAssembler
 {

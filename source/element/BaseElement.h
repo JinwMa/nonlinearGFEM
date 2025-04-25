@@ -10,28 +10,34 @@
 struct GaussPointInfo
 {
     std::vector<double> pcoord; // 参数坐标
-    double weight; // 积分权重
+    double weight;              // 积分权重
     // 备注：不能存放雅可比,因为每个单元的雅可比不一样
 };
 
 class BaseElement
 {
-    public:
-    BaseElement(){};
-    virtual ~BaseElement(){};
+public:
+    BaseElement() {};
+    virtual ~BaseElement() {};
 
-    virtual void init(){};
+    virtual void init() {};
     virtual void takeDB(shared_ptr<DataBase> db);
 
-    virtual void elementStiffness(ElementData & elementData,
+    virtual void elementStiffness(ElementData &elementData,
+                                  std::vector<double> & xyz,
+                                  std::vector<double> & u,
+                                  std::vector<double> & du,
                                   std::vector<double> & elementMat,
-                                  std::shared_ptr<ObjectControlParam> control = nullptr){};
-    virtual void elementInterForce(ElementData & elementData,
+                                  std::shared_ptr<ObjectControlParam> control = nullptr) {};
+    virtual void elementInterForce(ElementData &elementData,
+                                   std::vector<double> & xyz,
+                                   std::vector<double> & u,
+                                   std::vector<double> & du,
                                    std::vector<double> & elementVector,
-                                   std::shared_ptr<ObjectControlParam> control = nullptr){};
-    virtual void updateElementData(ElementData & elementData){};
+                                   std::shared_ptr<ObjectControlParam> control = nullptr) {};
+    virtual void updateElementData(ElementData &elementData) {};
 
-    virtual void initElementData(ElementData & elementData){};
+    virtual void initElementData(ElementData &elementData) {};
 
     void setGuassInfoHex8();
 
@@ -43,10 +49,6 @@ class BaseElement
     // 单元上的自由度标签
     std::vector<std::string> d_dof_labs;
     std::shared_ptr<BaseMaterial> d_material;
-
-
 };
-
-
 
 #endif

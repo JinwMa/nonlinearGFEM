@@ -12,14 +12,21 @@ class LinearHex8 : public BaseElement
     virtual void init();
     virtual void initElementData(ElementData & elementData);
     virtual void updateElementData(ElementData & elementData);
-    virtual void elementStiffness(ElementData & elementData,
+
+
+    virtual void elementStiffness(ElementData &elementData,
+                                  std::vector<double> & xyz,
+                                  std::vector<double> & u,
+                                  std::vector<double> & du,
                                   std::vector<double> & elementMat,
-                                  std::shared_ptr<ObjectControlParam> control = nullptr);
-    virtual void elementInterForce(ElementData & elementData,
+                                  std::shared_ptr<ObjectControlParam> control = nullptr) {};
+    virtual void elementInterForce(ElementData &elementData,
+                                   std::vector<double> & xyz,
+                                   std::vector<double> & u,
+                                   std::vector<double> & du,
                                    std::vector<double> & elementVector,
-                                   std::shared_ptr<ObjectControlParam> control = nullptr);
-
-
+                                   std::shared_ptr<ObjectControlParam> control = nullptr) {};
+    
     //
     int d_integration_order = 2;
     int d_numEdofs = 24;

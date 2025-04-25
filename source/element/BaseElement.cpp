@@ -1,7 +1,6 @@
 #include "BaseElement.h"
 
 
-
 void BaseElement::takeDB(shared_ptr<DataBase> db)
 {
     if(db->ifExist("integration_order")) d_integration_order = db->getInt("integration_order");
@@ -9,14 +8,7 @@ void BaseElement::takeDB(shared_ptr<DataBase> db)
     auto modal_market_db = db->d_root_db->getDataBase("modal_market");
     auto material_db = modal_market_db->getDataBase(material_name);
     std::string material_type = material_db->getString("type");
-    if (material_type == "LinearElasticity")
-    {
-        d_material = make_shared<LinearElastic>();
-    }
-    else
-    {
-        toolbox::error("not support this type of material");
-    }
+    d_material = newMaterial(material_type);
     d_material->takeDB(material_db);
 }
 
