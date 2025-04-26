@@ -13,7 +13,7 @@
 std::shared_ptr<BaseElement> newElement(const std::string & type); 
 
 
-// 获取单元群id id对应外部输入的id
+// 获取群单元ids id对应内部的单元id
 void getGroup(std::shared_ptr<DataBase> db,
               std::shared_ptr<Mesh> mesh,
               std::vector<int> & igroup);

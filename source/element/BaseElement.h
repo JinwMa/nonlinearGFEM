@@ -37,7 +37,7 @@ public:
                                    std::shared_ptr<ObjectControlParam> control = nullptr) {};
     virtual void updateElementData(ElementData &elementData) {};
 
-    virtual void initElementData(ElementData &elementData) {};
+    virtual void allocateElementData(ElementData &elementData);
 
     void setGuassInfoHex8();
 
@@ -49,6 +49,8 @@ public:
     // 单元上的自由度标签
     std::vector<std::string> d_dof_labs;
     std::shared_ptr<BaseMaterial> d_material;
+
+    int d_variable_Size = 0;
 };
 
 #endif

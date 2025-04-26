@@ -24,6 +24,10 @@
 #include "ObjectElementData.h"
 #include "ObjectControlParam.h"
 #include "ElementAssembler.h"
+#include "ObjectSparseFactor.h"
+#include "ObjectSparseVector.h"
+
+// 原子求解器基类：只定义成员变量和提供基础实现
 class BaseAtomSolver
 {
     public:
@@ -35,18 +39,20 @@ class BaseAtomSolver
     virtual ~BaseAtomSolver(){};
 
     // 成员变量
-    std::vector<ElementData>d_elementData;
+    std::vector<ElementData> d_elementData;
     std::shared_ptr<DataBase> d_solve_db;
     std::shared_ptr<Mesh> d_mesh;
 
     // Manager
     std::shared_ptr<ConstraintManager> d_constraint_manger;
-
-    //
     std::shared_ptr<DofMap> d_dof_map;
     std::shared_ptr<ObjectControlParam> d_control_param;
     std::shared_ptr<ElementAssembler> d_elementAssembler;
 
+
+    // 稀疏矩阵
+    std::map<std::string, std::shared_ptr<SparseFactor>> d_Matrixs;
+    std::map<std::string, std::shared_ptr<SparseVector>> d_Vectors;
 
     // 成员函数
     /*

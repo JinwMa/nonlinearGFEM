@@ -1,7 +1,8 @@
 #ifndef ELEMENTASSEMBLER_H
 #define ELEMENTASSEMBLER_H
 
-#include<Eigen/Dense>
+#include <omp.h>
+#include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include "input.h"
 #include "DofMap.h"

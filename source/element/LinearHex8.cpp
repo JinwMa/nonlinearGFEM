@@ -7,9 +7,9 @@ void LinearHex8::init()
 }
 
 
-void LinearHex8::initElementData(ElementData & elementData)
+void LinearHex8::allocateElementData(ElementData & elementData)
 {
-
+    BaseClass::allocateElementData(elementData);
 }
 
 void LinearHex8::updateElementData(ElementData & elementData){}

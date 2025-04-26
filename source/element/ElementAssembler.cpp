@@ -12,6 +12,7 @@ void ElementAssembler::takeDB()
         std::string element_type = sub_db->getString("type");
         auto element = newElement(element_type);
         element->takeDB(sub_db);
+        element->init();
         d_element_pointers.push_back(element);
         // step 3 : build element groups    
         std::vector<int> igroup;
@@ -23,6 +24,19 @@ void ElementAssembler::takeDB()
 
 void ElementAssembler::allocateElementData(std::vector<ElementData> & elementDatas)
 {
+    elementDatas.resize(d_mesh->d_actual_element_count);
+   int numType = d_element_list.size();
+   for (int i = 0; i < numType; i++)
+   {
+       auto elementPointer = d_element_pointers[i];
+       auto elementGroup = d_element_groups[i];    
+#pragma omp parallel for
+       for (auto iElement : elementGroup)
+       {
+        std::cout << iElement << std::endl;
+        elementPointer->allocateElementData(elementDatas[iElement]);
+       }
+   }
 }
 
 

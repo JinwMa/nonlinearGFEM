@@ -10,7 +10,7 @@ class LinearHex8 : public BaseElement
     LinearHex8(){};
     virtual ~LinearHex8() {};
     virtual void init();
-    virtual void initElementData(ElementData & elementData);
+    virtual void allocateElementData(ElementData & elementData);
     virtual void updateElementData(ElementData & elementData);
 
 
@@ -32,6 +32,7 @@ class LinearHex8 : public BaseElement
     int d_numEdofs = 24;
     int d_numNodes = 8;
     std::vector<std::string> d_dof_labs = {"ux", "uy", "uz"};
+    int d_variableSize = 0;
 };
 
 
