@@ -17,37 +17,7 @@ void DofMap::initializeDofTag()
     }
 }
 
-void DofMap::buildNodeDofs()
-{
-    // 单元数
-    int element_num = d_mesh->d_actual_element_count;
-    for (int i = 0; i < element_num; i++)
-    {
-        // 单元外部编号
-        int ex_elem = d_mesh->getElementExternalId(i);
-        auto nodes = d_mesh->d_element_connectivity[i];
-        int num_nodes = nodes.size();
-        // 单元类型
-        int element_type = d_mesh->d_element_type[i];
-        if (element_type == 1 ||
-            element_type == 2)
-        {
-            set<int> dofs = {0, 1, 2};
-            for (int inode = 0; inode < num_nodes; inode++)
-            {
-                int ex_node_id = nodes[inode];
-                int int_node_id = d_mesh->getNodeInternalId(ex_node_id);
-                d_nodes_dofs[int_node_id].insert(dofs.begin(), dofs.end());
-            }
-        }
-        else
-        {
-            toolbox::error("暂时不支持该单元类型的自由度构建");
-        }
-    }
 
-    // printNodesDofs();
-}
 
 void DofMap::printNodesDofs()
 {
@@ -125,3 +95,18 @@ int DofMap::getDofIndex(const int node_internal_id, const std::string dof_lab)
     return d_nodes_dof_index[node_internal_id] + dof_order;
 }
 
+
+
+std::vector<int> DofMap::transTagsToInt(std::vector<std::string> & Tags)
+{
+    std::vector<int> Ints;
+    for (auto it : Tags)
+    {
+        if(d_dof_tag_to_int.find(it) == d_dof_tag_to_int.end())
+        {
+            toolbox::error("failed to trans the tag to int");
+        }
+        Ints.push_back(d_dof_tag_to_int[it]);        
+    }
+    return Ints;
+}

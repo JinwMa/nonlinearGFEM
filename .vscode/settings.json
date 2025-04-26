@@ -118,7 +118,8 @@
         "openglsupport": "cpp",
         "specialfunctions": "cpp",
         "splines": "cpp",
-        "eigen": "cpp"
+        "eigen": "cpp",
+        "nonlinearoptimization": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

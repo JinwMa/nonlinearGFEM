@@ -16,7 +16,6 @@ public:
     {
         d_mesh = mesh;
         initializeDofTag();
-        buildNodeDofs();
     };
     ~DofMap() {};
 
@@ -32,11 +31,10 @@ public:
     vector<int> d_full_to_solver;       // 全自由度映射关系,正表示Free自由度,负数表示slave自由度并指示其关联的约束方程id
     vector<int> d_free_to_full;         // 用于解还原
     vector<int> d_slave_to_CE;          // 用于计算slave解
+    vector<int> d_dof_type;             // 每个自由度的类型
 
 public:
     // 根据单元特征开放节点上的自由度
-    void
-    buildNodeDofs();
     void buildDofMap();
     int getDofIndex(const int node_internal_id, const string dof_lab);
     // int getDofIndex(const int node_internal_id, const int dof_order);
@@ -48,6 +46,8 @@ public:
 
     // 建立或更新节点自由度的起始值
     void setNodesDofIndex();
+
+     vector<int> transTagsToInt(vector<string> & Tags);
 
 private:
     void initializeDofTag();

@@ -28,6 +28,9 @@ void StructuralAtomSolver::initializeSolver()
     
     // 初始化ElementData
     d_elementAssembler->allocateElementData(d_elementData);
+
+    // 预处理DofMap
+    d_elementAssembler->preBuildNodesDofs();
 }
 
 void StructuralAtomSolver::initializeTimeStep(const double current_time)

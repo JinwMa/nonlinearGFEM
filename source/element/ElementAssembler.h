@@ -42,6 +42,9 @@ class ElementAssembler
     void allocateElementData(std::vector<ElementData> & elementData);
 
 
+    void preBuildNodesDofs();
+
+    
     public:
     std::shared_ptr<DataBase> d_db;
     std::shared_ptr<DofMap> d_dof_map;

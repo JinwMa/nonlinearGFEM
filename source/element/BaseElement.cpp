@@ -95,5 +95,5 @@ void BaseElement::setGuassInfoHex8()
 
 void BaseElement::allocateElementData(ElementData & elementdata)
 {
-    elementdata.elementVariable.resize(d_variable_Size);
+    elementdata.elementVariable.resize(d_variableSize);
 }

@@ -28,11 +28,6 @@ class LinearHex8 : public BaseElement
                                    std::shared_ptr<ObjectControlParam> control = nullptr) {};
     
     //
-    int d_integration_order = 2;
-    int d_numEdofs = 24;
-    int d_numNodes = 8;
-    std::vector<std::string> d_dof_labs = {"ux", "uy", "uz"};
-    int d_variableSize = 0;
 };
 
 

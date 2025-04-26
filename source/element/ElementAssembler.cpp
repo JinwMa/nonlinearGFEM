@@ -22,6 +22,8 @@ void ElementAssembler::takeDB()
 }
 
 
+
+// 开辟连续空间：不要并行
 void ElementAssembler::allocateElementData(std::vector<ElementData> & elementDatas)
 {
     elementDatas.resize(d_mesh->d_actual_element_count);
@@ -30,16 +32,32 @@ void ElementAssembler::allocateElementData(std::vector<ElementData> & elementDat
    {
        auto elementPointer = d_element_pointers[i];
        auto elementGroup = d_element_groups[i];    
-#pragma omp parallel for
+// #pragma omp parallel for
        for (auto iElement : elementGroup)
        {
-        std::cout << iElement << std::endl;
         elementPointer->allocateElementData(elementDatas[iElement]);
        }
    }
 }
 
-
-
-
-
+void ElementAssembler::preBuildNodesDofs()
+{
+    int numType = d_element_list.size();
+    for (int i = 0; i < numType; i++)
+    {
+        auto elementPointer = d_element_pointers[i];
+        auto elementGroup = d_element_groups[i];
+        // #pragma omp parallel for   :    don't parallel
+        for (auto iElement : elementGroup)
+        {
+            auto tags = elementPointer->getDofLab();            
+            auto Ints = d_dof_map->transTagsToInt(tags);
+            auto nodeIds = d_mesh->d_element_connectivity[iElement];
+            for (auto i : nodeIds)
+            {
+                int nodeInternalId = d_mesh->getNodeInternalId(i);
+                d_dof_map->d_nodes_dofs[nodeInternalId].insert(Ints.begin(), Ints.end());
+            }
+        }
+    }
+}
