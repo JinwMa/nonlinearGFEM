@@ -9,6 +9,7 @@
 
 #include"input.h"
 #include"mesh.h"
+#include "ConstraintInterface.h"
 
 #include"BaseConstraint.h"
 #include"DofMap.h"
@@ -24,6 +25,7 @@ class ConstraintManager
         d_mesh = mesh;
         d_db = db;
         d_dof_map = dofmap;
+        init();
     };
     ~ConstraintManager(){};
     // 不要把takeDB接口直接暴露给外部
@@ -32,7 +34,7 @@ class ConstraintManager
         takeDB();
     }
     void takeDB();
-    void buildDofs();
+    void buildNodeDofs();
     void buildConstrintEquation();
     void assembleStiffness(){};
     void assembleInternalFoce(){};
@@ -42,8 +44,8 @@ class ConstraintManager
     //
     vector<ConstraintEquation> d_CEs_vec;
     vector<shared_ptr<BaseConstraint>> d_constraints;
-    vector<int> d_all_slave_dofs;
-    vector<int> d_all_master_dofs;
+    shared_ptr<set<int>> d_MasterSetPointer;
+    shared_ptr<set<int>> d_SlaveSetPointer;
 
     //
     shared_ptr<Mesh> d_mesh;

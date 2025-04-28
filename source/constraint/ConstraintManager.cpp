@@ -8,15 +8,8 @@ void ConstraintManager::takeDB()
         std::string iconstraint = constraint_list[i];
         auto db = d_db->d_root_db->getDataBase("modal_market")->getDataBase(iconstraint);
         std::string constraint_type = db->getString("type");
-        if (true)
-        {
-            auto constraint = make_shared<BaseConstraint>(db, d_mesh, d_dof_map);
-            d_constraints.push_back(constraint);
-        }
-        else
-        {
-            toolbox::error("not supprot this type of constraint");
-        }
+        auto constraint = newConstraint(constraint_type, db, d_mesh, d_dof_map);
+        d_constraints.push_back(constraint);
     } 
     // 循环调用每个约束的takeDB
     for (auto constraint : d_constraints)
@@ -25,12 +18,12 @@ void ConstraintManager::takeDB()
     }   
 }
 
-void ConstraintManager::buildDofs()
+void ConstraintManager::buildNodeDofs()
 {
     if (d_constraints.size() == 0) toolbox::error("no constraint in this input");
     for (auto constraint : d_constraints)
     {
-        constraint->buildDofs();
+        constraint->buildNodeDofs();
     }
 }
 
@@ -40,7 +33,7 @@ void ConstraintManager::buildConstrintEquation()
     for (auto constraint : d_constraints)
     {
         std::vector<ConstraintEquation> Ces;
-        constraint->buildConstraintEquations(Ces);
+        constraint->buildConstraintEquations(Ces, d_SlaveSetPointer, d_MasterSetPointer);
         d_CEs_vec.insert(d_CEs_vec.end(), Ces.begin(), Ces.end());
     }
 }

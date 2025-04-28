@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <vector>
+#include <string>
 
 
 class TimeMater
@@ -22,8 +23,8 @@ class TimeMater
     public:
 
     void start();
-    void getPassedCpuTimeFromLast();
-    void getPassedCpuTimeFromStart();
+    void getPassedCpuTimeFromLast(std::string message = "");
+    void getPassedCpuTimeFromStart(std::string message = "");
 
     private:
     TimeMater(){};

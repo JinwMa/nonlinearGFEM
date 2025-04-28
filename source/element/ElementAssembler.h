@@ -24,6 +24,7 @@ class ElementAssembler
         d_mesh = mesh;
         d_db = db;
         d_dof_map = dof_map;
+        init();
     }
     virtual ~ElementAssembler(){};
     

@@ -47,11 +47,10 @@ void ElementAssembler::preBuildNodesDofs()
     {
         auto elementPointer = d_element_pointers[i];
         auto elementGroup = d_element_groups[i];
-        // #pragma omp parallel for   :    don't parallel
         for (auto iElement : elementGroup)
         {
             auto tags = elementPointer->getDofLab();            
-            auto Ints = d_dof_map->transTagsToInt(tags);
+            auto Ints = d_dof_map->transTagsToInts(tags);
             auto nodeIds = d_mesh->d_element_connectivity[iElement];
             for (auto i : nodeIds)
             {
