@@ -15,6 +15,8 @@
 
 using namespace std;
 
+
+// constraintEquation : const = c1 * dof1 + c2 * dof2 + c3 * dof3 ...
 struct ConstraintEquation
 {
     int equation_id;
@@ -44,12 +46,9 @@ class BaseConstraint
                                           shared_ptr<set<int>> SlaveSet,
                                           shared_ptr<set<int>> MasterSet) {};
     
-    void addDofToSlaveDofs(const int node_id, const string dof, vector<int> & allSlaveDofs){};
-    void addDofsToMasterDofs(const vector<int> & node_ids, const vector<string> dofs, vector<int> & allMasterDofs){};
+    void addDofToDofSet(const int node_id, const string dof, shared_ptr<set<int>> DofSet);
 
-
-    bool checkIfdofTouchedMasterOrSlave(const int, shared_ptr<set<int>>);
-    void putDofIntoMasterOrSlave(const int, shared_ptr<set<int>>);
+    bool checkIfdofTouchedMasterOrSlave(const int nodeId, const string dof, shared_ptr<set<int>>);
 
     public:
     shared_ptr<Mesh> d_mesh;

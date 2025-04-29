@@ -30,10 +30,33 @@ void ConstraintManager::buildNodeDofs()
 
 void ConstraintManager::buildConstrintEquation()
 {
+    d_SlaveSetPointer = make_shared<set<int>>();
+    d_MasterSetPointer = make_shared<set<int>>();
     for (auto constraint : d_constraints)
     {
         std::vector<ConstraintEquation> Ces;
         constraint->buildConstraintEquations(Ces, d_SlaveSetPointer, d_MasterSetPointer);
         d_CEs_vec.insert(d_CEs_vec.end(), Ces.begin(), Ces.end());
+    }
+    if(std::getenv("PRINTCONSTRAINTEQUATIONS"))    printConstraintEquations();
+}
+
+void ConstraintManager::printConstraintEquations()
+{
+    std::cout << "number of CEs: " << d_CEs_vec.size() << std::endl;
+    for (auto CE : d_CEs_vec)
+    {
+        // ce id 
+        std::cout << " CE id =  " << CE.equation_id << std::endl;
+        // equation:
+        std::cout << CE.constant << " = ";
+        std::cout << CE.slave_factor << " * " << d_mesh->getNodeExternalId(CE.slave_node_id) << CE.slave_dof;
+        int numMaster = CE.master_dofs.size();
+        for (int i = 0; i < numMaster; i++)
+        {
+            std::cout << " + " << CE.master_factors[i] << " * " << CE.master_node_ids[i] << CE.master_dofs[i];
+        } 
+        std::cout << std::endl;
+        std::cout << "#######################################" << std::endl;
     }
 }

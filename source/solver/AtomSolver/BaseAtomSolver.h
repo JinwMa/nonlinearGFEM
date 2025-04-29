@@ -24,8 +24,8 @@
 #include "ObjectElementData.h"
 #include "ObjectControlParam.h"
 #include "ElementAssembler.h"
-#include "ObjectSparseFactor.h"
 #include "ObjectSparseVector.h"
+#include "ObjectSparseMatrix.h"
 
 // 原子求解器基类：只定义成员变量和提供基础实现
 class BaseAtomSolver
@@ -50,9 +50,11 @@ class BaseAtomSolver
     std::shared_ptr<ElementAssembler> d_elementAssembler;
 
 
-    // 稀疏矩阵
-    std::map<std::string, std::shared_ptr<SparseFactor>> d_Matrixs;
+    // 稀疏向量
     std::map<std::string, std::shared_ptr<SparseVector>> d_Vectors;
+
+    // 稀疏矩阵
+    std::map<std::string, std::shared_ptr<SparseMatrix>> d_Matrix;
 
     // 成员函数
     /*

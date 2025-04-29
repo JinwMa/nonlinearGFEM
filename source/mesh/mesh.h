@@ -26,16 +26,17 @@ public:
     int d_actual_element_count = 0;
     int d_actual_node_count = 0;
 
-    map<int, vector<vector<int>>> d_element_face_node_order; // element_face_node
-    std::vector<int> d_element_type;                         // element_type
-    std::vector<int> d_node_external_ids;                      // node outer ids in order
-    std::vector<int> d_element_external_ids;                   // element outer ids in order
-    std::vector<std::vector<double>> d_nodes_coordinate;     // nodes' coordinate
-    std::vector<std::vector<int>> d_element_connectivity;    // elements' connectivity
+    map<int, vector<vector<int>>> d_element_face_node_order;           // element_face_node
+    std::vector<int> d_element_type;                                   // element_type
+    std::vector<int> d_node_external_ids;                              // node outer ids in order
+    std::vector<int> d_element_external_ids;                           // element outer ids in order
+    std::vector<std::vector<double>> d_nodes_coordinate;               // nodes' coordinate
+    std::vector<std::vector<int>> d_element_connectivity;              // elements' connectivity
+    std::vector<std::vector<int>> d_element_connectivity_internal;     // elements' connectivity internal node ids
 
-    map<int, vector<int>> d_node_sets;                       // 节点集 : 点集编号和节点编号都是外部编号
-    map<int, vector<int>> d_element_sets;                    // 单元集 : 单元集编号和单元编号都是外部编号
-    map<int, vector<vector<int>>> d_segment_sets;            // 面片集 : 存储形式: 一个片段代表一个面片
+    map<int, vector<int>> d_node_sets;                                 // 节点集 : 点集编号和节点编号都是外部编号
+    map<int, vector<int>> d_element_sets;                              // 单元集 : 单元集编号和单元编号都是外部编号
+    map<int, vector<vector<int>>> d_segment_sets;                      // 面片集 : 存储形式: 一个片段代表一个面片
     
 
     unordered_map<int, int> d_node_internal_ids;
@@ -49,6 +50,7 @@ public:
         buildElementFaceNodeOrder();                         // 创建单元上节点的序号
         readmeshfile();                                      // 读网格 节点集 单元集 面片集 
         checkmesh();                                         // 检查网格
+        buildElementsConnectivityInternal();
     }
     void checkmesh();
 
@@ -81,6 +83,7 @@ private:
     void readmeshfile();
     void buildElementsOfNodes();
     void buildElementFaceNodeOrder();
+    void buildElementsConnectivityInternal();
 
 public:
     void getOuterFaceOfElementSet(const vector<int> & element_set,

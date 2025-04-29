@@ -461,3 +461,22 @@ void Mesh::getOuterFaceOfElementSet(const std::vector<int> & element_set,
         }
     }    
 }
+
+
+void Mesh::buildElementsConnectivityInternal()
+{
+    d_element_connectivity_internal.resize(d_actual_element_count);
+    for (int i = 0; i < d_actual_element_count; i++)
+    {
+        int numNodes = d_element_connectivity[i].size();
+        d_element_connectivity_internal[i].resize(numNodes);
+        // 
+        for (int j = 0; j < numNodes; j++)
+        {
+            int nodeExtId = d_element_connectivity[i][j];
+            d_element_connectivity_internal[i][j] = getNodeInternalId(nodeExtId);
+            // std::cout << d_element_connectivity_internal[i][j] << " ";
+        }
+        // std::cout << std::endl;
+    }
+}

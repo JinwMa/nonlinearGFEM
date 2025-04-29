@@ -1,7 +1,7 @@
 #include "SPC.h"
 
 
-
+// takeDB时候读到的节点id为外部编号,出takeDB之前,要将其转换为内部ID
 void SPC::takeDB()
 {
     // get nodes
@@ -97,5 +97,34 @@ void SPC::buildConstraintEquations(vector<ConstraintEquation> &CEs,
                                    shared_ptr<set<int>> SlaveSet,
                                    shared_ptr<set<int>> MasterSet)
 {
-
+    int numDofs = d_dofs.size();
+    int numNode = d_nodes.size();
+    for (int i = 0; i < numDofs; i++)
+    {
+        auto dof = d_dofs[i];
+        for (int j = 0; j < numNode; j++)
+        {
+            ConstraintEquation newCE;
+            auto nodeIntId = d_nodes[j];             
+            double value = d_values[i][j];
+            // 检查节点自由度是否在SlaveSet
+            if (checkIfdofTouchedMasterOrSlave(nodeIntId, dof, SlaveSet)) 
+            {
+                std::cout << "Warning: find duplicate constraint definition in SPC" << std::endl;
+                continue;
+            }
+            // 检查节点自由度是否在MasterSet
+            if (checkIfdofTouchedMasterOrSlave(nodeIntId, dof, MasterSet))
+            {
+                toolbox::error("Error: SPC dof cannot be a master dof");
+            }
+            addDofToDofSet(nodeIntId, dof, SlaveSet);
+            newCE.equation_id = 0;            
+            newCE.slave_dof = dof;
+            newCE.constant = value;
+            newCE.slave_factor = 1.0;
+            newCE.slave_node_id = nodeIntId;
+            CEs.push_back(newCE);
+        }
+    }
 }

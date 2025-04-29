@@ -22,13 +22,16 @@ void StructuralAtomSolver::initializeSolver()
     d_elementAssembler->allocateElementData(d_elementData);
 
     // 预处理DofMap
-    // std::cout << "befor" << std::endl;
-    // d_dof_map->printNodesDofs();
     d_elementAssembler->preBuildNodesDofs();
     d_constraint_manger->buildNodeDofs();
     d_dof_map->buildNodeIndex();
-    // std::cout << "after" << std::endl;
-    // d_dof_map->printNodesDofs();
+
+    // 
+    d_constraint_manger->buildConstrintEquation();
+
+    // allocate matrix and vector
+    d_Matrix["K"] = make_shared<SparseMatrix>("K");
+    d_Vectors["u"] = make_shared<SparseVector>("u");
 }
 
 void StructuralAtomSolver::initializeTimeStep(const double current_time)

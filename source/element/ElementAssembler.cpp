@@ -51,10 +51,10 @@ void ElementAssembler::preBuildNodesDofs()
         {
             auto tags = elementPointer->getDofLab();            
             auto Ints = d_dof_map->transTagsToInts(tags);
-            auto nodeIds = d_mesh->d_element_connectivity[iElement];
+            auto nodeIds = d_mesh->d_element_connectivity_internal[iElement];
             for (auto i : nodeIds)
             {
-                int nodeInternalId = d_mesh->getNodeInternalId(i);
+                int nodeInternalId = i;
                 d_dof_map->d_nodes_dofs[nodeInternalId].insert(Ints.begin(), Ints.end());
             }
         }

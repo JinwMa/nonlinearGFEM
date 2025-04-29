@@ -51,6 +51,8 @@ class ConstraintManager
     shared_ptr<Mesh> d_mesh;
     shared_ptr<DataBase> d_db; 
     shared_ptr<DofMap> d_dof_map;
+
+    void printConstraintEquations();
 };
 
 
