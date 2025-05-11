@@ -10,6 +10,9 @@
 #include "ObjectControlParam.h"
 #include "ObjectElementData.h"
 #include "ElementInterface.h"
+#include "ObjectSparseMatrix.h"
+#include "ObjectSparseVector.h"
+
 
 class ElementAssembler
 {
@@ -35,10 +38,10 @@ class ElementAssembler
     void takeDB();
     void assembleMaterix(const std::string type, 
                          std::vector<ElementData> & elementData,
-                         Eigen::SparseMatrix<double> & matrix){};
+                         std::shared_ptr<SparseMatrix> matrix);
     void assembleVector(const std::string type, 
                         std::vector<ElementData> & elementData,
-                        Eigen::VectorXd & vector){};
+                        std::shared_ptr<SparseVector> vector){};
 
     void allocateElementData(std::vector<ElementData> & elementData);
 

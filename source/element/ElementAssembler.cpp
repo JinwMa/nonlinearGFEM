@@ -60,3 +60,10 @@ void ElementAssembler::preBuildNodesDofs()
         }
     }
 }
+
+void ElementAssembler::assembleMaterix(const std::string type,
+                                       std::vector<ElementData> &elementData,
+                                       std::shared_ptr<SparseMatrix> matrix)
+{
+    std::cout << type << std::endl;
+}

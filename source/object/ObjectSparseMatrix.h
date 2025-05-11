@@ -1,7 +1,7 @@
 #ifndef OBJECTSPARSMATRIX
 #define OBJECTSPARSMATRIX
 
-#include<string>
+#include <string>
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <Eigen/PardisoSupport>
