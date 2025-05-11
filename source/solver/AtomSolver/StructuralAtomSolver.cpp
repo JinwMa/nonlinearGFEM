@@ -26,8 +26,14 @@ void StructuralAtomSolver::initializeSolver()
     d_constraint_manger->buildNodeDofs();
     d_dof_map->buildNodeIndex();
 
-    // 
+    // 建立约束方程 
     d_constraint_manger->buildConstrintEquation();
+
+    // 建立自由度映射表
+    d_constraint_manger->buildDofMap();
+
+    if(std::getenv("PRINTCONSTRAINTEQUATIONS"))  d_constraint_manger->printConstraintEquations();
+
 
     // allocate matrix and vector
     d_Matrix["K"] = make_shared<SparseMatrix>("K");

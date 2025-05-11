@@ -25,14 +25,14 @@ public:
     int d_numAllDofs = 0;
     int d_numMasterDofs = 0;
     int d_numSlaveDofs = 0;
-    map<int, set<int>> d_nodes_dofs;
-    vector<int> d_nodes_dof_index;
-    map<string, int> d_Tag2Int;
-    map<int, string> d_Int2Tag;
-    vector<int> d_All2MasterSlave;       // 
-    vector<int> d_All2Solver;            // 
-    vector<int> d_Slave2CEId;            // 
-    vector<int> d_DofType;               // 
+    map<int, set<int>> d_nodes_dofs;     // 节点上的自由度
+    vector<int> d_nodes_dof_index;       // 每个节点第一个自由度在整体自由度列表中的位置
+    map<string, int> d_Tag2Int;          // 自由度标签对应的整型数字
+    map<int, string> d_Int2Tag;          // 整型数字对应的自由度标签
+    vector<int> d_All2MasterSlave;       // 暂时未用到
+    vector<int> d_All2Solver;            // 整体自由度跟求解器中自由度的对应关系
+    vector<int> d_Slave2CEId;            // 暂时未用到
+    vector<int> d_DofType;               // 0 master -1 slave 
 
 public:
     // 根据单元特征开放节点上的自由度

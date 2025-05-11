@@ -36,6 +36,11 @@ class ConstraintManager
     void takeDB();
     void buildNodeDofs();
     void buildConstrintEquation();
+
+    void buildDofMap();
+
+
+
     void assembleStiffness(){};
     void assembleInternalFoce(){};
     void assembleGMatrix(){};
