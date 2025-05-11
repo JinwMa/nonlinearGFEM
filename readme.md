@@ -94,3 +94,32 @@ useful head file
 openmp并行中有个很常见的问题：内存竞争
 类的方法可以并行，但类的数据最好不要通过openmp并行，尤其是累加操作
 openmp会访问同一片地址，造成数据冲突
+
+
+
+
+
+
+
+
+## 配置SSH密钥
+1. 终端运行 ssh-keygen -t ed25519 -C "majinwei_1234@163.com"
+2. cat ~/.ssh/id_ed25519.pub
+
+    登录 GitLab。
+
+    点击右上角头像 → Preferences → SSH Keys。
+
+    粘贴公钥内容（以 ssh-ed25519 AAA... 或 ssh-rsa AAA... 开头）。
+
+    点击 Add key。
+
+
+    4. 测试 SSH 连接
+bash
+
+ssh -T git@gitlab.com
+
+    如果看到 Welcome to GitLab, @your-username!，表示成功。
+
+    如果提示输入密码，输入你生成密钥时设置的密码。
