@@ -123,3 +123,7 @@ ssh -T git@gitlab.com
     如果看到 Welcome to GitLab, @your-username!，表示成功。
 
     如果提示输入密码，输入你生成密钥时设置的密码。
+
+
+   5. 在原路径下运行，以切换到ssh
+   git remote set-url origin git@gitlab.com:Ma_2023/wal-nonlinearfem.git
