@@ -5,9 +5,14 @@
 #include "mesh.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
+
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh);
+void printLogo();
 int main(int argc, char *argv[])
 {
+    std::cout << "pass here" << std::endl;
+    printLogo();
+    std::cout << "Analysis Start ..." << std::endl;
     TimeMater::getInstance()->start();
     // 读取输入文件
     auto input = make_shared<Input>(argv[1]);

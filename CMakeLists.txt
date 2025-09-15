@@ -192,17 +192,7 @@ endif()
 
 
 set(SUBDIRECTORIES
-    input
-    mesh
-    post
-    object
-    solver
-    material
-    element
-    load
-    constraint
-    pre
-    toolbox
+    discretization
 )
 
 set(SUB_LIBRARIES)

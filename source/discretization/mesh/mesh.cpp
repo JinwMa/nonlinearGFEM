@@ -361,9 +361,9 @@ void Mesh::readmeshfile()
     }
     inputFile.close();
     buildElementsOfNodes();
-    std::cout << "当前模型中有: " << std::endl;
-    std::cout << "    单元" << d_actual_element_count << std::endl;
-    std::cout << "    节点" << d_actual_node_count << std::endl;
+    std::cout << "the current model containts: " << std::endl;
+    std::cout << "    elements:" << d_actual_element_count << std::endl;
+    std::cout << "    nodes:" << d_actual_node_count << std::endl;
 }
 
 void Mesh::checkmesh()
