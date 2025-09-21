@@ -119,7 +119,8 @@
         "specialfunctions": "cpp",
         "splines": "cpp",
         "eigen": "cpp",
-        "nonlinearoptimization": "cpp"
+        "nonlinearoptimization": "cpp",
+        "cassert": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

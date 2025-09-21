@@ -2,31 +2,26 @@
 #include <ctime>
 #include <chrono>
 #include "input.h"
-#include "mesh.h"
+#include "MeshDataAgent.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
 
-void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<Mesh> mesh);
+void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<MeshDataAgent> mesh);
 void printLogo();
 int main(int argc, char *argv[])
 {
-    std::cout << "pass here" << std::endl;
     printLogo();
     std::cout << "Analysis Start ..." << std::endl;
     TimeMater::getInstance()->start();
-    // 读取输入文件
-    auto input = make_shared<Input>(argv[1]);
-    // 设置根数据库
-    auto root_db = input->d_root_db;
-    // 模型市场数据库
-    auto modal_market_db = root_db->getDataBase("modal_market");
-    // 全局控制数据库
-    auto global_control_db = root_db->getDataBase("global_control");
-    // 创建网格类
-    auto mesh = make_shared<Mesh>(global_control_db);
 
-    auto dof_map = make_shared<DofMap>(mesh);
-    // 求解
+    // build modal
+    auto input = make_shared<Input>(argv[1]);
+    auto root_db = input->d_root_db;
+    auto modal_market_db = root_db->getDataBase("modal_market");
+    auto global_control_db = root_db->getDataBase("global_control");
+    auto mesh = make_shared<MeshDataAgent>(global_control_db);
+
+    
     solve(root_db->getDataBase("solver"), mesh);
     TimeMater::getInstance()->getPassedCpuTimeFromStart("all solve time");
     return 0;

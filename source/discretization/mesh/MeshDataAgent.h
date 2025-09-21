@@ -1,0 +1,70 @@
+#ifndef MESHDATAAGENT_H
+#define MESHDATAAGENT_H
+#include <vector>
+#include <string>
+#include <map>
+#include <unordered_map>
+
+#include "input.h"
+#include "toolbox.h"
+
+using namespace std;
+class MeshDataAgent
+{
+
+public:
+    MeshDataAgent(std::shared_ptr<DataBase> mesh_db)
+    {
+        d_mesh_db = mesh_db;
+        d_mesh_filename = mesh_db->getString("mesh_file");
+    }
+    ~MeshDataAgent() {};
+
+private:
+    int d_maxnum_element = 300000;
+    int d_maxnum_node = 300000;
+    std::string d_mesh_filename;
+    std::shared_ptr<DataBase> d_mesh_db;
+
+    // node
+    int d_actual_node_count = 0;
+    int d_actual_node_count_original = 0; // 针对加点情况特别设置原始模型中的点数
+    std::vector<std::vector<double>> d_nodes_coordinate;
+    std::vector<int> d_internalNodeId_to_externalNodeId;
+    std::unordered_map<int, int> d_externalNodeId_to_internalNodeId;
+    unordered_map<int, vector<int>> d_node_connect_to_elements;
+
+    // element
+    int d_actual_element_count = 0;
+    std::vector<int> d_element_type;
+    unordered_map<int, vector<int>> d_element_connect_to_nodes;
+    std::vector<int> d_internalElementId_to_externalElementId;
+    std::unordered_map<int, int> d_externalElementId_to_internalElementId;
+
+    // part
+    std::map<int, std::vector<int>> d_part_connect_elements;
+    std::map<int, std::string> d_part_element_type;
+
+    // face -- todo
+    // edge -- todo
+
+    //
+    void readmeshfile();
+    void readNodeInfo();
+    void readElementInfo();
+
+    inline int getElementTypeIndex(std::string typeName)
+    {
+        if (typeName.substr(0, 4) == "C3D4")
+           return 2;
+        else if (typeName.substr(0, 4) == "C3D8")
+           return 1;
+        else
+        {
+            toolbox::error("not support type of element " + typeName);
+        }
+        return 0;
+    }
+};
+
+#endif // MESH1_H
