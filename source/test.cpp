@@ -9,6 +9,7 @@
 
 #include "BaseFieldData.h"
 #include "NodeFieldData.h"
+#include "FieldManager.h"
 void printLogo()
 {
     printf("\n\n");
@@ -25,5 +26,10 @@ void printLogo()
 
 void testNodeField(std::shared_ptr<MeshDataAgent> mda)
 {
-    auto node_field = std::make_shared<NodeFieldData<double>>("aaa");
+    // auto node_field = std::make_shared<NodeFieldData<double>>("aaa");
+    auto field_manager = make_shared<FieldManager> (mda);
+    field_manager->createNodeField<double>("disp", 1, 0.0);
+    // field_manager->printNodeFieldData<double>("disp");
+    field_manager->createElementField<int>("alive", 1, 10);
+    field_manager->printElementFieldData<int>("alive");
 }
