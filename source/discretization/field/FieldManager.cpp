@@ -54,20 +54,20 @@ void FieldManager::printNodeFieldData(std::string name)
     // 检查字段是否存在
     auto it = d_all_fields.find(name);
     if (it == d_all_fields.end()) {
-        toolbox::error("Field " + name + " is not built");
+        toolbox::error("NodeField " + name + " is not built");
         return;
     }
     
     // 安全的类型转换
     auto field = std::static_pointer_cast<NodeFieldData<T>>(it->second);
     if (!field) {
-        toolbox::error("Field " + name + " has incorrect type for the requested template parameter");
+        toolbox::error("NodeField " + name + " has incorrect type for the requested template parameter");
         return;
     }
     
     // 打印数据
     const auto& field_data = field->getData();
-    std::cout << "Field: " << name << " (size: " << field_data.size() << ")" << std::endl;
+    std::cout << "NodeField: " << name << " (size: " << field_data.size() << ")" << std::endl;
     for (const auto& value : field_data) {
         std::cout << value << std::endl;
     }
@@ -79,20 +79,20 @@ void FieldManager::printElementFieldData(std::string name)
     // 检查字段是否存在
     auto it = d_all_fields.find(name);
     if (it == d_all_fields.end()) {
-        toolbox::error("Field " + name + " is not built");
+        toolbox::error("ElementField " + name + " is not built");
         return;
     }
     
     // 安全的类型转换
     auto field = std::static_pointer_cast<ElementFieldData<T>>(it->second);
     if (!field) {
-        toolbox::error("Field " + name + " has incorrect type for the requested template parameter");
+        toolbox::error("ElementField " + name + " has incorrect type for the requested template parameter");
         return;
     }
     
     // 打印数据
     const auto& field_data = field->getData();
-    std::cout << "Field: " << name << " (size: " << field_data.size() << ")" << std::endl;
+    std::cout << "ElementField: " << name << " (size: " << field_data.size() << ")" << std::endl;
     for (const auto& value : field_data) {
         std::cout << value << std::endl;
     }
