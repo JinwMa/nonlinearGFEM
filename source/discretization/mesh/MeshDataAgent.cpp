@@ -8,9 +8,173 @@
 #include <cassert>
 #include <stdexcept>
 
+void MeshDataAgent::readNodeInfo()
+{
+    std::ifstream inputFile(d_mesh_filename); // 打开文件
+    std::streampos pos;
+    if (!inputFile)
+    {
+        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
+    }
+    std::string line;
+    bool nodeZone = false;
+    while (std::getline(inputFile, line))
+    {
+        // 去除行首空白字符
+        size_t start_pos = line.find_first_not_of(" \t\n\r\f\v");
+        if (start_pos != std::string::npos)
+        {
+            line.erase(0, start_pos);
+        }
+
+        // 去除行尾空白字符
+        size_t end_pos = line.find_last_not_of(" \t\n\r\f\v");
+        if (end_pos != std::string::npos)
+        {
+            line.erase(end_pos + 1);
+        }
+
+        // 跳过空行
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::string line_lower = line;
+        // 将整行变成小写
+        std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
+        if (line_lower.find("*") != std::string::npos)
+        {
+            nodeZone = false;
+        }
+        if (line_lower.find("*node") != std::string::npos)
+        {
+            nodeZone = true;
+            continue;
+        }
+        if (nodeZone)
+        {
+             std::istringstream iss(line);
+             int node_external_id;
+             iss >> node_external_id;
+             if (node_external_id >= d_maxnum_node || node_external_id < 1)
+             {
+                 std::cerr << "错误:节点ID超出范围:" << node_external_id << std::endl;
+                 exit(0);
+                 continue;
+             }
+             d_externalNodeId_to_internalNodeId[node_external_id] = d_actual_node_count;
+             d_internalNodeId_to_externalNodeId.push_back(node_external_id);             
+
+             double coordinate;
+             vector<double> coordinates_of_one_node;
+             int iii = 0;
+             while (iss >> coordinate)
+             {                 
+                 coordinates_of_one_node.push_back(coordinate);
+             }
+             d_nodes_coordinate.push_back(coordinates_of_one_node);
+             d_actual_node_count++;
+        }
+    }
+    d_actual_node_count_original = d_actual_node_count;
+}
+
+
+void MeshDataAgent::readElementInfo()
+{
+    std::ifstream inputFile(d_mesh_filename); // 打开文件
+    std::streampos pos;
+    if (!inputFile)
+    {
+        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
+    }
+    std::string line;
+    bool elementZone = false;
+    std::string elementType;
+    while (std::getline(inputFile, line))
+    {
+        // 去除行首空白字符
+        size_t start_pos = line.find_first_not_of(" \t\n\r\f\v");
+        if (start_pos != std::string::npos)
+        {
+            line.erase(0, start_pos);
+        }
+
+        // 去除行尾空白字符
+        size_t end_pos = line.find_last_not_of(" \t\n\r\f\v");
+        if (end_pos != std::string::npos)
+        {
+            line.erase(end_pos + 1);
+        }
+
+        // 跳过空行
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::string line_lower = line;
+        // 将整行变成小写
+        std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
+        if (line_lower.find("*") != std::string::npos)
+        {
+            elementZone = false;
+        }
+        if (line_lower.find("*element") != std::string::npos)
+        {
+            elementZone = true;
+            size_t firstDash = line_lower.find('-');
+            // 找到第二个 '-' 的位置
+            size_t secondDash = line_lower.find('-', firstDash + 1);
+            elementType = line.substr(firstDash + 1, secondDash - firstDash - 1);
+            // std::cout << elementType << std::endl;
+
+            std::string setIdString = line.substr(secondDash + 1);
+            int setId = std::stoi(setIdString);
+            d_part_element_type[setId] = elementType;            
+            continue;
+        }
+        if (elementZone)
+        {
+             std::istringstream iss(line);
+             int element_external_id;
+             int element_internal_id = d_actual_element_count;
+             iss >> element_external_id;
+             if (element_external_id >= d_maxnum_element || element_external_id < 1)
+             {
+                 std::cerr << "错误:单元ID超出范围:" << element_external_id << std::endl;
+                 exit(0);
+                 continue;
+             }
+             d_externalElementId_to_internalElementId[element_external_id] = element_internal_id;
+             d_internalElementId_to_externalElementId.push_back(element_external_id);             
+
+             int elementSetID;
+             iss >> elementSetID;
+
+             int elementNodesCount;
+             iss >> elementNodesCount;
+
+             int nodeId;
+             vector<int> element_connect;
+             while (iss >> nodeId)
+             {   
+                 int nodeInternalId = getNodeInternalId(nodeId);
+                 element_connect.push_back(nodeInternalId);
+             }
+             d_element_connect_to_nodes.push_back(element_connect);
+             // build part          
+             d_part_connect_elements[elementSetID].push_back(element_internal_id);
+             d_part_ids.push_back(elementSetID);
+             d_actual_element_count++;
+        }
+    }
+}
+
 
 // void MeshDataAgent::readmeshfile()
-// {    
+// {
 //     std::streampos pos;
 //     std::string mesh_file_name = d_mesh_db->getString("mesh_file");
 //     std::ifstream inputFile(mesh_file_name); // 打开文件
@@ -20,7 +184,7 @@
 //     }
 //     std::string line;
 //     while (std::getline(inputFile, line))
-//     {        
+//     {
 //         // 去除前后的空白字符
 //         line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
 //         line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
@@ -28,7 +192,6 @@
 //         // 将整行变成小写
 //         std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
 
-        
 //         // 读单元
 //         if (line_lower.substr(0, 8) == "*element" && line_lower.substr(8, 8) != "_")
 //         {
@@ -58,7 +221,7 @@
 //             {
 //                toolbox::error("Type not found in the line! " +  line);
 //             }
-            
+
 //             // #############################################################
 //             // #############################################################
 //             // 单元类型读取完毕
@@ -96,10 +259,10 @@
 //                 {
 //                     // mesh_element[element_id - 1].push_back(node_id);
 //                     aelement.push_back(node_id);
-//                 }                
+//                 }
 //                 if (!aelement.empty())
-//                 {         
-//                     d_element_connectivity.push_back(aelement);           
+//                 {
+//                     d_element_connectivity.push_back(aelement);
 //                     ++d_actual_element_count;
 //                     // element_ids[d_actual_element_count - 1] = element_id;
 //                     d_element_external_ids.push_back(element_id);
@@ -141,20 +304,20 @@
 //                 {
 //                     // mesh_node[node_id - 1].push_back(coordinate);
 //                     coordinates_of_one_node.push_back(coordinate);
-//                 }                
+//                 }
 //                 if (!coordinates_of_one_node.empty())
 //                 {
 //                     d_nodes_coordinate.push_back(coordinates_of_one_node);
 //                     ++d_actual_node_count;
 //                     d_node_external_ids.push_back(node_id);
 //                     d_node_internal_ids[node_id] = d_actual_node_count - 1;
-//                 }  
+//                 }
 //             }
 //         }
 //         else if (line_lower.substr(0, 5) == "*nset")
 //         {
 //             int node_set_id;
-            
+
 //             // 读取下一行
 //             if (!std::getline(inputFile, line))
 //             {
@@ -220,7 +383,7 @@
 //         else if (line_lower.substr(0, 6) == "*elset" )
 //         {
 //             int element_set_id;
-            
+
 //             // 读取下一行
 //             if (!std::getline(inputFile, line))
 //             {
@@ -286,7 +449,7 @@
 //         else if (line_lower.substr(0, 12) == "*segment_set")
 //         {
 //             int segment_set_id;
-            
+
 //             // 读取下一行
 //             if (!std::getline(inputFile, line))
 //             {
@@ -348,9 +511,9 @@
 //                 {
 //                     // mesh_element[element_id - 1].push_back(node_id);
 //                     asegment.push_back(node_id);
-//                 }                
+//                 }
 //                 if (!asegment.empty())
-//                 {         
+//                 {
 //                     d_segment_sets[segment_set_id].push_back(asegment);
 //                 }
 //             }
@@ -362,5 +525,3 @@
 //     std::cout << "    elements:" << d_actual_element_count << std::endl;
 //     std::cout << "    nodes:" << d_actual_node_count << std::endl;
 // }
-
-

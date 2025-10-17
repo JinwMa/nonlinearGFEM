@@ -17,8 +17,49 @@ public:
     {
         d_mesh_db = mesh_db;
         d_mesh_filename = mesh_db->getString("mesh_file");
+        readNodeInfo();
+        readElementInfo();
     }
     ~MeshDataAgent() {};
+
+    // 内外节点Id相互映射
+    inline int getNodeInternalId(int nodeExternalId){
+        return d_externalNodeId_to_internalNodeId[nodeExternalId];
+    }
+    inline int getNodeExternalId(int nodeInternalId)
+    {
+        return d_internalNodeId_to_externalNodeId[nodeInternalId];
+    }
+    
+    // 获取节点坐标
+    inline std::vector<double> getNodeCoordinate(int nodeInternalId)
+    {
+        return d_nodes_coordinate[nodeInternalId];
+    }
+
+    // 获取单元节点列表
+    inline std::vector<int> getElementNodes(int elementInternalId)
+    {
+        return d_element_connect_to_nodes[elementInternalId];
+    }
+    
+    // 获取当前模型中的单元数量
+    inline int getElementNum()
+    {
+        return d_actual_element_count;
+    }
+
+    // 获取当前模型中节点数量
+    inline int getNodeNum()
+    {
+        return d_actual_node_count;
+    }
+
+    // 获取当前模型中部件编号列表 -- 用于分类计算和组装刚度矩阵
+    inline std::vector<int> getPartIdList()
+    {
+        return d_part_ids;
+    }
 
 private:
     int d_maxnum_element = 300000;
@@ -37,13 +78,14 @@ private:
     // element
     int d_actual_element_count = 0;
     std::vector<int> d_element_type;
-    unordered_map<int, vector<int>> d_element_connect_to_nodes;
+    vector<vector<int>> d_element_connect_to_nodes;
     std::vector<int> d_internalElementId_to_externalElementId;
     std::unordered_map<int, int> d_externalElementId_to_internalElementId;
 
     // part
     std::map<int, std::vector<int>> d_part_connect_elements;
     std::map<int, std::string> d_part_element_type;
+    std::vector<int> d_part_ids;
 
     // face -- todo
     // edge -- todo
