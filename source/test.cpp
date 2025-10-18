@@ -34,7 +34,10 @@ void testNodeField(std::shared_ptr<MeshDataAgent> mda)
     field_manager->createElementField<int>("alive", 1, 10);
     // field_manager->printElementFieldData<int>("alive");
 
-    DofTypes::Dof_Tag a = DofTypes::Dof_Tag::Ux;
-    std::cout << DofTypes::to_string(a) << std::endl;
+    DofTypes::Dof_Tag a = DofTypes::Dof_Tag::MAX;
+    std::cout << DofTypes::to_string(a) << " " << DofTypes::to_int(a) << std::endl;
+    std::cout << mda->getNodeInternalId(1) << std::endl;
+
+    std::shared_ptr<DofMap> dofMap = make_shared<DofMap> (mda);
     
 }
