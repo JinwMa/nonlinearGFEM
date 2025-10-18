@@ -8,12 +8,12 @@
                          int group,
                          T defaultValue)
 {
-    if (d_all_fields.find(name) != d_all_fields.end() )
+    if (d_element_fields.find(name) != d_element_fields.end() )
     {
         toolbox::error(name + " has already built");
     }
     std::shared_ptr<ElementFieldData<T>> element_field = make_shared<ElementFieldData<T>>(name, group);
-    d_all_fields[name] = element_field;
+    d_element_fields[name] = element_field;
     auto & element_field_data = element_field->getData();
     // 初始化一个全局单元场
     int elementNum = d_mda->getElementNum();
@@ -30,12 +30,12 @@ void FieldManager::createNodeField(std::string name,
                                    int group,
                                    T defaultValue)
 {
-    if (d_all_fields.find(name) != d_all_fields.end() )
+    if (d_node_fields.find(name) != d_node_fields.end() )
     {
         toolbox::error(name + " has already built");
     }
     std::shared_ptr<NodeFieldData<T>> node_field = make_shared<NodeFieldData<T>>(name, group);
-    d_all_fields[name] = node_field;
+    d_node_fields[name] = node_field;
     auto & node_field_data = node_field->getData();
     // 初始化一个全局节点场
     int nodeNum = d_mda->getNodeNum();
@@ -52,8 +52,8 @@ template<typename T>
 void FieldManager::printNodeFieldData(std::string name)
 {
     // 检查字段是否存在
-    auto it = d_all_fields.find(name);
-    if (it == d_all_fields.end()) {
+    auto it = d_node_fields.find(name);
+    if (it == d_node_fields.end()) {
         toolbox::error("NodeField " + name + " is not built");
         return;
     }
@@ -77,8 +77,8 @@ template<typename T>
 void FieldManager::printElementFieldData(std::string name)
 {
     // 检查字段是否存在
-    auto it = d_all_fields.find(name);
-    if (it == d_all_fields.end()) {
+    auto it = d_element_fields.find(name);
+    if (it == d_element_fields.end()) {
         toolbox::error("ElementField " + name + " is not built");
         return;
     }

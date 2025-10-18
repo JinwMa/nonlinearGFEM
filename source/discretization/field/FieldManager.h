@@ -32,7 +32,8 @@ class FieldManager
     void printElementFieldData(std::string name);
 
     private:
-    std::map<std::string, std::shared_ptr<BaseField>> d_all_fields;
+    std::map<std::string, std::shared_ptr<BaseField>> d_node_fields;
+    std::map<std::string, std::shared_ptr<BaseField>> d_element_fields;
     std::shared_ptr<MeshDataAgent> d_mda;
 
 };
