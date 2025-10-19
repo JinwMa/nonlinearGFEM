@@ -38,9 +38,10 @@ public:
     }
 
     // 获取单元节点列表
-    inline std::vector<int> getElementNodes(int elementInternalId)
+    inline void getElementNodes(int elementInternalId, std::vector<int> & nodes)
     {
-        return d_element_connect_to_nodes[elementInternalId];
+        nodes = d_element_connect_to_nodes[elementInternalId];
+        // return d_element_connect_to_nodes[elementInternalId];
     }
     
     // 获取当前模型中的单元数量
@@ -59,6 +60,25 @@ public:
     inline std::vector<int> getPartIdList()
     {
         return d_part_ids;
+    }
+
+    // 根据partId获取单元类型
+    inline std::string getElementTypeByPartId(int partId)
+    {
+        if (d_part_element_type.find(partId) != d_part_element_type.end())
+            return d_part_element_type[partId];
+        else
+            toolbox::error("do not have this pardId in model");
+        return "unknown";
+    }
+
+    // 根据partId获取单元列表
+    inline void getElementListByPardId(int partId, std::vector<int> &elements)
+    {
+        if (d_part_connect_elements.find(partId) != d_part_connect_elements.end())
+            elements = d_part_connect_elements[partId];
+        else
+            toolbox::error("do not have this pardId in model");
     }
 
 private:

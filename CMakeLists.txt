@@ -135,6 +135,13 @@ endif()
   find_package(OpenMP REQUIRED)
   target_link_libraries(M3D PUBLIC OpenMP::OpenMP_CXX)
 
+  # 如果找到OpenMP，添加编译标志
+  if(OpenMP_CXX_FOUND)
+     message("find openmp support")
+     target_compile_options(M3D PRIVATE ${OpenMP_CXX_FLAGS})
+     target_link_libraries(M3D PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+
 
 
 # 添加Eigen支持
@@ -175,6 +182,12 @@ endif()
      #foreach(_variableName ${_variableNames})
      #    message(STATUS "${_variableName}=${${_variableName}}")
      #endforeach()
+
+
+# 添加openmp支持
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 
 # 添加编译器标志，启用 16 字节或 32 字节的对齐支持

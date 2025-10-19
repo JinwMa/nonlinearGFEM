@@ -9,7 +9,7 @@
 
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<MeshDataAgent> mesh);
 void printLogo();
-void testNodeField(std::shared_ptr<MeshDataAgent> mda);
+void test(std::shared_ptr<DataBase> db, std::shared_ptr<MeshDataAgent> mda);
 int main(int argc, char *argv[])
 {
     printLogo();
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     auto global_control_db = root_db->getDataBase("global_control");
     auto mda = make_shared<MeshDataAgent>(global_control_db);    
     solve(root_db->getDataBase("solver"), mda);
-    testNodeField(mda);
+    test(root_db, mda);
     TimeMater::getInstance()->getPassedCpuTimeFromStart("all solve time");
     return 0;
 }

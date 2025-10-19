@@ -2,15 +2,20 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <memory>
+
 #include "input.h"
 #include "MeshDataAgent.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
 
+
 #include "BaseFieldData.h"
 #include "NodeFieldData.h"
 #include "FieldManager.h"
-#include "DofMap.h"
+#include "ElementAssembler.h"
+
+
 void printLogo()
 {
     printf("\n\n");
@@ -25,7 +30,8 @@ void printLogo()
     printf("────────────────────────────────────────────────────────────────\n");
 }
 
-void testNodeField(std::shared_ptr<MeshDataAgent> mda)
+void test(std::shared_ptr<DataBase> db,
+          std::shared_ptr<MeshDataAgent> mda)
 {
     // auto node_field = std::make_shared<NodeFieldData<double>>("aaa");
     auto field_manager = make_shared<FieldManager> (mda);
@@ -39,5 +45,15 @@ void testNodeField(std::shared_ptr<MeshDataAgent> mda)
     std::cout << mda->getNodeInternalId(1) << std::endl;
 
     std::shared_ptr<DofMap> dofMap = make_shared<DofMap> (mda);
+
+    std::shared_ptr<ElementAssembler> element_assembler = make_shared<ElementAssembler> (db, mda, dofMap);
+
+    // element_assembler->createDofbyElements();
+
+    std::unique_ptr<ElementProcessingStrategy> EPS (new DofCreationStrategy());
+    std::shared_ptr<ParallelPartProcessor> PPP = make_shared<ParallelPartProcessor>(db, mda);
+    PPP->setStrategy(std::move(EPS));
+    PPP->execute();
+
     
 }

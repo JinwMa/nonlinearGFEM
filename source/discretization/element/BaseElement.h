@@ -43,13 +43,15 @@ class BaseElement
     BaseElement(){};
     virtual ~BaseElement() {}; 
 
+    virtual void createDofsInElement(int element_id, std::vector<int> nodes, std::vector<Dof> & dofs) = 0;
+
     virtual void ComputeStiffness(int elementId,
                                   ElementInfoPack * pack,
                                   Matrix<double> & K) = 0;
 
     virtual void ComputeInternalForce(int elementId,
                                       ElementInfoPack * pack,
-                                      std::vector<double> & fint) {};
+                                      std::vector<double> & fint) = 0;
 
 
 

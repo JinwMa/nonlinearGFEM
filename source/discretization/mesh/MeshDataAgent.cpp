@@ -132,7 +132,8 @@ void MeshDataAgent::readElementInfo()
 
             std::string setIdString = line.substr(secondDash + 1);
             int setId = std::stoi(setIdString);
-            d_part_element_type[setId] = elementType;            
+            d_part_element_type[setId] = elementType;      
+            d_part_ids.push_back(setId);      
             continue;
         }
         if (elementZone)
@@ -165,8 +166,7 @@ void MeshDataAgent::readElementInfo()
              }
              d_element_connect_to_nodes.push_back(element_connect);
              // build part          
-             d_part_connect_elements[elementSetID].push_back(element_internal_id);
-             d_part_ids.push_back(elementSetID);
+             d_part_connect_elements[elementSetID].push_back(element_internal_id);             
              d_actual_element_count++;
         }
     }
