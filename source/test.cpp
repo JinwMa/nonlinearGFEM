@@ -48,12 +48,6 @@ void test(std::shared_ptr<DataBase> db,
 
     std::shared_ptr<ElementAssembler> element_assembler = make_shared<ElementAssembler> (db, mda, dofMap);
 
-    // element_assembler->createDofbyElements();
-
-    std::unique_ptr<ElementProcessingStrategy> EPS (new DofCreationStrategy());
-    std::shared_ptr<ParallelPartProcessor> PPP = make_shared<ParallelPartProcessor>(db, mda);
-    PPP->setStrategy(std::move(EPS));
-    PPP->execute();
-
+    element_assembler->createDofbyElements();
     
 }

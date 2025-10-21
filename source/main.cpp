@@ -1,10 +1,12 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <omp.h>
 #include "input.h"
 #include "MeshDataAgent.h"
 #include "ObjectTime.h"
 #include "DofMap.h"
+
 
 
 void solve(std::shared_ptr<DataBase> solve_db, std::shared_ptr<MeshDataAgent> mesh);
@@ -25,5 +27,10 @@ int main(int argc, char *argv[])
     solve(root_db->getDataBase("solver"), mda);
     test(root_db, mda);
     TimeMater::getInstance()->getPassedCpuTimeFromStart("all solve time");
+
+
+
+
+
     return 0;
 }
