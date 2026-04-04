@@ -68,17 +68,17 @@ public:
         if (d_part_element_type.find(partId) != d_part_element_type.end())
             return d_part_element_type[partId];
         else
-            toolbox::error("do not have this pardId in model");
+            toolbox::error("do not have this partId in model");
         return "unknown";
     }
 
     // 根据partId获取单元列表
-    inline void getElementListByPardId(int partId, std::vector<int> &elements)
+    inline void getElementListByPartId(int partId, std::vector<int> &elements)
     {
         if (d_part_connect_elements.find(partId) != d_part_connect_elements.end())
             elements = d_part_connect_elements[partId];
         else
-            toolbox::error("do not have this pardId in model");
+            toolbox::error("do not have this partId in model");
     }
 
 private:
@@ -115,6 +115,10 @@ private:
     void readNodeInfo();
     void readElementInfo();
 
+    // 辅助函数：预处理行（去除空白字符，转换为小写）
+    // 返回预处理后的字符串，start_pos返回原始行中非空白字符的起始位置
+    std::string preprocessLine(const std::string& line, size_t& start_pos);
+
     inline int getElementTypeIndex(std::string typeName)
     {
         if (typeName.substr(0, 4) == "C3D4")
@@ -123,7 +127,7 @@ private:
            return 1;
         else
         {
-            toolbox::error("not support type of element " + typeName);
+            toolbox::error("Element type not supported: " + typeName);
         }
         return 0;
     }

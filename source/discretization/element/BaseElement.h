@@ -15,7 +15,7 @@
 
 
 using DofTag = DofTypes::Dof_Tag;
-using EntityTyep = Entity::EntityType;
+using EntityType = Entity::EntityType;
 
 struct ElementInfoPack {
     std::array<double, 60> coord;
@@ -56,16 +56,10 @@ class BaseElement
 
 
     protected:
-        void AmnXBpq(const double *A, const int m, const int n,
-                     const double *B, const int p, const int q,
-                     double *C);
 
         void AXB3663(const double A[3][6], const double B[6][3], double C[3][3]);
         void AXB3666(const double A[3][6], const double B[6][6], double C[3][6]);
         void AXB3883(const double A[3][8], const double B[8][3], double C[3][3]);
-        double invertMatrix(const double input[3][3], double inverse[3][3]);
-        double invertMatrix(const std::vector<std::vector<double>> &input,
-                            std::vector<std::vector<double>> &inverse);
         void AXB3338(const double A[3][3], const double B[3][8], double C[3][8]);
 
     public:

@@ -71,7 +71,7 @@ private:
     {
         std::cout << "处理 partId: " << partId << std::endl;
         std::vector<int> elements;
-        d_mda_->getElementListByPardId(partId, elements);
+        d_mda_->getElementListByPartId(partId, elements);
         std::string et = d_mda_->getElementTypeByPartId(partId);
         std::shared_ptr<BaseElement> elementPointer = createElement(et);
         std::cout << "元素数量: " << elements.size() << std::endl;

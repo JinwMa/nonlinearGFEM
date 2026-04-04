@@ -112,7 +112,7 @@ void Input::checkInput(const string & filename)
     std::ifstream inputFile(filename); // 打开文件 
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << filename << std::endl;
+        std::cerr << "Cannot open file: " << filename << std::endl;
         exit(0);
     }   
     std::string line;
@@ -137,7 +137,7 @@ void Input::checkInput(const string & filename)
         line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
         if(!check_line(line))
         {
-            std::cout << "输入文件错误 - 行号： " << line_num << "行输入不符合规则,请检查" << std::endl;
+            std::cout << "Input file error - line number: " << line_num << " input does not conform to rules" << std::endl;
             std::cout << line << std::endl;
             exit(0);
         }
@@ -147,7 +147,7 @@ void Input::checkInput(const string & filename)
             // if (!std::regex_match(line_last, std::regex("^\\s*\\w+\\s*$")))
             if (check_line(line_last) != 5)
             {
-                std::cout << "输入文件错误 - 行号：" << line_num << " 行的上一行应该是数据块的名字" << std::endl;
+                std::cout << "Input file error - line number: " << line_num << " previous line should be a data block name" << std::endl;
                 std::cout << line << std::endl;
                 exit(0);
             }
@@ -163,7 +163,7 @@ void Input::checkInput(const string & filename)
             deleteSpace(line_next);
             if (check_line(line_next) != 3)
             {
-                std::cout << "输入文件错误 - 行号： " << line_num << " 行的下一行应该跟着一个用花括号包裹的数据块" << std::endl;
+                std::cout << "Input file error - line number: " << line_num << " next line should be a data block wrapped in curly braces" << std::endl;
                 exit(0);
             }
             inputFile.clear();
@@ -173,7 +173,7 @@ void Input::checkInput(const string & filename)
     }    
     if (!num_common==0)
     {
-        std::cout << "输入文件错误： 数据块没有闭合" << std::endl;
+        std::cout << "Input file error: data block not closed" << std::endl;
         std::cout << line << std::endl;
         exit(0);
     }
@@ -193,7 +193,7 @@ void Input::read(const string & filename)
     std::ifstream inputFile(filename); // 打开文件
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << filename << std::endl;
+        std::cerr << "Cannot open file: " << filename << std::endl;
         exit(0);
     }   
     std::string line;    
@@ -248,7 +248,7 @@ void Input::read(const string & filename)
             std::size_t equalPos = line.find('=');
             if (line.find('=') == std::string::npos)
             {
-                std::cerr << "错误:行中没有找到等号:" << line << std::endl;
+                std::cerr << "Error: equal sign not found in line: " << line << std::endl;
             }
             std::string key = line.substr(0, equalPos);
             std::string values = line.substr(equalPos + 1);
@@ -257,12 +257,12 @@ void Input::read(const string & filename)
             key.erase(0, key.find_first_not_of(" \t\n\r\f\v"));
             if (key.empty() || key.find(' ') != std::string::npos)
             {
-                std::cerr << "错误:键必须是唯一且不能包含空格:" << line << std::endl;
+                std::cerr << "Error: key must be unique and cannot contain spaces: " << line << std::endl;
                 exit(0);
             }
             if (current_db->d_all_keys.find(key) != current_db->d_all_keys.end())
             {
-                std::cerr << "数据块： " << current_db->d_name << " 中的" << "错误:键必须是唯一的,发现重复键:" << key << std::endl;
+                std::cerr << "Data block: " << current_db->d_name << " in " << "Error: key must be unique, duplicate key found: " << key << std::endl;
                 exit(0);
             }
             current_db->d_all_keys.insert(key);
@@ -285,7 +285,7 @@ void Input::read(const string & filename)
                     subValue.erase(0, subValue.find_first_not_of(" \t\n\r\f\v"));
                     if (subValue.find(' ') != std::string::npos)
                     {
-                        std::cerr << "错误:值中不能包含空格:" << subValue << std::endl;
+                        std::cerr << "Error: value cannot contain spaces: " << subValue << std::endl;
                         invalidValue = true;
                         break;
                     }
@@ -297,7 +297,7 @@ void Input::read(const string & filename)
         else
         {
             std::cout << line_type << std::endl;
-            std::cout << "不支持的输入类型： " << line_num << " 行" << std::endl;
+            std::cout << "Unsupported input type: " << line_num << " line" << std::endl;
             exit(0);
         }
     }

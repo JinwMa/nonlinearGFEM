@@ -209,22 +209,13 @@ void SparseMatrix::saveToFile(const std::string& filename) const {
         file << "SparseMatrix" << std::endl;
         file << d_matrix.rows() << " " << d_matrix.cols() << " " << d_matrix.nonZeros() << std::endl;
         
-        // 正确的迭代方式 - 使用 coo 格式访问非零元素
-        std::vector<Eigen::Triplet<double>> triplets;
-        triplets.reserve(d_matrix.nonZeros());
-
-         // 将K塞到增广矩阵中
+        // Save non-zero elements using COO format
         for (int ii = 0; ii < d_matrix.outerSize(); ++ii)
         {
             for (Eigen::SparseMatrix<double>::InnerIterator it(d_matrix, ii); it; ++it)
             {
                  file << it.row() << " " << it.col() << " " << it.value() << std::endl;
             }
-        }
-        
-        // 保存非零元素
-        for (const auto& triplet : triplets) {
-            file << triplet.row() << " " << triplet.col() << " " << triplet.value() << std::endl;
         }
         file.close();
     }
@@ -234,7 +225,7 @@ void SparseMatrix::loadFromFile(const std::string& filename) {
     std::ifstream file(filename);
     if (file.is_open()) {
         std::string header;
-        std::getline(file, header); // 读取头部
+        std::getline(file, header); // Read header
         
         if (header != "SparseMatrix") {
             std::cerr << "Invalid file format" << std::endl;

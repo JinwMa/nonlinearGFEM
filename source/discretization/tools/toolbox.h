@@ -37,7 +37,7 @@ public:
     static void checkvector(std::vector<double> &a, std::vector<double> b)
     {
         if (a.size() != b.size())
-            error("the vec1 and vec2 compared is do not match in size!!!");
+            error("Vector sizes do not match");
         double absolute_error = 0.0;
         double relative_error = 0.0;
         for (int i = 0; i < a.size(); i++)
@@ -87,7 +87,7 @@ public:
         double r[3] = {0.0};
         r[0] = point[0] - refer_point[0];
         r[1] = point[1] - refer_point[1];
-        r[2] = point[1] - refer_point[2];
+        r[2] = point[2] - refer_point[2];
         double dir_temp[3] = {0.0};
         for (int i = 0; i < 3; i++) dir_temp[i] = dir[i];
         normalize_a3(dir_temp);
@@ -128,7 +128,7 @@ public:
     {
         if (p != n)
         {
-            std::cout << "矩阵相乘输入错误" << std::endl;
+            std::cout << "Matrix multiplication input error" << std::endl;
         }
 
         for (int i = 0; i < m; i++)
@@ -188,7 +188,7 @@ public:
                  input[0][2] * (input[1][0] * input[2][1] - input[2][0] * input[1][1]);
 
     if (det == 0) {
-        error("矩阵不可逆");
+        error("Matrix is not invertible");
     }
 
     double invDet = 1.0 / det;
@@ -213,7 +213,7 @@ static void invertMatrix(const std::vector<std::vector<double>> & input, double 
                  input[0][2] * (input[1][0] * input[2][1] - input[2][0] * input[1][1]);
 
     if (det == 0) {
-        error("矩阵不可逆");
+        error("Matrix is not invertible");
     }
 
     double invDet = 1.0 / det;
@@ -238,7 +238,7 @@ static void invertMatrix(const std::vector<std::vector<double>> & input, std::ve
                  input[0][2] * (input[1][0] * input[2][1] - input[2][0] * input[1][1]);
 
     if (det == 0) {
-        error("矩阵不可逆");
+        error("Matrix is not invertible");
     }
 
     double invDet = 1.0 / det;

@@ -14,35 +14,19 @@ void MeshDataAgent::readNodeInfo()
     std::streampos pos;
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
+        std::cerr << "Cannot open file: " << d_mesh_filename << std::endl;
     }
     std::string line;
     bool nodeZone = false;
     while (std::getline(inputFile, line))
     {
-        // 去除行首空白字符
-        size_t start_pos = line.find_first_not_of(" \t\n\r\f\v");
-        if (start_pos != std::string::npos)
-        {
-            line.erase(0, start_pos);
-        }
-
-        // 去除行尾空白字符
-        size_t end_pos = line.find_last_not_of(" \t\n\r\f\v");
-        if (end_pos != std::string::npos)
-        {
-            line.erase(end_pos + 1);
-        }
-
+        size_t start_pos;
+        std::string line_lower = preprocessLine(line, start_pos);
         // 跳过空行
-        if (line.empty())
+        if (line_lower.empty())
         {
             continue;
         }
-
-        std::string line_lower = line;
-        // 将整行变成小写
-        std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
         if (line_lower.find("*") != std::string::npos)
         {
             nodeZone = false;
@@ -59,7 +43,7 @@ void MeshDataAgent::readNodeInfo()
              iss >> node_external_id;
              if (node_external_id >= d_maxnum_node || node_external_id < 1)
              {
-                 std::cerr << "错误:节点ID超出范围:" << node_external_id << std::endl;
+                 std::cerr << "Error: Node ID out of range: " << node_external_id << std::endl;
                  exit(0);
                  continue;
              }
@@ -87,36 +71,20 @@ void MeshDataAgent::readElementInfo()
     std::streampos pos;
     if (!inputFile)
     {
-        std::cerr << "无法打开文件:" << d_mesh_filename << std::endl;
+        std::cerr << "Cannot open file: " << d_mesh_filename << std::endl;
     }
     std::string line;
     bool elementZone = false;
     std::string elementType;
     while (std::getline(inputFile, line))
     {
-        // 去除行首空白字符
-        size_t start_pos = line.find_first_not_of(" \t\n\r\f\v");
-        if (start_pos != std::string::npos)
-        {
-            line.erase(0, start_pos);
-        }
-
-        // 去除行尾空白字符
-        size_t end_pos = line.find_last_not_of(" \t\n\r\f\v");
-        if (end_pos != std::string::npos)
-        {
-            line.erase(end_pos + 1);
-        }
-
+        size_t start_pos;
+        std::string line_lower = preprocessLine(line, start_pos);
         // 跳过空行
-        if (line.empty())
+        if (line_lower.empty())
         {
             continue;
         }
-
-        std::string line_lower = line;
-        // 将整行变成小写
-        std::transform(line_lower.begin(), line_lower.end(), line_lower.begin(), ::tolower);
         if (line_lower.find("*") != std::string::npos)
         {
             elementZone = false;
@@ -127,10 +95,12 @@ void MeshDataAgent::readElementInfo()
             size_t firstDash = line_lower.find('-');
             // 找到第二个 '-' 的位置
             size_t secondDash = line_lower.find('-', firstDash + 1);
-            elementType = line.substr(firstDash + 1, secondDash - firstDash - 1);
+            size_t firstDashInLine = start_pos + firstDash;
+            size_t secondDashInLine = start_pos + secondDash;
+            elementType = line.substr(firstDashInLine + 1, secondDashInLine - firstDashInLine - 1);
             // std::cout << elementType << std::endl;
 
-            std::string setIdString = line.substr(secondDash + 1);
+            std::string setIdString = line.substr(secondDashInLine + 1);
             int setId = std::stoi(setIdString);
             d_part_element_type[setId] = elementType;      
             d_part_ids.push_back(setId);      
@@ -144,7 +114,7 @@ void MeshDataAgent::readElementInfo()
              iss >> element_external_id;
              if (element_external_id >= d_maxnum_element || element_external_id < 1)
              {
-                 std::cerr << "错误:单元ID超出范围:" << element_external_id << std::endl;
+                 std::cerr << "Error: Element ID out of range: " << element_external_id << std::endl;
                  exit(0);
                  continue;
              }
@@ -525,3 +495,27 @@ void MeshDataAgent::readElementInfo()
 //     std::cout << "    elements:" << d_actual_element_count << std::endl;
 //     std::cout << "    nodes:" << d_actual_node_count << std::endl;
 // }
+
+// 辅助函数：预处理行（去除空白字符，转换为小写）
+std::string MeshDataAgent::preprocessLine(const std::string& line, size_t& start_pos) {
+    std::string result = line;
+
+    // 去除行首空白字符
+    start_pos = result.find_first_not_of(" \t\n\r\f\v");
+    if (start_pos != std::string::npos) {
+        result.erase(0, start_pos);
+    } else {
+        start_pos = 0; // 全空白行
+    }
+
+    // 去除行尾空白字符
+    size_t end_pos = result.find_last_not_of(" \t\n\r\f\v");
+    if (end_pos != std::string::npos) {
+        result.erase(end_pos + 1);
+    }
+
+    // 转换为小写
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+
+    return result;
+}
