@@ -34,6 +34,21 @@ target_include_directories(discretizationlib PUBLIC
 
 
 
+# 预编译头加速编译 (需要 CMake 3.16+)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+    # 为 Eigen 和常用标准库头文件创建预编译头
+    target_precompile_headers(discretizationlib PRIVATE
+        <vector>
+        <string>
+        <iostream>
+        <Eigen/Dense>
+        <Eigen/Sparse>
+    )
+    message(STATUS "Precompiled headers enabled for discretizationlib")
+else()
+    message(STATUS "CMake version < 3.16, precompiled headers not available")
+endif()
+
 target_link_libraries(discretizationlib)
 
 # 指定静态库的输出目录(可选)

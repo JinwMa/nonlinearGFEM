@@ -1,6 +1,26 @@
 # cmake 的固定部分
 cmake_minimum_required(VERSION 3.13)
 project(M3D)
+# 尝试使用 ccache 加速编译
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "Found ccache: ${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+else()
+    message(STATUS "ccache not found, consider installing it for faster rebuilds")
+endif()
+
+# 尝试使用 gold 链接器加速链接
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    find_program(GOLD_LINKER ld.gold)
+    if(GOLD_LINKER)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+        message(STATUS "Found gold linker: ${GOLD_LINKER}")
+    else()
+        message(STATUS "Gold linker not found, using default linker")
+    endif()
+endif()
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
@@ -69,7 +89,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3 -g -fno-fat-lto-objects")
     
     # Debug 模式
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og -fno-omit-frame-pointer")
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # MSVC 优化设置（保持不变）
@@ -86,6 +106,21 @@ endif()
 ###4444444444444444444444444444444444444444444444444444444444444444
 add_executable(M3D source/main.cpp source/solve.cpp source/test.cpp)
 ###4444444444444444444444444444444444444444444444444444444444444444
+
+# 预编译头加速编译 (需要 CMake 3.16+)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+    # 为 Eigen 和常用标准库头文件创建预编译头
+    target_precompile_headers(M3D PRIVATE
+        <vector>
+        <string>
+        <iostream>
+        <Eigen/Dense>
+        <Eigen/Sparse>
+    )
+    message(STATUS "Precompiled headers enabled for target M3D")
+else()
+    message(STATUS "CMake version < 3.16, precompiled headers not available")
+endif()
 
 
 ###5555555555555555555555555555555555555555555555555555555555555555
