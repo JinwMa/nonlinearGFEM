@@ -68,12 +68,12 @@ class BaseElement
         std::vector<std::vector<double>> d_GaussPoints;
 
         // Material access methods
-        void setMaterial(std::shared_ptr<BaseMaterial> material) { material_ = material; }
-        std::shared_ptr<BaseMaterial> getMaterial() const { return material_; }
-        bool hasMaterial() const { return material_ != nullptr; }
+        void setMaterial(std::shared_ptr<BaseMaterial> material) { d_material = material; }
+        std::shared_ptr<BaseMaterial> getMaterial() const { return d_material; }
+        bool hasMaterial() const { return d_material != nullptr; }
 
     protected:
-        std::shared_ptr<BaseMaterial> material_;
+        std::shared_ptr<BaseMaterial> d_material;
 
 };
 

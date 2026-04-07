@@ -73,14 +73,14 @@ public:
     virtual void initializeStateVariables(std::vector<double>& state_vars) const = 0;
 
 protected:
-    std::string name_; // Material name
-    double density_;   // Material density
+    std::string d_name; // Material name
+    double d_density;   // Material density
 
     // Common material parameters (optional, derived classes can store their own)
-    double youngs_modulus_;
-    double poissons_ratio_;
-    double yield_stress_;
-    double hardening_modulus_;
+    double d_youngsModulus;
+    double d_poissonsRatio;
+    double d_yieldStress;
+    double d_hardeningModulus;
 };
 
 #endif // BASE_MATERIAL_H

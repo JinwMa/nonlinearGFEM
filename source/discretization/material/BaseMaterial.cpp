@@ -1,20 +1,20 @@
 #include "BaseMaterial.h"
 
 BaseMaterial::BaseMaterial(const std::string& name, double density)
-    : name_(name), density_(density),
-      youngs_modulus_(0.0), poissons_ratio_(0.0),
-      yield_stress_(0.0), hardening_modulus_(0.0) {}
+    : d_name(name), d_density(density),
+      d_youngsModulus(0.0), d_poissonsRatio(0.0),
+      d_yieldStress(0.0), d_hardeningModulus(0.0) {}
 
 std::string BaseMaterial::getName() const {
-    return name_;
+    return d_name;
 }
 
 double BaseMaterial::getDensity() const {
-    return density_;
+    return d_density;
 }
 
 void BaseMaterial::setDensity(double density) {
-    density_ = density;
+    d_density = density;
 }
 
 BaseMaterial::~BaseMaterial() {

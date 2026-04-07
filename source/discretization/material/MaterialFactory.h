@@ -26,7 +26,7 @@ public:
 
     // Register a material type
     void registerMaterialType(const std::string& typeName, MaterialCreator creator) {
-        creators_[typeName] = creator;
+        d_creators[typeName] = creator;
     }
 
     // Create material from database
@@ -61,8 +61,8 @@ public:
         }
 
         // Check if material type is registered
-        auto it = creators_.find(materialType);
-        if (it == creators_.end()) {
+        auto it = d_creators.find(materialType);
+        if (it == d_creators.end()) {
             throw std::runtime_error("Unknown material type: " + materialType);
         }
 
@@ -82,8 +82,8 @@ public:
         std::shared_ptr<DataBase> db = nullptr) {
 
         // Check if material type is registered
-        auto it = creators_.find(typeName);
-        if (it == creators_.end()) {
+        auto it = d_creators.find(typeName);
+        if (it == d_creators.end()) {
             throw std::runtime_error("Unknown material type: " + typeName);
         }
 
@@ -119,7 +119,7 @@ private:
     MaterialFactory(const MaterialFactory&) = delete;
     MaterialFactory& operator=(const MaterialFactory&) = delete;
 
-    std::map<std::string, MaterialCreator> creators_;
+    std::map<std::string, MaterialCreator> d_creators;
 };
 
 #endif // MATERIAL_FACTORY_H

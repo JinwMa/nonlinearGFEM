@@ -36,32 +36,32 @@ class OmpStrategy
 class ParallelPartProcessor : public OmpStrategy
 {
 private:
-    std::shared_ptr<DataBase> d_db_;
-    std::shared_ptr<MeshDataAgent> d_mda_;
-    std::unique_ptr<ElementStrategy> strategy_;
+    std::shared_ptr<DataBase> d_db;
+    std::shared_ptr<MeshDataAgent> d_mda;
+    std::unique_ptr<ElementStrategy> d_strategy;
 
 public:
     ParallelPartProcessor(std::shared_ptr<DataBase> db,
                           std::shared_ptr<MeshDataAgent> mda)
-        : d_db_(std::move(db)), d_mda_(std::move(mda)) {}
+        : d_db(std::move(db)), d_mda(std::move(mda)) {}
 
     void setStrategy(std::unique_ptr<ElementStrategy> strategy)
     {
-        strategy_ = std::move(strategy);
+        d_strategy = std::move(strategy);
     }
 
     void execute()
     {
-        if (!strategy_)
+        if (!d_strategy)
         {
             throw std::runtime_error("未设置处理策略");
         }
 
-        int max_threads = std::min(d_db_->getInt("max_threads"), d_max_threads);
+        int max_threads = std::min(d_db->getInt("max_threads"), d_max_threads);
         omp_set_num_threads(max_threads);
         std::cout << "配置最大线程数: " << max_threads << std::endl;
 
-        for (auto partId : d_mda_->getPartIdList())
+        for (auto partId : d_mda->getPartIdList())
         {
             processPart(partId);
         }
@@ -72,8 +72,8 @@ private:
     {
         std::cout << "处理 partId: " << partId << std::endl;
         std::vector<int> elements;
-        d_mda_->getElementListByPartId(partId, elements);
-        std::string et = d_mda_->getElementTypeByPartId(partId);
+        d_mda->getElementListByPartId(partId, elements);
+        std::string et = d_mda->getElementTypeByPartId(partId);
         std::shared_ptr<BaseElement> elementPointer = createElement(et);
 
         // Try to set material for this part
@@ -81,10 +81,10 @@ private:
             // Get material ID from database (assuming format: partX_material_id or material_id)
             std::string materialKey = "part" + std::to_string(partId) + "_material_id";
             std::string materialId;
-            if (d_db_->ifExist(materialKey)) {
-                materialId = d_db_->getString(materialKey);
-            } else if (d_db_->ifExist("material_id")) {
-                materialId = d_db_->getString("material_id");
+            if (d_db->ifExist(materialKey)) {
+                materialId = d_db->getString(materialKey);
+            } else if (d_db->ifExist("material_id")) {
+                materialId = d_db->getString("material_id");
             } else {
                 materialId = "default_material";
             }
@@ -110,7 +110,7 @@ private:
 #pragma omp parallel
         {
             int threadId = omp_get_thread_num();
-            strategy_->onThreadStart(threadId);
+            d_strategy->onThreadStart(threadId);
 
 #pragma omp for
             for (int i = 0; i < elements.size(); i++)
@@ -118,12 +118,12 @@ private:
                 auto elementId = elements[i];
                 std::vector<int> nodes;
                 std::vector<Dof> dofs;
-                d_mda_->getElementNodes(elementId, nodes);
+                d_mda->getElementNodes(elementId, nodes);
 
-                strategy_->processElement(elementPointer, elementId, nodes, dofs);
+                d_strategy->processElement(elementPointer, elementId, nodes, dofs);
             }
 
-            strategy_->onThreadEnd(threadId);
+            d_strategy->onThreadEnd(threadId);
         }
 
         std::cout << "完成 partId: " << partId << std::endl

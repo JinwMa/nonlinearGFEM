@@ -40,9 +40,9 @@ void test(std::shared_ptr<DataBase> db,
 {
     // Initialize materials from database
     try {
-        auto modal_market_db = db->getDataBase("modal_market");
-        if (modal_market_db) {
-            MaterialInitializer::initializeFromDatabase(modal_market_db);
+        auto modalMarketDb = db->getDataBase("modal_market");
+        if (modalMarketDb) {
+            MaterialInitializer::initializeFromDatabase(modalMarketDb);
         } else {
             std::cout << "警告: 未找到 modal_market 数据库" << std::endl;
         }
@@ -96,11 +96,11 @@ void test(std::shared_ptr<DataBase> db,
     }
 
     // auto node_field = std::make_shared<NodeFieldData<double>>("aaa");
-    auto field_manager = make_shared<FieldManager> (mda);
-    field_manager->createNodeField<double>("disp", 1, 0.0);
-    // field_manager->printNodeFieldData<double>("disp");
-    field_manager->createElementField<int>("alive", 1, 10);
-    // field_manager->printElementFieldData<int>("alive");
+    auto fieldManager = make_shared<FieldManager> (mda);
+    fieldManager->createNodeField<double>("disp", 1, 0.0);
+    // fieldManager->printNodeFieldData<double>("disp");
+    fieldManager->createElementField<int>("alive", 1, 10);
+    // fieldManager->printElementFieldData<int>("alive");
 
     DofTypes::Dof_Tag a = DofTypes::Dof_Tag::MAX;
     std::cout << DofTypes::to_string(a) << " " << DofTypes::to_int(a) << std::endl;
@@ -108,8 +108,8 @@ void test(std::shared_ptr<DataBase> db,
 
     std::shared_ptr<DofMap> dofMap = make_shared<DofMap> (mda);
 
-    std::shared_ptr<ElementAssembler> element_assembler = make_shared<ElementAssembler> (db, mda, dofMap);
+    std::shared_ptr<ElementAssembler> elementAssembler = make_shared<ElementAssembler> (db, mda, dofMap);
 
-    element_assembler->createDofbyElements();
+    elementAssembler->createDofbyElements();
     
 }

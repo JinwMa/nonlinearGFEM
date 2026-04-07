@@ -6,15 +6,15 @@
 
 // Constructor with explicit parameters
 LinearElastic::LinearElastic(const std::string& name, double density,
-                             double youngs_modulus, double poissons_ratio)
+                             double youngsModulus, double poissonsRatio)
     : BaseMaterial(name, density),
-      youngs_modulus_(youngs_modulus),
-      poissons_ratio_(poissons_ratio) {
+      d_youngsModulus(youngsModulus),
+      d_poissonsRatio(poissonsRatio) {
     // Validate parameters
-    if (youngs_modulus <= 0.0) {
+    if (youngsModulus <= 0.0) {
         throw std::invalid_argument("Young's modulus must be positive");
     }
-    if (poissons_ratio <= -1.0 || poissons_ratio >= 0.5) {
+    if (poissonsRatio <= -1.0 || poissonsRatio >= 0.5) {
         throw std::invalid_argument("Poisson's ratio must be in (-1, 0.5)");
     }
 }
@@ -22,8 +22,8 @@ LinearElastic::LinearElastic(const std::string& name, double density,
 // Constructor taking only name and density (parameters to be set via takeDB)
 LinearElastic::LinearElastic(const std::string& name, double density)
     : BaseMaterial(name, density),
-      youngs_modulus_(0.0),
-      poissons_ratio_(0.0) {
+      d_youngsModulus(0.0),
+      d_poissonsRatio(0.0) {
 }
 
 void LinearElastic::takeDB(std::shared_ptr<DataBase> db) {
@@ -34,17 +34,17 @@ void LinearElastic::takeDB(std::shared_ptr<DataBase> db) {
     // Read material parameters from database
     // Expected keys: youngs_modulus, poissons_ratio
     if (db->ifExist("youngs_modulus")) {
-        youngs_modulus_ = db->getDouble("youngs_modulus");
+        d_youngsModulus = db->getDouble("youngs_modulus");
     } else if (db->ifExist("E")) {
-        youngs_modulus_ = db->getDouble("E");
+        d_youngsModulus = db->getDouble("E");
     } else {
         throw std::runtime_error("LinearElastic: youngs_modulus or E not found in database");
     }
 
     if (db->ifExist("poissons_ratio")) {
-        poissons_ratio_ = db->getDouble("poissons_ratio");
+        d_poissonsRatio = db->getDouble("poissons_ratio");
     } else if (db->ifExist("nu")) {
-        poissons_ratio_ = db->getDouble("nu");
+        d_poissonsRatio = db->getDouble("nu");
     } else {
         throw std::runtime_error("LinearElastic: poissons_ratio or nu not found in database");
     }
@@ -55,10 +55,10 @@ void LinearElastic::takeDB(std::shared_ptr<DataBase> db) {
     }
 
     // Validate parameters
-    if (youngs_modulus_ <= 0.0) {
+    if (d_youngsModulus <= 0.0) {
         throw std::invalid_argument("Young's modulus must be positive");
     }
-    if (poissons_ratio_ <= -1.0 || poissons_ratio_ >= 0.5) {
+    if (d_poissonsRatio <= -1.0 || d_poissonsRatio >= 0.5) {
         throw std::invalid_argument("Poisson's ratio must be in (-1, 0.5)");
     }
 }
@@ -130,8 +130,8 @@ int LinearElastic::getProblemDimension(int strain_size) const {
 Eigen::MatrixXd LinearElastic::computeElasticityMatrix3D() const {
     // 3D elasticity matrix (6x6) in Voigt notation
     // Order: ε_xx, ε_yy, ε_zz, γ_xy, γ_yz, γ_zx
-    double E = youngs_modulus_;
-    double nu = poissons_ratio_;
+    double E = d_youngsModulus;
+    double nu = d_poissonsRatio;
     double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
     double mu = E / (2 * (1 + nu));
 
@@ -146,8 +146,8 @@ Eigen::MatrixXd LinearElastic::computeElasticityMatrix3D() const {
 Eigen::MatrixXd LinearElastic::computeElasticityMatrix2DPlaneStress() const {
     // 2D plane stress elasticity matrix (3x3)
     // Order: ε_xx, ε_yy, γ_xy
-    double E = youngs_modulus_;
-    double nu = poissons_ratio_;
+    double E = d_youngsModulus;
+    double nu = d_poissonsRatio;
     double factor = E / (1 - nu * nu);
 
     Eigen::MatrixXd D = Eigen::MatrixXd::Zero(3, 3);
@@ -161,8 +161,8 @@ Eigen::MatrixXd LinearElastic::computeElasticityMatrix2DPlaneStress() const {
 Eigen::MatrixXd LinearElastic::computeElasticityMatrix2DPlaneStrain() const {
     // 2D plane strain elasticity matrix (3x3)
     // Order: ε_xx, ε_yy, γ_xy
-    double E = youngs_modulus_;
-    double nu = poissons_ratio_;
+    double E = d_youngsModulus;
+    double nu = d_poissonsRatio;
     double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
     double mu = E / (2 * (1 + nu));
 

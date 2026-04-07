@@ -10,7 +10,7 @@ class DataBase;
 class LinearElastic : public BaseMaterial {
 public:
     // Constructor with explicit parameters
-    LinearElastic(const std::string& name, double density, double youngs_modulus, double poissons_ratio);
+    LinearElastic(const std::string& name, double density, double youngsModulus, double poissonsRatio);
 
     // Constructor taking database
     LinearElastic(const std::string& name, double density);
@@ -48,16 +48,16 @@ public:
     virtual void initializeStateVariables(std::vector<double>& state_vars) const override;
 
     // Getters for material properties
-    double getYoungsModulus() const { return youngs_modulus_; }
-    double getPoissonsRatio() const { return poissons_ratio_; }
+    double getYoungsModulus() const { return d_youngsModulus; }
+    double getPoissonsRatio() const { return d_poissonsRatio; }
 
     // Setters
-    void setYoungsModulus(double E) { youngs_modulus_ = E; }
-    void setPoissonsRatio(double nu) { poissons_ratio_ = nu; }
+    void setYoungsModulus(double E) { d_youngsModulus = E; }
+    void setPoissonsRatio(double nu) { d_poissonsRatio = nu; }
 
 private:
-    double youngs_modulus_;
-    double poissons_ratio_;
+    double d_youngsModulus;
+    double d_poissonsRatio;
 
     // Helper method to compute elasticity matrix (3D)
     Eigen::MatrixXd computeElasticityMatrix3D() const;

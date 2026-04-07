@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
 
     // build modal
     auto input = make_shared<Input>(argv[1]);
-    auto root_db = input->d_root_db;
-    auto modal_market_db = root_db->getDataBase("modal_market");
-    auto global_control_db = root_db->getDataBase("global_control");
-    auto mda = make_shared<MeshDataAgent>(global_control_db);    
-    solve(root_db->getDataBase("solver"), mda);
-    test(root_db, mda);
+    auto rootDb = input->d_root_db;
+    auto modalMarketDb = rootDb->getDataBase("modal_market");
+    auto globalControlDb = rootDb->getDataBase("global_control");
+    auto mda = make_shared<MeshDataAgent>(globalControlDb);    
+    solve(rootDb->getDataBase("solver"), mda);
+    test(rootDb, mda);
     TimeMater::getInstance()->getPassedCpuTimeFromStart("all solve time");
 
 
