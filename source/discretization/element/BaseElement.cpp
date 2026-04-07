@@ -66,3 +66,8 @@ void BaseElement::AXB3338(const double A[3][3], const double B[3][8], double C[3
 }
 
 
+
+BaseElement::BaseElement() : d_material(nullptr)
+{
+    // 构造函数实现
+}

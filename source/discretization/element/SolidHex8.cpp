@@ -4,6 +4,32 @@
 #include <iostream>
 #include <stdexcept>
 
+// 2x2x2 Gauss integration points and weights for hexahedron
+static const int NUM_GAUSS_POINTS = 8;
+static const double GAUSS_POINTS[8][3] = {
+    {-0.577350269189626, -0.577350269189626, -0.577350269189626},
+    { 0.577350269189626, -0.577350269189626, -0.577350269189626},
+    { 0.577350269189626,  0.577350269189626, -0.577350269189626},
+    {-0.577350269189626,  0.577350269189626, -0.577350269189626},
+    {-0.577350269189626, -0.577350269189626,  0.577350269189626},
+    { 0.577350269189626, -0.577350269189626,  0.577350269189626},
+    { 0.577350269189626,  0.577350269189626,  0.577350269189626},
+    {-0.577350269189626,  0.577350269189626,  0.577350269189626}
+};
+static const double GAUSS_WEIGHTS[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+
+SolidHex8::SolidHex8()
+{
+    // 初始化8个高斯积分点 (2x2x2)
+    d_integrationPoints.resize(NUM_GAUSS_POINTS);
+    for (int i = 0; i < NUM_GAUSS_POINTS; ++i) {
+        IntegrationPoint& ip = d_integrationPoints[i];
+        ip.naturalCoords.assign({GAUSS_POINTS[i][0], GAUSS_POINTS[i][1], GAUSS_POINTS[i][2]});
+        ip.weight = GAUSS_WEIGHTS[i];
+        ip.jacobian = 0.0; // 将在实际计算中设置
+    }
+}
+
 void SolidHex8::createDofsInElement(int element_id, std::vector<int> nodes, std::vector<Dof> & dofs)
 {
     // std::cout << element_id << std::endl;
@@ -142,19 +168,6 @@ static void computeBMatrix(const double dNdx[8][3], double B[6][24]) {
     }
 }
 
-// 2x2x2 Gauss integration points and weights for hexahedron
-static const int NUM_GAUSS_POINTS = 8;
-static const double GAUSS_POINTS[8][3] = {
-    {-0.577350269189626, -0.577350269189626, -0.577350269189626},
-    { 0.577350269189626, -0.577350269189626, -0.577350269189626},
-    { 0.577350269189626,  0.577350269189626, -0.577350269189626},
-    {-0.577350269189626,  0.577350269189626, -0.577350269189626},
-    {-0.577350269189626, -0.577350269189626,  0.577350269189626},
-    { 0.577350269189626, -0.577350269189626,  0.577350269189626},
-    { 0.577350269189626,  0.577350269189626,  0.577350269189626},
-    {-0.577350269189626,  0.577350269189626,  0.577350269189626}
-};
-static const double GAUSS_WEIGHTS[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
 void SolidHex8::ComputeStiffness(int elementId,
                                  ElementInfoPack * pack,
@@ -350,4 +363,57 @@ void SolidHex8::ComputeInternalForce(int elementId,
             fint[i] += sum * factor;
         }
     }
+}
+
+// 形状函数相关接口实现
+void SolidHex8::evaluateShapeFunctions(const std::vector<double>& naturalCoords,
+                                       std::vector<double>& shapeFunctions) const
+{
+    if (naturalCoords.size() < 3) {
+        throw std::runtime_error("SolidHex8::evaluateShapeFunctions: naturalCoords must have at least 3 components");
+    }
+    double xi = naturalCoords[0];
+    double eta = naturalCoords[1];
+    double zeta = naturalCoords[2];
+
+    shapeFunctions.resize(8);
+    hex8ShapeFunctions(xi, eta, zeta, shapeFunctions.data());
+}
+
+void SolidHex8::evaluateShapeFunctionDerivatives(const std::vector<double>& naturalCoords,
+                                                 std::vector<std::vector<double>>& derivatives) const
+{
+    if (naturalCoords.size() < 3) {
+        throw std::runtime_error("SolidHex8::evaluateShapeFunctionDerivatives: naturalCoords must have at least 3 components");
+    }
+    double xi = naturalCoords[0];
+    double eta = naturalCoords[1];
+    double zeta = naturalCoords[2];
+
+    double dNdxi[8][3];
+    hex8ShapeFunctionDerivatives(xi, eta, zeta, dNdxi);
+
+    derivatives.resize(8);
+    for (int i = 0; i < 8; ++i) {
+        derivatives[i].resize(3);
+        derivatives[i][0] = dNdxi[i][0];
+        derivatives[i][1] = dNdxi[i][1];
+        derivatives[i][2] = dNdxi[i][2];
+    }
+}
+
+const std::vector<IntegrationPoint>& SolidHex8::getIntegrationPoints() const
+{
+    return d_integrationPoints;
+}
+
+ElementDimension SolidHex8::getElementDimension() const
+{
+    // SolidHex8: 3D, 8节点, 每个节点3个自由度, 8个积分点, 6个应力分量
+    return ElementDimension(3, 8, 3, 8, 6);
+}
+
+std::string SolidHex8::getElementTypeName() const
+{
+    return "SolidHex8";
 }
