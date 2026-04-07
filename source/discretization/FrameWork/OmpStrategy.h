@@ -18,6 +18,7 @@
 #include "DofMap.h"
 #include "toolbox.h"
 #include "ElementStrategy.h"
+#include "../material/MaterialManager.h"
 
 
 class OmpStrategy
@@ -74,6 +75,36 @@ private:
         d_mda_->getElementListByPartId(partId, elements);
         std::string et = d_mda_->getElementTypeByPartId(partId);
         std::shared_ptr<BaseElement> elementPointer = createElement(et);
+
+        // Try to set material for this part
+        try {
+            // Get material ID from database (assuming format: partX_material_id or material_id)
+            std::string materialKey = "part" + std::to_string(partId) + "_material_id";
+            std::string materialId;
+            if (d_db_->ifExist(materialKey)) {
+                materialId = d_db_->getString(materialKey);
+            } else if (d_db_->ifExist("material_id")) {
+                materialId = d_db_->getString("material_id");
+            } else {
+                materialId = "default_material";
+            }
+
+            // Get material from manager and set to element
+            auto& materialManager = MaterialManager::getInstance();
+            if (materialManager.hasMaterial(materialId)) {
+                auto material = materialManager.getMaterial(materialId);
+                elementPointer->setMaterial(material);
+                std::cout << "设置材料: " << materialId << " 给 partId: " << partId << std::endl;
+            } else {
+                std::cout << "警告: 材料 " << materialId << " 未找到，使用默认材料" << std::endl;
+                // Optionally create a default linear elastic material
+                // auto defaultMaterial = std::make_shared<LinearElastic>("default", 0.0, 1.0e7, 0.3);
+                // elementPointer->setMaterial(defaultMaterial);
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "设置材料时出错: " << e.what() << std::endl;
+        }
+
         std::cout << "元素数量: " << elements.size() << std::endl;
 
 #pragma omp parallel

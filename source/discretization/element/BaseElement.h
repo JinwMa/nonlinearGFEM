@@ -13,6 +13,7 @@
 #include "DofMap.h"
 #include "Entity.h"
 
+class BaseMaterial;
 
 using DofTag = DofTypes::Dof_Tag;
 using EntityType = Entity::EntityType;
@@ -66,8 +67,14 @@ class BaseElement
         // 高斯点的参数坐标和权重，每个单元都一样，因此可用openmp并行
         std::vector<std::vector<double>> d_GaussPoints;
 
+        // Material access methods
+        void setMaterial(std::shared_ptr<BaseMaterial> material) { material_ = material; }
+        std::shared_ptr<BaseMaterial> getMaterial() const { return material_; }
+        bool hasMaterial() const { return material_ != nullptr; }
+
     protected:
-    
+        std::shared_ptr<BaseMaterial> material_;
+
 };
 
 
